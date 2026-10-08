@@ -1,5 +1,4 @@
 dist
-dist-ssr
 .wrangler
 .output
 .vercel
@@ -20,14 +19,6 @@ app.config.timestamp_*.js
 .classpath
 *.launch
 .settings/
-.vscode/*
-!.vscode/extensions.json
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
 
 # Temp
 gitignore
@@ -35,12 +26,3 @@ gitignore
 # System Files
 .DS_Store
 Thumbs.db
-
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
