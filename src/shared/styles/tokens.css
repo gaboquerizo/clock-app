@@ -1,6 +1,7 @@
 :root {
     --app-sidebar-expanded: var(--w-18);
     --app-sidebar-collapsed: var(--size-64);
+    --app-logo: var(--size-40);
 
     --app-space-L: var(--space-200);
     --app-space-M: var(--space-150);
@@ -10,9 +11,19 @@
     --app-radius-M: var(--radius-150);
     --app-radius-S: var(--radius-100);
 
-    /* Provisional */    
+    --app-solid-L: var(--border-solid-L);
+    --app-solid-M: var(--border-solid-M);
+    --app-solid-S: var(--border-solid-S);
+
+    /* Provisional */
     --app-bg-1: var(--slate-100);
     --app-bg-2: var(--slate-200);
+
+    --app-txt-1: var(--slate-800);
+    --app-accent: var(--blue-600);
+
+    --app-focus: var(--blue-300);
+    --app-offset: var(--size-04);
 }
 
 :root[data-theme="light"] {

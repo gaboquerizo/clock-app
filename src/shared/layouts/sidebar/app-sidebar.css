@@ -1,0 +1,90 @@
+.app-sidebar {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  padding: var(--app-space-M);
+  color: var(--app-txt-1);
+}
+
+.app-sidebar__header {
+  display: flex;
+  align-items: center;
+  gap: var(--app-space-S);
+  padding-block: var(--app-space-S) var(--app-space-L);
+}
+
+.app-logo_gaboquerizo {
+  flex: 0 0 auto;
+  width: var(--app-logo);
+  height: var(--app-logo);
+}
+
+.app-sidebar__brand {
+  font-size: var(--headline-L);
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.app-sidebar__nav {
+  flex: 1;
+  min-height: 0;
+}
+
+.app-sidebar__footer {
+  display: flex;
+  align-items: center;
+  padding-top: var(--app-space-M);
+}
+
+.app-sidebar__repository {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--app-space-S);
+  min-width: 0;
+  color: inherit;
+  font-size: var(--body-M);
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.app-sidebar__repository:hover {
+  color: var(--app-accent);
+}
+
+.app-sidebar__repository:focus-visible {
+  outline: var(--app-solid-M) var(--app-focus);
+  outline-offset: var(--app-offset);
+  border-radius: var(--app-radius-S);
+}
+
+.app-sidebar__github-icon {
+  flex: 0 0 auto;
+  width: var(--icon-M);
+  height: var(--icon-M);
+}
+
+@media (max-width: 768px) {
+  .app-sidebar {
+    align-items: center;
+    padding: var(--app-space-S);
+  }
+
+  .app-sidebar__header {
+    padding-block: 0 var(--app-space-L);
+  }
+
+  .app-sidebar__brand,
+  .app-sidebar__developer,
+  .app-sidebar__repository > span[aria-hidden='true'],
+  .app-sidebar__repository > time {
+    display: none;
+  }
+
+  .app-sidebar__footer {
+    padding-top: var(--app-space-M);
+  }
+}
