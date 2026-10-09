@@ -1,6 +1,7 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
 import 'solid-devtools';
+import './shared/styles/bluelabel.css';
 
 import AppRoot from './app/app-root';
 

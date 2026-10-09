@@ -1,7 +1,10 @@
+import './app-root.css';
+
 export default function AppRoot() {
   return (
-    <>
-      <h1>Clock App</h1>
-    </>
+    <div class="app-shell">
+      <aside class="app-shell__sidebar" />
+      <main class="app-shell__main" />
+    </div>
   );
 }
