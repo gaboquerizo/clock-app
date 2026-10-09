@@ -1,30 +1,3 @@
-@font-face {
-  font-family: 'Exo 2';
-  src: url('../assets/fonts/Exo2.woff2') format('woff2');
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-}
-
-:root {
-  font-family: 'Exo 2', sans-serif;
-  color: var(--slate-800);
-  background: var(--slate-300);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-}
-
-html,
-body {
-  min-width: 320px;
-  min-height: 100%;
-  margin: 0;
-}
-
-body {
-  background: var(--slate-300);
-}
-
 app-root {
   display: block;
   min-height: 100dvh;

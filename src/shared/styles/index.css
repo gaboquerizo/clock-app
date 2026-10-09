@@ -1,0 +1,14 @@
+@import url('./reset.css');
+@import url('./font.css');
+@import url('./bluelabel.css');
+
+html,
+body {
+    min-width: 320px;
+    min-height: 100%;
+    margin: 0;
+}
+
+body {
+    background: var(--slate-300);
+}

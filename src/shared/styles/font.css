@@ -1,0 +1,17 @@
+@font-face {
+    font-family: 'Exo 2';
+    src:url('../../assets/fonts/Exo2.woff2') format('woff2'),
+    url('../../assets/fonts/Exo2.woff') format('woff'),
+    url('../../assets/fonts/Exo2.ttf') format('ttf');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root, html, body {
+    --font-main: 'Exo 2';
+    font-family: var(--font-main),
+    system-ui,
+    -apple-system,
+    arial;
+}
