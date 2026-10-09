@@ -1,8 +1,11 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
 import 'solid-devtools';
-import './shared/styles/bluelabel.css';
 
+/*—————————— Styles ——————————*/
+import './shared/styles/main.css';
+
+/*—————————— Components ——————————*/
 import AppRoot from './app/app-root';
 
 const root = document.querySelector('app-root');

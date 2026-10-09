@@ -1,3 +1,4 @@
+/*—————————— Styles ——————————*/
 import './app-root.css';
 
 export default function AppRoot() {
