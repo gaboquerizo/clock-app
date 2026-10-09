@@ -1,0 +1,26 @@
+:root {
+    --app-sidebar-expanded: var(--w-18);
+    --app-sidebar-collapsed: var(--size-64);
+
+    --app-space-L: var(--space-200);
+    --app-space-M: var(--space-150);
+    --app-space-S: var(--space-100);
+
+    --app-radius-L: var(--radius-200);
+    --app-radius-M: var(--radius-150);
+    --app-radius-S: var(--radius-100);
+
+    /* Provisional */    
+    --app-bg-1: var(--slate-100);
+    --app-bg-2: var(--slate-200);
+}
+
+:root[data-theme="light"] {
+    --app-bg-1: var(--slate-100);
+    --app-bg-2: var(--slate-200);
+}
+
+:root[data-theme="dark"] {
+    --app-bg-1: var(--pearl-100);
+    --app-bg-2: var(--pearl-200);
+}

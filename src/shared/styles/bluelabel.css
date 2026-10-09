@@ -13,15 +13,15 @@
     --slate-800: #4A647D;
     --slate-900: #2D465A;
 
-    --mist-100: #F1F3F3;
-    --mist-200: #E3E7E8;
-    --mist-300: #D0D6D8;
-    --mist-400: #9CA8AB;
-    --mist-500: #67787C;
-    --mist-600: #4B585B;
-    --mist-700: #394447;
-    --mist-800: #22292B;
-    --mist-900: #161B1D;
+    --pearl-100: #0D0F14;
+    --pearl-200: #13161C;
+    --pearl-300: #1A1D24;
+    --pearl-400: #252930;
+    --pearl-500: #363B44;
+    --pearl-600: #5D6370;
+    --pearl-700: #898F9C;
+    --pearl-800: #A9AEB8;
+    --pearl-900: #CACED4;
 
     --blue-100: #D6F0FF;
     --blue-200: #B5E5FF;
@@ -133,7 +133,7 @@
     /* Shades Scale */
     --shadow-slate: 209.41  20%  50%;
     --shadow-slate-01:
-            0px 0.4px 0.8px 0px hsl(var(--shadow-slate) / 0.4);
+            0px 0.4px 0.8px 0px hsl(var(--shadow-slate) / 0.2);
     --shadow-slate-02:
             0px 2px 4px 0px hsl(var(--shadow-slate) / 0.2);
     --shadow-slate-03:
