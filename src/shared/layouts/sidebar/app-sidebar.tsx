@@ -1,3 +1,7 @@
+import { For } from 'solid-js';
+
+import { menuItems, type MenuItem } from '../../../app/menu-items';
+import AppIcon from '../../ui/ui-icon/ui-icon';
 import './app-sidebar.css';
 
 const repositoryUrl = 'https://github.com/gaboquerizo/clock-app';
@@ -31,6 +35,35 @@ function GitHubIcon() {
   );
 }
 
+function MenuItemContent(props: { item: MenuItem }) {
+  const content = (
+    <>
+      <AppIcon class="app-sidebar__menu-icon" name={props.item.icon} />
+      <span class="app-sidebar__menu-label">{props.item.label}</span>
+    </>
+  );
+
+  if (props.item.href) {
+    return (
+      <a
+        class="app-sidebar__menu-link app-sidebar__menu-link--available"
+        href={props.item.href}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <span
+      aria-disabled="true"
+      class="app-sidebar__menu-placeholder"
+    >
+      {content}
+    </span>
+  );
+}
+
 export default function AppSidebar() {
   const currentYear = new Date().getFullYear();
 
@@ -41,7 +74,18 @@ export default function AppSidebar() {
         <span class="app-sidebar__brand">Clock app</span>
       </header>
 
-      <nav aria-label="Main navigation" class="app-sidebar__nav" >
+      <nav aria-label="Navegación principal" class="app-sidebar__nav">
+        <ul class="app-sidebar__menu">
+          <For each={menuItems}>
+            {(item) => (
+              <li
+                class={`app-sidebar__menu-item${item.dividerBefore ? ' app-sidebar__menu-item--divider' : ''}`}
+              >
+                <MenuItemContent item={item} />
+              </li>
+            )}
+          </For>
+        </ul>
       </nav>
 
       <footer class="app-sidebar__footer">

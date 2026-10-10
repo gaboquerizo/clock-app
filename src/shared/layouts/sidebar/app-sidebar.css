@@ -4,7 +4,7 @@
   flex-direction: column;
   height: 100%;
   min-width: 0;
-  padding: var(--app-space-M);
+  padding: var(--app-space-L);
   color: var(--app-txt-1);
 }
 
@@ -12,7 +12,7 @@
   display: flex;
   align-items: center;
   gap: var(--app-space-S);
-  padding-block: var(--app-space-S) var(--app-space-L);
+  padding-block: var(--app-space-XS) var(--app-space-L);
 }
 
 .app-logo_gaboquerizo {
@@ -22,7 +22,7 @@
 }
 
 .app-sidebar__brand {
-  font-size: var(--headline-L);
+  font-size: var(--headline-M);
   font-weight: 400;
   line-height: 1;
   white-space: nowrap;
@@ -31,6 +31,72 @@
 .app-sidebar__nav {
   flex: 1;
   min-height: 0;
+}
+
+.app-sidebar__menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-space-XS);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.app-sidebar__menu-item {
+  display: flex;
+  min-width: 0;
+}
+
+.app-sidebar__menu-item--divider {
+  border-top: var(--app-solid-S) var(--app-bg-2);
+}
+
+.app-sidebar__menu-link,
+.app-sidebar__menu-placeholder {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--app-space-S);
+  width: 100%;
+  min-height: var(--app-logo);
+  padding: var(--app-space-S);
+  border-radius: var(--app-radius-S);
+  color: var(--app-txt-1);
+  font-size: var(--body-M);
+  line-height: 1.25;
+  text-decoration: none;
+}
+
+.app-sidebar__menu-link:hover {
+  background-color: var(--app-bg-2);
+  color: var(--app-accent);
+}
+
+.app-sidebar__menu-link--available {
+  background-color: var(--app-bg-2);
+  color: var(--app-accent);
+}
+
+.app-sidebar__menu-link:focus-visible {
+  outline: var(--app-solid-M) var(--app-focus);
+  outline-offset: var(--app-offset);
+}
+
+.app-sidebar__menu-placeholder {
+  opacity: 0.58;
+}
+
+.app-sidebar__menu-icon {
+  flex: 0 0 auto;
+  width: var(--icon-M);
+  height: var(--icon-M);
+}
+
+.app-sidebar__menu-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .app-sidebar__footer {
@@ -70,7 +136,7 @@
 @media (max-width: 768px) {
   .app-sidebar {
     align-items: center;
-    padding: var(--app-space-S);
+    padding: var(--app-space-S) var(--app-space-XS);
   }
 
   .app-sidebar__header {
@@ -81,6 +147,19 @@
   .app-sidebar__developer,
   .app-sidebar__repository > span[aria-hidden='true'],
   .app-sidebar__repository > time {
+    display: none;
+  }
+
+  .app-sidebar__menu-link,
+  .app-sidebar__menu-placeholder {
+    justify-content: center;
+    padding-inline: 0;
+  }
+  .app-sidebar__nav {
+    width: 100%;
+  }
+
+  .app-sidebar__menu-label {
     display: none;
   }
 

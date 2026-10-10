@@ -15,7 +15,7 @@ app-root {
 
 .app-shell__sidebar {
   min-width: 0;
-  border-radius: var(--app-radius-S);
+  border-radius: var(--app-radius-M);
   background-color: var(--app-bg-1);
 }
 
