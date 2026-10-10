@@ -1,12 +1,16 @@
 :root {
     --app-sidebar-expanded: var(--w-18);
     --app-sidebar-collapsed: var(--size-64);
+    --app-sidebar-menu-gap: var(--space-025);
     --app-logo: var(--size-40);
 
     --app-space-L: var(--space-200);
     --app-space-M: var(--space-150);
     --app-space-S: var(--space-100);
-    --app-space-XS: var(--space-025);
+
+    --app-gap-L: var(--space-075);
+    --app-gap-M: var(--space-050);
+    --app-gap-S: var(--space-025);
 
     --app-radius-L: var(--radius-200);
     --app-radius-M: var(--radius-150);
@@ -23,8 +27,8 @@
     --app-txt-1: var(--slate-800);
     --app-accent: var(--blue-600);
 
-    --app-focus: var(--blue-300);
-    --app-offset: var(--size-04);
+    --app-focus: var(--blue-400);
+    --app-offset: var(--size-02);
 }
 
 :root[data-theme="light"] {

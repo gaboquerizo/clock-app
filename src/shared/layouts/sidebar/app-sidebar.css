@@ -12,7 +12,7 @@
   display: flex;
   align-items: center;
   gap: var(--app-space-S);
-  padding-block: var(--app-space-XS) var(--app-space-L);
+  padding-bottom: var(--app-space-L);
 }
 
 .app-logo_gaboquerizo {
@@ -36,7 +36,7 @@
 .app-sidebar__menu {
   display: flex;
   flex-direction: column;
-  gap: var(--app-space-XS);
+  gap: var(--app-gap-S);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -56,10 +56,10 @@
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: var(--app-space-S);
+  gap: var(--app-gap-L);
   width: 100%;
   min-height: var(--app-logo);
-  padding: var(--app-space-S);
+  padding: var(--app-gap-L) var(--app-space-S);
   border-radius: var(--app-radius-S);
   color: var(--app-txt-1);
   font-size: var(--body-M);
@@ -136,11 +136,11 @@
 @media (max-width: 768px) {
   .app-sidebar {
     align-items: center;
-    padding: var(--app-space-S) var(--app-space-XS);
+    padding: var(--app-space-M) var(--app-gap-M);
   }
 
   .app-sidebar__header {
-    padding-block: 0 var(--app-space-L);
+    padding-bottom: var(--app-space-M);
   }
 
   .app-sidebar__brand,
@@ -154,7 +154,9 @@
   .app-sidebar__menu-placeholder {
     justify-content: center;
     padding-inline: 0;
+    border-radius: var(--app-radius-L);
   }
+  
   .app-sidebar__nav {
     width: 100%;
   }

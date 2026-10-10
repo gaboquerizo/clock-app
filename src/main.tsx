@@ -6,7 +6,7 @@ import 'solid-devtools';
 import './shared/styles/main.css';
 
 /*—————————— Components ——————————*/
-import AppRoot from './app/app-root';
+import AppRoutes from './app/routes/app.routes';
 
 const root = document.querySelector('app-root');
 
@@ -16,4 +16,4 @@ if (!(root instanceof HTMLElement)) {
   );
 }
 
-render(() => <AppRoot />, root);
+render(() => <AppRoutes />, root);
