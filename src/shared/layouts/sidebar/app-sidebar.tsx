@@ -1,4 +1,5 @@
 import { For } from 'solid-js';
+import { A } from '@solidjs/router';
 
 import { menuItems, type MenuItem } from '../../../app/menu-items';
 import AppIcon from '../../ui/ui-icon/ui-icon';
@@ -45,12 +46,14 @@ function MenuItemContent(props: { item: MenuItem }) {
 
   if (props.item.href) {
     return (
-      <a
-        class="app-sidebar__menu-link app-sidebar__menu-link--available"
+      <A
+        class="app-sidebar__menu-link"
+        activeClass="app-sidebar__menu-link--active"
+        end
         href={props.item.href}
       >
         {content}
-      </a>
+      </A>
     );
   }
 

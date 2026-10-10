@@ -72,7 +72,7 @@
   color: var(--app-accent);
 }
 
-.app-sidebar__menu-link--available {
+.app-sidebar__menu-link--active {
   background-color: var(--app-bg-2);
   color: var(--app-accent);
 }
