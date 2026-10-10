@@ -1,7 +1,9 @@
 /*—————————— Library ——————————*/
 import type { RouteSectionProps } from '@solidjs/router';
+
 /*—————————— Styles ——————————*/
 import './app-root.css';
+
 /*—————————— Components ——————————*/
 import AppSidebar from '../shared/layouts/sidebar/app-sidebar';
 

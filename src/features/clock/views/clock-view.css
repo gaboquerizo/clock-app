@@ -15,10 +15,13 @@
 }
 
 .clock-view__display {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: var(--app-space-L);
   min-height: 0;
-  place-items: center;
   padding-block: var(--app-space-L);
 }
 
@@ -31,8 +34,62 @@
   white-space: nowrap;
 }
 
+.clock-view__timezone {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--app-space-M);
+  width: min(100%, var(--w-28));
+  margin: 0;
+  padding: var(--app-gap-L) var(--app-space-M);
+  border-radius: var(--app-radius-L);
+  background-color: var(--app-bg-1);
+  color: var(--app-txt-1);
+}
+
+.clock-view__timezone-item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--app-gap-M);
+  min-width: 0;
+  margin: 0;
+}
+
+.clock-view__timezone-item + .clock-view__timezone-item {
+  padding-inline-start: var(--app-space-M);
+  border-inline-start: var(--app-solid-S) solid var(--app-bg-2);
+}
+
+.clock-view__timezone dt {
+  color: var(--app-txt-1);
+  font-size: var(--body-S);
+}
+
+.clock-view__timezone dd {
+  margin: 0;
+  color: var(--app-txt-1);
+  font-size: var(--body-M);
+  overflow-wrap: anywhere;
+  white-space: nowrap;
+}
+
 @media (max-width: 768px) {
   .clock-view__time {
     font-size: var(--display-mobile-L);
+  }
+
+  .clock-view__timezone {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .clock-view__timezone-item + .clock-view__timezone-item {
+    width: 100%;
+    padding-block-start: var(--app-gap-L);
+    padding-inline-start: 0;
+    border-block-start: var(--app-solid-S) solid var(--app-bg-2);
+    border-inline-start: 0;
   }
 }
