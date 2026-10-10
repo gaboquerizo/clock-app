@@ -2,7 +2,10 @@
 import { createSignal, onCleanup, onMount } from 'solid-js';
 
 /*—————————— Functions ——————————*/
-import { formatLocalClockTime } from '../../../core/time/clock';
+import {
+  formatLocalClockDate,
+  formatLocalClockTime,
+} from '../../../core/time/clock';
 import {
   formatLocalGmtOffset,
   getDeviceTimeZone,
@@ -11,6 +14,7 @@ import {
 const localClockUpdateInterval = 1000;
 
 type LocalClockState = {
+  date: string;
   gmtOffset: string;
   time: string;
   timeZone: string;
@@ -18,6 +22,7 @@ type LocalClockState = {
 
 function getLocalClockState(timestamp: number): LocalClockState {
   return {
+    date: formatLocalClockDate(timestamp),
     gmtOffset: formatLocalGmtOffset(timestamp),
     time: formatLocalClockTime(timestamp),
     timeZone: getDeviceTimeZone(),

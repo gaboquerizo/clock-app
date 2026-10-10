@@ -34,18 +34,31 @@
   white-space: nowrap;
 }
 
-.clock-view__timezone {
-  box-sizing: border-box;
+.clock-view__context {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   gap: var(--app-space-M);
-  width: min(100%, var(--w-28));
+  width: min(100%, var(--w-56));
+}
+
+.clock-view__timezone,
+.clock-view__date {
+  box-sizing: border-box;
+  flex: 1;
+  min-width: 0;
   margin: 0;
   padding: var(--app-gap-L) var(--app-space-M);
   border-radius: var(--app-radius-L);
   background-color: var(--app-bg-1);
   color: var(--app-txt-1);
+}
+
+.clock-view__timezone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--app-space-M);
 }
 
 .clock-view__timezone-item {
@@ -74,15 +87,30 @@
   white-space: nowrap;
 }
 
+.clock-view__date {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-size: var(--body-M);
+}
+
 @media (max-width: 768px) {
   .clock-view__time {
     font-size: var(--display-mobile-L);
   }
 
-  .clock-view__timezone {
+  .clock-view__context {
     flex-direction: column;
-    align-items: flex-start;
     width: 100%;
+  }
+
+  .clock-view__timezone,
+  .clock-view__date {
+    width: 100%;
+  }
+
+  .clock-view__timezone {
+    align-items: flex-start;
   }
 
   .clock-view__timezone-item + .clock-view__timezone-item {

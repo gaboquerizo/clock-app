@@ -20,16 +20,24 @@ export default function ClockView() {
         >
           {localClock().time}
         </time>
-        <dl class="clock-view__timezone">
-          <div class="clock-view__timezone-item">
-            <dt>Zona horaria del dispositivo</dt>
-            <dd>{localClock().timeZone}</dd>
-          </div>
-          <div class="clock-view__timezone-item">
-            <dt>Desplazamiento</dt>
-            <dd>{localClock().gmtOffset}</dd>
-          </div>
-        </dl>
+        <div class="clock-view__context">
+          <dl class="clock-view__timezone">
+            <div class="clock-view__timezone-item">
+              <dt>Zona horaria local</dt>
+              <dd>{localClock().timeZone}</dd>
+            </div>
+            <div class="clock-view__timezone-item">
+              <dt>Desplazamiento</dt>
+              <dd>{localClock().gmtOffset}</dd>
+            </div>
+          </dl>
+          <time
+            aria-label={`Fecha local: ${localClock().date}`}
+            class="clock-view__date"
+          >
+            {localClock().date}
+          </time>
+        </div>
       </div>
     </section>
   );
