@@ -1,4 +1,4 @@
-/*—————————— Libraries ——————————*/
+/*—————————— Library ——————————*/
 import type { RouteSectionProps } from '@solidjs/router';
 /*—————————— Styles ——————————*/
 import './app-root.css';

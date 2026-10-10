@@ -1,3 +1,4 @@
+/*—————————— Types ——————————*/
 import type { IconName } from '../shared/ui/ui-icon/ui-icon';
 
 export type MenuItem = {

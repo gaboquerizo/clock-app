@@ -1,5 +1,7 @@
 .clock-view {
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   min-height: 100%;
   padding: var(--app-space-L) var(--app-space-S);
 }
@@ -10,4 +12,27 @@
   font-size: var(--headline-L);
   font-weight: 400;
   line-height: 1.2;
+}
+
+.clock-view__display {
+  display: grid;
+  flex: 1;
+  min-height: 0;
+  place-items: center;
+  padding-block: var(--app-space-L);
+}
+
+.clock-view__time {
+  color: var(--app-txt-1);
+  font-size: var(--display-L);
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .clock-view__time {
+    font-size: var(--display-mobile-L);
+  }
 }

@@ -1,4 +1,4 @@
-/* @refresh reload */
+/*—————————— Library ——————————*/
 import { render } from 'solid-js/web';
 import 'solid-devtools';
 
