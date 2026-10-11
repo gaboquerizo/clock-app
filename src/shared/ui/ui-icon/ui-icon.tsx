@@ -1,6 +1,8 @@
 export type IconName =
   | 'proicons:clock'
+  | 'proicons:calendar'
   | 'proicons:alarm-clock'
+  | 'proicons:globe'
   | 'proicons:pie-chart'
   | 'proicons:hourglass'
   | 'proicons:history'
@@ -26,6 +28,28 @@ function renderIcon(name: IconName) {
           <path d="M21.25 12a9.25 9.25 0 1 1-18.5 0a9.25 9.25 0 0 1 18.5 0" />
           <path d="M11.25 6.75v6h4" />
         </g>
+      );
+    case 'proicons:calendar':
+      return (
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          d="M17.25 4.75H6.75a3.5 3.5 0 0 0-3.5 3.5v9.5a3.5 3.5 0 0 0 3.5 3.5h10.5a3.5 3.5 0 0 0 3.5-3.5v-9.5a3.5 3.5 0 0 0-3.5-3.5m-14 4.5h17.5M7.361 4.75v-2m9.25 2v-2"
+        />
+      );
+    case 'proicons:globe':
+      return (
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          d="M21.25 12A9.25 9.25 0 0 0 12 2.75M21.25 12H2.75m18.5 0A9.25 9.25 0 0 1 12 21.25m0-18.5A9.25 9.25 0 0 0 2.75 12M12 2.75c-.5 0-4 4.141-4 9.25s3.5 9.25 4 9.25m0-18.5c.5 0 4 4.141 4 9.25s-3.5 9.25-4 9.25M2.75 12A9.25 9.25 0 0 0 12 21.25"
+        />
       );
     case 'proicons:alarm-clock':
       return (
