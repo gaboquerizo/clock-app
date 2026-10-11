@@ -26,22 +26,15 @@ export default function ClockView() {
             aria-label="Información de zona horaria"
             class="clock-view__timezone"
           >
-            <div class="clock-view__timezone-item">
+            
               <AppIcon class="clock-view__timezone-icon" name="proicons:globe" />
               <div class="clock-view__timezone-content">
                 <span class="clock-view__timezone-value">
-                  {localClock().timeZone}
+                  {localClock().timeZone} ({localClock().gmtOffset})
                 </span>
               </div>
-            </div>
-            <div class="clock-view__timezone-item">
-              <AppIcon class="clock-view__timezone-icon" name="proicons:clock" />
-              <div class="clock-view__timezone-content">
-                <span class="clock-view__timezone-value">
-                  {localClock().gmtOffset}
-                </span>
-              </div>
-            </div>
+            
+            
           </div>
           <time
             aria-label={`Fecha local: ${localClock().date}`}
