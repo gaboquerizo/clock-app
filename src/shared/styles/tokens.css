@@ -25,6 +25,8 @@
     --app-bg-2: var(--slate-200);
 
     --app-txt-1: var(--slate-800);
+    --app-txt-2: var(--slate-700);
+    --app-txt-3: var(--slate-600);
     --app-accent: var(--blue-600);
 
     --app-focus: var(--blue-400);

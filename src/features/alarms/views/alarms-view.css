@@ -59,13 +59,3 @@
   width: var(--icon-M);
   height: var(--icon-M);
 }
-
-@media (max-width: 768px) {
-  .alarms-view__content {
-    align-items: flex-start;
-  }
-
-  .alarms-view__add-button {
-    width: 100%;
-  }
-}

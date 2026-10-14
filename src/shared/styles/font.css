@@ -3,7 +3,7 @@
     src:url('../../assets/fonts/Exo2.woff2') format('woff2'),
     url('../../assets/fonts/Exo2.woff') format('woff'),
     url('../../assets/fonts/Exo2.ttf') format('ttf');
-    font-weight: 100 900;
+    font-weight: normal;
     font-style: normal;
     font-display: swap;
 }
