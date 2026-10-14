@@ -68,13 +68,16 @@
 }
 
 .app-sidebar__menu-link:hover {
-  background-color: var(--app-bg-2);
-  color: var(--app-accent);
+  background-color: rgb(from var(--app-bg-2) r g b / 40%);
 }
 
 .app-sidebar__menu-link--active {
   background-color: var(--app-bg-2);
   color: var(--app-accent);
+}
+
+.app-sidebar__menu-link--active:hover {
+  background-color: var(--app-bg-2);
 }
 
 .app-sidebar__menu-link:focus-visible {

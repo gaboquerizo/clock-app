@@ -3,6 +3,7 @@ import { Navigate, Router, type RouteDefinition } from '@solidjs/router';
 import { createComponent } from 'solid-js';
 
 /*—————————— Functions ——————————*/
+import AlarmsView from '../../features/alarms/views/alarms-view';
 import ClockView from '../../features/clock/views/clock-view';
 import AppRoot from '../app-root';
 
@@ -14,6 +15,10 @@ export const appRoutes: RouteDefinition[] = [
   {
     path: '/clock',
     component: ClockView,
+  },
+  {
+    path: '/alarms',
+    component: AlarmsView,
   },
 ];
 
