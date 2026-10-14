@@ -1,7 +1,15 @@
 .alarms-view {
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   min-height: 100%;
   padding: var(--app-space-L) var(--app-space-S);
+}
+
+.alarms-view__header {
+  display: flex;
+  align-items: center;
+  min-height: var(--app-logo);
 }
 
 .alarms-view__title {
@@ -10,4 +18,54 @@
   font-size: var(--headline-L);
   font-weight: 400;
   line-height: 1.2;
+}
+
+.alarms-view__content {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding-block: var(--app-space-L);
+}
+
+.alarms-view__add-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--app-gap-L);
+  min-height: var(--app-logo);
+  padding: var(--app-gap-L) var(--app-space-M);
+  border: 0;
+  border-radius: var(--app-radius-S);
+  background-color: var(--app-accent);
+  color: var(--app-bg-1);
+  cursor: pointer;
+  font-size: var(--body-M);
+  line-height: 1.25;
+}
+
+.alarms-view__add-button:hover {
+  filter: brightness(1.08);
+}
+
+.alarms-view__add-button:focus-visible {
+  outline: var(--app-solid-M) var(--app-focus);
+  outline-offset: var(--app-offset);
+}
+
+.alarms-view__add-icon {
+  flex: 0 0 auto;
+  width: var(--icon-M);
+  height: var(--icon-M);
+}
+
+@media (max-width: 768px) {
+  .alarms-view__content {
+    align-items: flex-start;
+  }
+
+  .alarms-view__add-button {
+    width: 100%;
+  }
 }

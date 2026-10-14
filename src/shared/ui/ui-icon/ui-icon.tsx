@@ -1,4 +1,5 @@
 export type IconName =
+  | 'proicons:add'
   | 'proicons:clock'
   | 'proicons:calendar'
   | 'proicons:alarm-clock'
@@ -16,6 +17,16 @@ type UiIconProps = {
 
 function renderIcon(name: IconName) {
   switch (name) {
+    case 'proicons:add':
+      return (
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-width="1.5"
+          d="M12 2.75v18.5M2.75 12h18.5"
+        />
+      );
     case 'proicons:clock':
       return (
         <g
