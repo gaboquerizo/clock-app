@@ -25,6 +25,11 @@ export type CreateAlarmInput = {
   createdAt: number;
 };
 
+export type UpdateAlarmInput = {
+  time: string;
+  label?: string;
+};
+
 export type AlarmTransition = 'enable' | 'disable' | 'trigger' | 'skip';
 
 export type AlarmField =
@@ -48,6 +53,7 @@ export type AlarmErrorCode =
   | 'invalid-timestamp'
   | 'duplicate-id'
   | 'duplicate-time'
+  | 'not-found'
   | 'invalid-transition';
 
 export type AlarmDomainError = {
