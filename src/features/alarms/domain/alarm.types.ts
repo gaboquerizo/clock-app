@@ -10,6 +10,7 @@ export type Alarm = {
   label: AlarmLabel;
   enabled: boolean;
   status: AlarmStatus;
+  order: number;
   createdAt: number;
   updatedAt: number;
   triggeredAt?: number;
@@ -20,17 +21,30 @@ export type CreateAlarmInput = {
   id: string;
   time: string;
   label?: string;
+  order: number;
   createdAt: number;
 };
 
 export type AlarmTransition = 'enable' | 'disable' | 'trigger' | 'skip';
 
-export type AlarmField = 'id' | 'time' | 'label' | 'createdAt' | 'updatedAt';
+export type AlarmField =
+  | 'id'
+  | 'time'
+  | 'label'
+  | 'enabled'
+  | 'status'
+  | 'order'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'triggeredAt'
+  | 'skippedAt';
 
 export type AlarmErrorCode =
   | 'invalid-id'
   | 'invalid-time'
   | 'invalid-label'
+  | 'invalid-order'
+  | 'invalid-state'
   | 'invalid-timestamp'
   | 'duplicate-id'
   | 'duplicate-time'

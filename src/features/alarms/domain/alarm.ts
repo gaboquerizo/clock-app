@@ -47,6 +47,7 @@ export function createAlarm(
       label: validatedInput.value.label,
       enabled: true,
       status: 'scheduled',
+      order: validatedInput.value.order,
       createdAt: validatedInput.value.createdAt,
       updatedAt: validatedInput.value.createdAt,
     },
@@ -77,7 +78,7 @@ export function transitionAlarm(
   transition: AlarmTransition,
   timestamp: number,
 ): AlarmResult<Alarm> {
-  if (!isValidTimestamp(timestamp)) {
+  if (!isValidTimestamp(timestamp) || timestamp < alarm.updatedAt) {
     return failure('invalid-timestamp');
   }
 
