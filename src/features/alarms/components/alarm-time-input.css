@@ -1,0 +1,102 @@
+.alarm-time-input {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--app-space-S);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.alarm-time-input__legend,
+.alarm-time-input__visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.alarm-time-input__unit {
+  display: grid;
+  grid-template-rows: var(--icon-L) auto var(--icon-L);
+  justify-items: center;
+  min-width: 0;
+}
+
+.alarm-time-input__step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-40);
+  height: var(--icon-L);
+  padding: 0;
+  border: 0;
+  border-radius: var(--app-radius-S);
+  background: transparent;
+  color: var(--app-txt-3);
+  cursor: pointer;
+}
+
+.alarm-time-input__step:hover {
+  background-color: var(--app-bg-2);
+  color: var(--app-accent);
+}
+
+.alarm-time-input__step:focus-visible {
+  outline: var(--app-solid-M) var(--app-focus);
+  outline-offset: var(--app-offset);
+}
+
+.alarm-time-input__step-icon {
+  width: var(--icon-S);
+  height: var(--icon-S);
+}
+
+.alarm-time-input__field-label {
+  display: block;
+}
+
+.alarm-time-input__field {
+  box-sizing: border-box;
+  width: var(--size-80);
+  height: var(--size-80);
+  padding: var(--app-gap-M);
+  border: var(--app-solid-S) var(--app-bg-2);
+  border-radius: var(--app-radius-S);
+  background-color: var(--app-bg-2);
+  color: var(--app-txt-1);
+  font-size: var(--display-L);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: center;
+}
+
+.alarm-time-input__field:hover {
+  border-color: var(--app-focus);
+}
+
+.alarm-time-input__field:focus {
+  border-color: var(--app-focus);
+  outline: var(--app-solid-M) var(--app-focus);
+  outline-offset: var(--app-offset);
+}
+
+.alarm-time-input__separator {
+  color: var(--app-txt-2);
+  font-size: var(--display-L);
+  line-height: 1;
+}
+
+@media (max-width: 420px) {
+  .alarm-time-input__field {
+    width: var(--size-64);
+    height: var(--size-64);
+    font-size: var(--display-M);
+  }
+}
