@@ -3,7 +3,7 @@ import { For, onMount, Show } from 'solid-js';
 import './alarms-view.css';
 
 import type { Alarm } from '../domain/alarm.types';
-import AlarmCard from '../components/alarm-card';
+import AlarmCard from '../components/alarm-card/alarm-card';
 import { createAlarmsState } from '../state/alarms-state';
 import AppIcon from '../../../shared/ui/ui-icon/ui-icon';
 import UiEmptyState from '../../../shared/ui/ui-empty-state/ui-empty-state';
