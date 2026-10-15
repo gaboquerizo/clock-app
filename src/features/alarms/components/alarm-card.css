@@ -1,0 +1,62 @@
+.alarm-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: var(--size-144);
+  padding: var(--app-space-M);
+  border: var(--app-solid-S) var(--app-bg-2);
+  border-radius: var(--app-radius-L);
+  background-color: var(--app-bg-1);
+  color: var(--app-txt-1);
+}
+
+.alarm-card--disabled {
+  color: var(--app-txt-3);
+  opacity: 0.62;
+}
+
+.alarm-card__time {
+  color: inherit;
+  font-size: var(--display-L);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.alarm-card__label {
+  min-width: 0;
+  margin: var(--app-gap-L) 0 0;
+  overflow: hidden;
+  color: inherit;
+  font-size: var(--body-M);
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.alarm-card__status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--app-gap-M);
+  margin-top: auto;
+  padding-top: var(--app-space-S);
+  color: var(--app-accent);
+  font-size: var(--body-S);
+  line-height: 1.25;
+}
+
+.alarm-card--disabled .alarm-card__status {
+  color: inherit;
+}
+
+.alarm-card__status-icon {
+  flex: 0 0 auto;
+  width: var(--icon-S);
+  height: var(--icon-S);
+}
+
+@media (max-width: 768px) {
+  .alarm-card__time {
+    font-size: var(--display-mobile-L);
+  }
+}

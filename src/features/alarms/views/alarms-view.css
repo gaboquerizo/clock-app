@@ -29,6 +29,28 @@
   padding-block: var(--app-space-L);
 }
 
+.alarms-view__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--w-18)), 1fr));
+  align-content: start;
+  gap: var(--app-space-S);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.alarms-view__list-item {
+  min-width: 0;
+}
+
+.alarms-view__message {
+  margin: 0;
+  color: var(--app-txt-2);
+  font-size: var(--body-M);
+  text-align: center;
+}
+
 .alarms-view__add-button {
   display: inline-flex;
   align-items: center;
