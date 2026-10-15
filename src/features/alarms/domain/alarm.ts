@@ -1,3 +1,4 @@
+/*—————————— Functions ——————————*/
 import {
   hasDuplicateAlarmId,
   hasDuplicateAlarmTime,
@@ -6,6 +7,8 @@ import {
   normalizeAlarmLabel,
   validateCreateAlarmInput,
 } from './alarm.rules';
+
+/*—————————— Types ——————————*/
 import type {
   Alarm,
   AlarmResult,

@@ -1,3 +1,4 @@
+/*—————————— Library ——————————*/
 import {
   createEffect,
   createSignal,
@@ -6,11 +7,15 @@ import {
   Switch,
 } from 'solid-js';
 
+/*—————————— Types ——————————*/
 import type { Alarm } from '../../domain/alarm.types';
+
+/*—————————— Components ——————————*/
 import AlarmTimeInput from '../alarm-time-input/alarm-time-input';
 import UiDialog from '../../../../shared/ui/ui-dialog/ui-dialog';
 import AppIcon from '../../../../shared/ui/ui-icon/ui-icon';
 
+/*—————————— Styles ——————————*/
 import './alarm-dialog.css';
 
 export type AlarmDialogMode = 'create' | 'edit' | 'confirm-delete';

@@ -1,3 +1,4 @@
+/*—————————— Library ——————————*/
 import {
   createEffect,
   createUniqueId,
@@ -5,6 +6,7 @@ import {
   type ParentProps,
 } from 'solid-js';
 
+/*—————————— Styles ——————————*/
 import './ui-dialog.css';
 
 export type UiDialogProps = ParentProps<{

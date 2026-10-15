@@ -1,4 +1,7 @@
+/*—————————— Function ——————————*/
 import { validateAlarm } from '../domain/alarm.rules';
+
+/*—————————— Types ——————————*/
 import type { Alarm, AlarmResult, AlarmStatus } from '../domain/alarm.types';
 
 export const ALARMS_DATABASE_NAME = 'clock-app';

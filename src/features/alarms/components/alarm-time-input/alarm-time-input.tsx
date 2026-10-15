@@ -1,7 +1,10 @@
+/*—————————— Library ——————————*/
 import { createSignal, createUniqueId } from 'solid-js';
 
+/*—————————— Components ——————————*/
 import AppIcon from '../../../../shared/ui/ui-icon/ui-icon';
 
+/*—————————— Styles ——————————*/
 import './alarm-time-input.css';
 
 type TimeUnit = 'hours' | 'minutes';

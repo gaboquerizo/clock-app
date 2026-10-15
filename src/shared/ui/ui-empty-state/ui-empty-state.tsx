@@ -1,7 +1,10 @@
+/*—————————— Library ——————————*/
 import { createUniqueId, type ParentProps } from 'solid-js';
 
+/*—————————— Components ——————————*/
 import AppIcon, { type IconName } from '../ui-icon/ui-icon';
 
+/*—————————— Styles ——————————*/
 import './ui-empty-state.css';
 
 type UiEmptyStateProps = ParentProps<{

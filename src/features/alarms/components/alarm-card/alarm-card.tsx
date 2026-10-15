@@ -1,7 +1,10 @@
+/*—————————— Types ——————————*/
 import type { Alarm } from '../../domain/alarm.types';
 
+/*—————————— Components ——————————*/
 import AppIcon from '../../../../shared/ui/ui-icon/ui-icon';
 
+/*—————————— Styles ——————————*/
 import './alarm-card.css';
 
 type AlarmCardProps = {

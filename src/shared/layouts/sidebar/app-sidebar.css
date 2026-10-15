@@ -68,7 +68,7 @@
 }
 
 .app-sidebar__menu-link:hover {
-  background-color: rgb(from var(--app-bg-2) r g b / 40%);
+  background-color: rgb(from var(--app-bg-2) r g b / 50%);
 }
 
 .app-sidebar__menu-link--active {

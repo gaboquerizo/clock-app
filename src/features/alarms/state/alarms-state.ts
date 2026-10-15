@@ -1,3 +1,4 @@
+/*—————————— Library ——————————*/
 import { createStore } from 'solid-js/store';
 
 import {

@@ -1,3 +1,4 @@
+/*—————————— Middleware ——————————*/
 import {
   IndexedDbError,
   openIndexedDb,
@@ -8,7 +9,11 @@ import {
   hasDuplicateAlarmTime,
   validateAlarm,
 } from '../domain/alarm.rules';
+
+/*—————————— Types ——————————*/
 import type { Alarm, AlarmResult } from '../domain/alarm.types';
+
+/*—————————— Middleware ——————————*/
 import {
   ALARMS_DATABASE_NAME,
   ALARMS_DATABASE_VERSION,
