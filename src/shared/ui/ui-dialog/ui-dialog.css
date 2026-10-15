@@ -1,0 +1,50 @@
+.ui-dialog {
+  width: min(calc(100% - var(--app-space-L)), var(--w-20));
+  max-width: var(--w-20);
+  padding: 0;
+  border: 0;
+  border-radius: var(--app-radius-L);
+  background-color: var(--app-bg-1);
+  box-shadow: var(--shadow-slate-05);
+  color: var(--app-txt-1);
+}
+
+.ui-dialog::backdrop {
+  background-color: rgb(from var(--app-txt-1) r g b / 42%);
+}
+
+.ui-dialog__surface {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ui-dialog__header {
+  padding: var(--app-space-M) var(--app-space-M) 0;
+}
+
+.ui-dialog__title {
+  margin: 0;
+  color: var(--app-txt-1);
+  font-size: var(--headline-M);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.ui-dialog__description {
+  margin: var(--app-gap-S) 0 0;
+  color: var(--app-txt-2);
+  font-size: var(--body-S);
+  line-height: 1.25;
+}
+
+.ui-dialog__content {
+  min-width: 0;
+  padding: var(--app-space-M);
+}
+
+@media (max-width: 420px) {
+  .ui-dialog {
+    width: min(calc(100% - var(--app-space-S)), var(--w-20));
+  }
+}

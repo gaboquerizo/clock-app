@@ -10,7 +10,9 @@ export type IconName =
   | 'proicons:settings'
   | 'proicons:timer'
   | 'proicons:chevron-up'
-  | 'proicons:chevron-down';
+  | 'proicons:chevron-down'
+  | 'proicons:edit'
+  | 'proicons:delete';
 
 type UiIconProps = {
   name: IconName;
@@ -159,6 +161,28 @@ function renderIcon(name: IconName) {
           stroke-linejoin="round"
           stroke-width="1.5"
           d="m5.5 9l6.5 6.5L18.5 9"
+        />
+      );
+    case 'proicons:edit':
+      return (
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          d="M14.45 5.55L18.45 9.55M4.25 19.75l3.78-.83L20.08 6.87a2 2 0 0 0-2.83-2.83L5.2 16.09z"
+        />
+      );
+    case 'proicons:delete':
+      return (
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          d="M4.75 7.25h14.5m-9.5 4v5m4.5-5v5M9 4.25h6l1 3H8zM6.25 7.25l.75 13h10l.75-13"
         />
       );
   }

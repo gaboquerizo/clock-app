@@ -1,6 +1,6 @@
 import { createSignal, createUniqueId } from 'solid-js';
 
-import AppIcon from '../../../shared/ui/ui-icon/ui-icon';
+import AppIcon from '../../../../shared/ui/ui-icon/ui-icon';
 
 import './alarm-time-input.css';
 
