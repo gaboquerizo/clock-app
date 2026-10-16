@@ -1,4 +1,4 @@
-import { createSignal, For, onMount, Show } from 'solid-js';
+import { createSignal, For, Show } from 'solid-js';
 
 import './alarms-view.css';
 
@@ -9,7 +9,8 @@ import AlarmDialog, {
   type AlarmDialogMode,
   type AlarmDialogValue,
 } from '../components/alarm-dialog/alarm-dialog';
-import { createAlarmsState, type AlarmsStateError } from '../state/alarms-state';
+import { useAlarmsState } from '../state/alarms-context';
+import type { AlarmsStateError } from '../state/alarms-state';
 import AppIcon from '../../../shared/ui/ui-icon/ui-icon';
 import UiEmptyState from '../../../shared/ui/ui-empty-state/ui-empty-state';
 
@@ -67,7 +68,7 @@ function AlarmList(props: {
 }
 
 export default function AlarmsView() {
-  const alarms = createAlarmsState();
+  const alarms = useAlarmsState();
   const [dialogOpen, setDialogOpen] = createSignal(false);
   const [dialogMode, setDialogMode] = createSignal<AlarmDialogMode>('create');
   const [selectedAlarmId, setSelectedAlarmId] = createSignal<string | undefined>(
@@ -204,10 +205,6 @@ export default function AlarmsView() {
       setToggling(alarm.id, false);
     }
   };
-
-  onMount(() => {
-    void alarms.actions.load();
-  });
 
   return (
     <section aria-labelledby="alarms-view-title" class="alarms-view">
