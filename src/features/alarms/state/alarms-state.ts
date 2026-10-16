@@ -103,12 +103,46 @@ function defaultCreateId(): string {
 
 function sortAlarms(alarms: readonly Alarm[]): Alarm[] {
   return [...alarms].sort((first, second) => {
+    const firstNextActivation = getNextActivationForOrdering(first);
+    const secondNextActivation = getNextActivationForOrdering(second);
+
+    if (
+      firstNextActivation !== undefined &&
+      secondNextActivation !== undefined
+    ) {
+      if (firstNextActivation !== secondNextActivation) {
+        return firstNextActivation - secondNextActivation;
+      }
+    } else if (firstNextActivation !== undefined) {
+      return -1;
+    } else if (secondNextActivation !== undefined) {
+      return 1;
+    }
+
     if (first.order !== second.order) {
       return first.order - second.order;
     }
 
-    return first.time.localeCompare(second.time);
+    const timeOrder = first.time.localeCompare(second.time);
+
+    if (timeOrder !== 0) {
+      return timeOrder;
+    }
+
+    return first.id.localeCompare(second.id);
   });
+}
+
+function getNextActivationForOrdering(alarm: Alarm): number | undefined {
+  if (
+    !alarm.enabled ||
+    alarm.status !== 'scheduled' ||
+    alarm.nextActivationAt === undefined
+  ) {
+    return undefined;
+  }
+
+  return alarm.nextActivationAt;
 }
 
 function nextAlarmOrder(alarms: readonly Alarm[]): number {

@@ -44,6 +44,12 @@ function hasConfiguredLocalTime(
   return `${hours}:${minutes}` === time;
 }
 
+export type AlarmTimeRemaining = {
+  hours: number;
+  minutes: number;
+  totalMinutes: number;
+};
+
 /**
  * Returns the next local occurrence of an alarm as an absolute timestamp.
  * The local calendar is rebuilt from the reference timestamp on every call,
@@ -68,6 +74,62 @@ export function getNextAlarmActivationAt(
   }
 
   return { ok: true, value: occurrence.getTime() };
+}
+
+/**
+ * Derives the remaining time from an absolute activation timestamp.
+ * The reference timestamp is read again by each caller update, so this
+ * calculation never depends on the number of interval executions.
+ */
+export function getAlarmTimeRemaining(
+  nextActivationAt: number,
+  referenceTimestamp: number,
+): AlarmResult<AlarmTimeRemaining> {
+  if (
+    !isValidTimestamp(nextActivationAt) ||
+    !isValidTimestamp(referenceTimestamp)
+  ) {
+    return failure('invalid-timestamp');
+  }
+
+  const remainingMilliseconds = Math.max(
+    0,
+    nextActivationAt - referenceTimestamp,
+  );
+  const totalMinutes = Math.ceil(remainingMilliseconds / 60_000);
+
+  return {
+    ok: true,
+    value: {
+      hours: Math.floor(totalMinutes / 60),
+      minutes: totalMinutes % 60,
+      totalMinutes,
+    },
+  };
+}
+
+export function formatAlarmTimeRemaining(
+  remaining: AlarmTimeRemaining,
+): string {
+  if (remaining.totalMinutes === 0) {
+    return 'ahora';
+  }
+
+  const parts: string[] = [];
+
+  if (remaining.hours > 0) {
+    parts.push(
+      `${remaining.hours} ${remaining.hours === 1 ? 'hora' : 'horas'}`,
+    );
+  }
+
+  if (remaining.minutes > 0) {
+    parts.push(
+      `${remaining.minutes} ${remaining.minutes === 1 ? 'minuto' : 'minutos'}`,
+    );
+  }
+
+  return `en ${parts.join(', ')}`;
 }
 
 /**

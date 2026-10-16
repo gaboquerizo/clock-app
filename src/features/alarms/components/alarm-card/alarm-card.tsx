@@ -5,13 +5,19 @@ import type { Alarm } from '../../domain/alarm.types';
 import AppIcon from '../../../../shared/ui/ui-icon/ui-icon';
 
 /*——— Library ———*/
-import { createSignal } from 'solid-js';
+import { createSignal, Show } from 'solid-js';
+
+import {
+  formatAlarmTimeRemaining,
+  getAlarmTimeRemaining,
+} from '../../domain/alarm-scheduling';
 
 /*——— Styles ———*/
 import './alarm-card.css';
 
 type AlarmCardProps = {
   alarm: Alarm;
+  now: number;
   onEdit: () => void;
   onToggle: () => void;
   toggleBusy: boolean;
@@ -26,6 +32,29 @@ export default function AlarmCard(props: AlarmCardProps) {
   const statusLabel = () => (props.alarm.enabled ? 'Activada' : 'Desactivada');
   const toggleLabel = () =>
     `${props.alarm.enabled ? 'Desactivar' : 'Activar'} alarma ${props.alarm.time}`;
+  const upcomingDescription = () => {
+    const nextActivationAt = props.alarm.nextActivationAt;
+
+    if (!props.alarm.enabled || nextActivationAt === undefined) {
+      return undefined;
+    }
+
+    const remaining = getAlarmTimeRemaining(nextActivationAt, props.now);
+
+    return remaining.ok ? formatAlarmTimeRemaining(remaining.value) : undefined;
+  };
+  const cardLabel = () => {
+    const upcoming = upcomingDescription();
+
+    return [
+      props.alarm.time,
+      getAlarmLabel(props.alarm),
+      statusLabel(),
+      upcoming,
+    ]
+      .filter((value): value is string => value !== undefined)
+      .join(', ');
+  };
 
   const handleToggle = () => {
     setHasInteracted(true);
@@ -34,7 +63,7 @@ export default function AlarmCard(props: AlarmCardProps) {
 
   return (
     <article
-      aria-label={`${props.alarm.time}, ${getAlarmLabel(props.alarm)}, ${statusLabel()}`}
+      aria-label={cardLabel()}
       class={`alarm-card${props.alarm.enabled ? '' : ' alarm-card--disabled'}`}
       data-alarm-id={props.alarm.id}
     >
@@ -48,10 +77,20 @@ export default function AlarmCard(props: AlarmCardProps) {
           {props.alarm.time}
         </time>
         <span class="alarm-card__label">{getAlarmLabel(props.alarm)}</span>
-        <span class="alarm-card__status">
-          <AppIcon class="alarm-card__status-icon" name="proicons:alarm-clock" />
-          <span>{statusLabel()}</span>
-        </span>
+        <Show
+          fallback={
+            <span class="alarm-card__status">
+              <AppIcon class="alarm-card__status-icon" name="proicons:alarm-clock" />
+              <span class="alarm-card__status-text">{statusLabel()}</span>
+            </span>
+          }
+          when={upcomingDescription() !== undefined}
+        >
+          <span class="alarm-card__status alarm-card__countdown">
+            <AppIcon class="alarm-card__status-icon" name="proicons:alarm-clock" />
+            <span class="alarm-card__status-text">{upcomingDescription()}</span>
+          </span>
+        </Show>
       </button>
 
       <button

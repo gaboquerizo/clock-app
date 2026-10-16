@@ -11,6 +11,7 @@ import AlarmDialog, {
 } from '../components/alarm-dialog/alarm-dialog';
 import { useAlarmsState } from '../state/alarms-context';
 import type { AlarmsStateError } from '../state/alarms-state';
+import { useAlarmNow } from '../state/use-alarm-now';
 import AppIcon from '../../../shared/ui/ui-icon/ui-icon';
 import UiEmptyState from '../../../shared/ui/ui-empty-state/ui-empty-state';
 
@@ -46,6 +47,7 @@ function getDialogError(error: AlarmsStateError): AlarmDialogError {
 function AlarmList(props: {
   alarms: Alarm[];
   isToggling: (alarmId: string) => boolean;
+  now: number;
   onEdit: (alarm: Alarm) => void;
   onToggle: (alarm: Alarm) => void;
 }) {
@@ -56,6 +58,7 @@ function AlarmList(props: {
           <li class="alarms-view__list-item">
             <AlarmCard
               alarm={alarm}
+              now={props.now}
               onEdit={() => props.onEdit(alarm)}
               onToggle={() => props.onToggle(alarm)}
               toggleBusy={props.isToggling(alarm.id)}
@@ -69,6 +72,7 @@ function AlarmList(props: {
 
 export default function AlarmsView() {
   const alarms = useAlarmsState();
+  const now = useAlarmNow();
   const [dialogOpen, setDialogOpen] = createSignal(false);
   const [dialogMode, setDialogMode] = createSignal<AlarmDialogMode>('create');
   const [selectedAlarmId, setSelectedAlarmId] = createSignal<string | undefined>(
@@ -255,6 +259,7 @@ export default function AlarmsView() {
               <AlarmList
                 alarms={alarms.state.alarms}
                 isToggling={isToggling}
+                now={now()}
                 onEdit={openEditDialog}
                 onToggle={handleToggle}
               />

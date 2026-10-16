@@ -63,6 +63,8 @@
   display: inline-flex;
   align-items: center;
   gap: var(--app-gap-M);
+  min-width: 0;
+  max-width: 100%;
   margin-top: auto;
   padding-top: var(--app-space-S);
   color: var(--app-accent);
@@ -78,6 +80,13 @@
   flex: 0 0 auto;
   width: var(--icon-S);
   height: var(--icon-S);
+}
+
+.alarm-card__status-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .alarm-card__toggle {
