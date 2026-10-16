@@ -13,6 +13,7 @@ export type Alarm = {
   order: number;
   createdAt: number;
   updatedAt: number;
+  nextActivationAt?: number;
   triggeredAt?: number;
   skippedAt?: number;
 };
@@ -32,6 +33,8 @@ export type UpdateAlarmInput = {
 
 export type AlarmTransition = 'enable' | 'disable' | 'trigger' | 'skip';
 
+export type AlarmReconciliationReason = 'activation' | 'recovery';
+
 export type AlarmField =
   | 'id'
   | 'time'
@@ -41,6 +44,7 @@ export type AlarmField =
   | 'order'
   | 'createdAt'
   | 'updatedAt'
+  | 'nextActivationAt'
   | 'triggeredAt'
   | 'skippedAt';
 

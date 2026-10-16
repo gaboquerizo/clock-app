@@ -7,6 +7,10 @@ import {
   normalizeAlarmLabel,
   validateCreateAlarmInput,
 } from './alarm.rules';
+import {
+  getNextAlarmActivationAt,
+  scheduleAlarm,
+} from './alarm-scheduling';
 
 /*—————————— Types ——————————*/
 import type {
@@ -45,6 +49,15 @@ export function createAlarm(
     return failure('duplicate-time');
   }
 
+  const nextActivation = getNextAlarmActivationAt(
+    validatedInput.value.time,
+    validatedInput.value.createdAt,
+  );
+
+  if (!nextActivation.ok) {
+    return { ok: false, error: nextActivation.error };
+  }
+
   return {
     ok: true,
     value: {
@@ -56,6 +69,7 @@ export function createAlarm(
       order: validatedInput.value.order,
       createdAt: validatedInput.value.createdAt,
       updatedAt: validatedInput.value.createdAt,
+      nextActivationAt: nextActivation.value,
     },
   };
 }
@@ -91,6 +105,20 @@ export function updateAlarm(
     return failure('duplicate-time');
   }
 
+  let nextActivationAt = alarm.nextActivationAt;
+
+  if (!alarm.enabled) {
+    nextActivationAt = undefined;
+  } else if (input.time !== alarm.time || nextActivationAt === undefined) {
+    const nextActivation = getNextAlarmActivationAt(input.time, timestamp);
+
+    if (!nextActivation.ok) {
+      return { ok: false, error: nextActivation.error };
+    }
+
+    nextActivationAt = nextActivation.value;
+  }
+
   return {
     ok: true,
     value: {
@@ -98,6 +126,7 @@ export function updateAlarm(
       time: input.time,
       label: label.value,
       updatedAt: timestamp,
+      nextActivationAt,
     },
   };
 }
@@ -135,16 +164,27 @@ export function transitionAlarm(
   }
 
   if (transition === 'enable') {
-    return {
-      ok: true,
-      value: { ...alarm, enabled: true, updatedAt: timestamp },
-    };
+    const scheduledAlarm = scheduleAlarm(
+      { ...alarm, enabled: true },
+      timestamp,
+    );
+
+    if (!scheduledAlarm.ok) {
+      return scheduledAlarm;
+    }
+
+    return scheduledAlarm;
   }
 
   if (transition === 'disable') {
     return {
       ok: true,
-      value: { ...alarm, enabled: false, updatedAt: timestamp },
+      value: {
+        ...alarm,
+        enabled: false,
+        nextActivationAt: undefined,
+        updatedAt: timestamp,
+      },
     };
   }
 
@@ -155,6 +195,7 @@ export function transitionAlarm(
         ...alarm,
         enabled: false,
         status: 'triggered',
+        nextActivationAt: undefined,
         triggeredAt: timestamp,
         updatedAt: timestamp,
       },
@@ -167,6 +208,7 @@ export function transitionAlarm(
       ...alarm,
       enabled: false,
       status: 'skipped',
+      nextActivationAt: undefined,
       skippedAt: timestamp,
       updatedAt: timestamp,
     },

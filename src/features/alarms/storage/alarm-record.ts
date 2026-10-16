@@ -17,6 +17,7 @@ export type AlarmRecord = {
   order: number;
   createdAt: number;
   updatedAt: number;
+  nextActivationAt?: number;
   triggeredAt?: number;
   skippedAt?: number;
 };
@@ -31,6 +32,9 @@ export function toAlarmRecord(alarm: Alarm): AlarmRecord {
     order: alarm.order,
     createdAt: alarm.createdAt,
     updatedAt: alarm.updatedAt,
+    ...(alarm.nextActivationAt === undefined
+      ? {}
+      : { nextActivationAt: alarm.nextActivationAt }),
     ...(alarm.triggeredAt === undefined
       ? {}
       : { triggeredAt: alarm.triggeredAt }),

@@ -6,9 +6,11 @@ import {
   transitionAlarm,
   updateAlarm,
 } from '../domain/alarm';
+import { reconcileAlarm } from '../domain/alarm-scheduling';
 import type {
   Alarm,
   AlarmDomainError,
+  AlarmReconciliationReason,
   AlarmResult,
   AlarmTransition,
   UpdateAlarmInput,
@@ -31,7 +33,8 @@ export type AlarmsOperation =
   | 'update'
   | 'remove'
   | 'enable'
-  | 'disable';
+  | 'disable'
+  | 'reconcile';
 
 export type AlarmsStateError = {
   operation: AlarmsOperation;
@@ -78,6 +81,10 @@ export type AlarmsActions = {
   remove(id: string): Promise<AlarmsActionResult<void>>;
   enable(id: string): Promise<AlarmsActionResult<Alarm>>;
   disable(id: string): Promise<AlarmsActionResult<Alarm>>;
+  reconcile(
+    id: string,
+    reason?: AlarmReconciliationReason,
+  ): Promise<AlarmsActionResult<Alarm>>;
   clearError(): void;
 };
 
@@ -295,6 +302,32 @@ export function createAlarmsState(
 
     disable(id) {
       return changeEnabledState('disable', id);
+    },
+
+    reconcile(id, reason = 'recovery') {
+      return runDomainMutation('reconcile', async () => {
+        const currentAlarm = state.alarms.find((alarm) => alarm.id === id);
+
+        if (currentAlarm === undefined) {
+          return {
+            ok: false,
+            error: { code: 'not-found' },
+          };
+        }
+
+        const result = reconcileAlarm(currentAlarm, now(), reason);
+
+        if (!result.ok) {
+          return result;
+        }
+
+        if (result.value !== currentAlarm) {
+          await repository.update(result.value);
+          replaceAlarm(result.value);
+        }
+
+        return result;
+      });
     },
 
     clearError() {

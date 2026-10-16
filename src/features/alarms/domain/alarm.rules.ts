@@ -162,11 +162,21 @@ export function validateAlarm(value: unknown): AlarmResult<Alarm> {
     return failure({ code: 'invalid-timestamp', field: 'skippedAt' });
   }
 
+  if (!isOptionalTimestamp(value.nextActivationAt)) {
+    return failure({ code: 'invalid-timestamp', field: 'nextActivationAt' });
+  }
+
+  const nextActivationAt = value.nextActivationAt;
   const triggeredAt = value.triggeredAt;
   const skippedAt = value.skippedAt;
 
   if (value.status === 'scheduled') {
-    if (triggeredAt !== undefined || skippedAt !== undefined) {
+    if (
+      triggeredAt !== undefined ||
+      skippedAt !== undefined ||
+      (!value.enabled && nextActivationAt !== undefined) ||
+      (nextActivationAt !== undefined && nextActivationAt < value.createdAt)
+    ) {
       return failure({ code: 'invalid-state', field: 'status' });
     }
   }
@@ -176,6 +186,7 @@ export function validateAlarm(value: unknown): AlarmResult<Alarm> {
       value.enabled ||
       triggeredAt === undefined ||
       skippedAt !== undefined ||
+      nextActivationAt !== undefined ||
       triggeredAt < value.createdAt ||
       triggeredAt > value.updatedAt
     ) {
@@ -188,6 +199,7 @@ export function validateAlarm(value: unknown): AlarmResult<Alarm> {
       value.enabled ||
       skippedAt === undefined ||
       triggeredAt !== undefined ||
+      nextActivationAt !== undefined ||
       skippedAt < value.createdAt ||
       skippedAt > value.updatedAt
     ) {
@@ -204,6 +216,7 @@ export function validateAlarm(value: unknown): AlarmResult<Alarm> {
     order: value.order,
     createdAt: value.createdAt,
     updatedAt: value.updatedAt,
+    ...(nextActivationAt === undefined ? {} : { nextActivationAt }),
     ...(triggeredAt === undefined ? {} : { triggeredAt }),
     ...(skippedAt === undefined ? {} : { skippedAt }),
   });
