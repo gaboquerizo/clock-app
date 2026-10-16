@@ -1,21 +1,15 @@
-/*—————————— Library ——————————*/
-import {
-  createEffect,
-  createSignal,
-  Match,
-  Show,
-  Switch,
-} from 'solid-js';
+/*——— Library ———*/
+import { createEffect, createSignal, Show } from 'solid-js';
 
-/*—————————— Types ——————————*/
+/*——— Types ———*/
 import type { Alarm } from '../../domain/alarm.types';
 
-/*—————————— Components ——————————*/
+/*——— Components ———*/
 import AlarmTimeInput from '../alarm-time-input/alarm-time-input';
 import UiDialog from '../../../../shared/ui/ui-dialog/ui-dialog';
 import AppIcon from '../../../../shared/ui/ui-icon/ui-icon';
 
-/*—————————— Styles ——————————*/
+/*——— Styles ———*/
 import './alarm-dialog.css';
 
 export type AlarmDialogMode = 'create' | 'edit' | 'confirm-delete';
@@ -25,12 +19,19 @@ export type AlarmDialogValue = {
   time: string;
 };
 
+export type AlarmDialogError = {
+  message: string;
+};
+
 export type AlarmDialogProps = {
   alarm?: Pick<Alarm, 'id' | 'label' | 'time'>;
+  busy?: boolean;
+  error?: AlarmDialogError;
   mode: AlarmDialogMode;
+  onClearError?: () => void;
   onClose: () => void;
-  onConfirmDelete?: (alarmId: string) => void;
-  onSubmit?: (value: AlarmDialogValue) => void;
+  onConfirmDelete?: (alarmId: string) => void | Promise<void>;
+  onSubmit?: (value: AlarmDialogValue) => void | Promise<void>;
   open: boolean;
 };
 
@@ -42,45 +43,96 @@ function getModeTitle(mode: AlarmDialogMode): string {
   return mode === 'edit' ? 'Editar alarma' : 'Añadir alarma';
 }
 
-function getModeIcon(mode: AlarmDialogMode) {
-  return mode === 'confirm-delete' ? 'proicons:delete' : 'proicons:alarm-clock';
-}
-
 export default function AlarmDialog(props: AlarmDialogProps) {
   const [activeMode, setActiveMode] = createSignal<AlarmDialogMode>(props.mode);
   const [time, setTime] = createSignal('00:00');
   const [label, setLabel] = createSignal('');
   const [formInstance, setFormInstance] = createSignal(0);
+  const [contentHeight, setContentHeight] = createSignal<number>();
   let previousExternalMode = props.mode;
   let previousFormKey = '';
+  let formPanel!: HTMLDivElement;
+  let confirmationPanel!: HTMLDivElement;
+  let confirmationCancelButton!: HTMLButtonElement;
+
+  const isConfirmation = () => activeMode() === 'confirm-delete';
+
+  const updateContentHeight = () => {
+    const activePanel = isConfirmation() ? confirmationPanel : formPanel;
+
+    if (activePanel !== undefined) {
+      setContentHeight(activePanel.scrollHeight);
+    }
+  };
+
+  const focusContent = (mode: AlarmDialogMode) => {
+    queueMicrotask(() => {
+      updateContentHeight();
+
+      const focusTarget =
+        mode === 'confirm-delete'
+          ? confirmationCancelButton
+          : formPanel?.querySelector<HTMLElement>('input, button');
+
+      focusTarget?.focus();
+    });
+  };
+
+  const switchToMode = (mode: AlarmDialogMode) => {
+    if (mode === activeMode()) {
+      return;
+    }
+
+    if (mode === 'confirm-delete' && props.alarm === undefined) {
+      return;
+    }
+
+    if (mode === 'edit') {
+      props.onClearError?.();
+    }
+
+    setActiveMode(mode);
+    focusContent(mode);
+  };
 
   createEffect(() => {
     const isOpen = props.open;
     const externalMode = props.mode;
-    const mode = activeMode();
 
     if (!isOpen) {
       setActiveMode(externalMode);
       previousExternalMode = externalMode;
       previousFormKey = '';
+      setContentHeight(undefined);
       return;
     }
 
     if (externalMode !== previousExternalMode) {
       previousExternalMode = externalMode;
       setActiveMode(externalMode);
+      focusContent(externalMode);
     }
 
+    const formMode = externalMode === 'edit' ? 'edit' : 'create';
     const alarmId = props.alarm?.id ?? 'new';
-    const initialTime = mode === 'edit' ? props.alarm?.time ?? '00:00' : '00:00';
-    const initialLabel = mode === 'edit' ? props.alarm?.label ?? '' : '';
-    const formKey = `${mode}:${alarmId}:${initialTime}:${initialLabel}`;
+    const initialTime = formMode === 'edit' ? props.alarm?.time ?? '00:00' : '00:00';
+    const initialLabel = formMode === 'edit' ? props.alarm?.label ?? '' : '';
+    const formKey = `${formMode}:${alarmId}:${initialTime}:${initialLabel}`;
 
     if (formKey !== previousFormKey) {
       previousFormKey = formKey;
       setTime(initialTime);
       setLabel(initialLabel);
       setFormInstance((instance) => instance + 1);
+    }
+  });
+
+  createEffect(() => {
+    const isOpen = props.open;
+    activeMode();
+
+    if (isOpen) {
+      queueMicrotask(updateContentHeight);
     }
   });
 
@@ -91,23 +143,17 @@ export default function AlarmDialog(props: AlarmDialogProps) {
       return;
     }
 
-    props.onSubmit?.({
+    void props.onSubmit?.({
       label: label().trim(),
       time: time(),
     });
-  };
-
-  const requestDeleteConfirmation = () => {
-    if (activeMode() === 'edit' && props.alarm !== undefined) {
-      setActiveMode('confirm-delete');
-    }
   };
 
   const confirmDelete = () => {
     const alarmId = props.alarm?.id;
 
     if (alarmId !== undefined) {
-      props.onConfirmDelete?.(alarmId);
+      void props.onConfirmDelete?.(alarmId);
     }
   };
 
@@ -117,42 +163,40 @@ export default function AlarmDialog(props: AlarmDialogProps) {
       title={getModeTitle(activeMode())}
       onClose={props.onClose}
     >
-      <div class="alarm-dialog">
-        <div class="alarm-dialog__mode-icon" data-mode={activeMode()}>
-          <AppIcon class="alarm-dialog__mode-icon-svg" name={getModeIcon(activeMode())} />
+      <div aria-busy={props.busy === true} class="alarm-dialog">
+        <div
+          class="alarm-dialog__mode-icon t-icon-swap"
+          data-mode={activeMode()}
+          data-state={isConfirmation() ? 'b' : 'a'}
+        >
+          <span class="alarm-dialog__mode-icon-item t-icon" data-icon="a">
+            <AppIcon class="alarm-dialog__mode-icon-svg" name="proicons:alarm-clock" />
+          </span>
+          <span class="alarm-dialog__mode-icon-item t-icon" data-icon="b">
+            <AppIcon class="alarm-dialog__mode-icon-svg" name="proicons:delete" />
+          </span>
         </div>
 
-        <Switch>
-          <Match when={activeMode() === 'confirm-delete'}>
-            <section aria-labelledby="alarm-dialog-delete-title" class="alarm-dialog__confirmation">
-              <h3 class="alarm-dialog__confirmation-title" id="alarm-dialog-delete-title">
-                ¿Eliminar esta alarma?
-              </h3>
-              <p class="alarm-dialog__confirmation-description">
-                La alarma «{props.alarm?.label || 'Alarma'}» se eliminará cuando se confirme.
-              </p>
-              <div class="alarm-dialog__actions">
-                <button
-                  autofocus
-                  class="alarm-dialog__button alarm-dialog__button--secondary"
-                  type="button"
-                  onClick={() => setActiveMode('edit')}
-                >
-                  Cancelar
-                </button>
-                <button
-                  class="alarm-dialog__button alarm-dialog__button--danger"
-                  disabled={props.alarm === undefined}
-                  type="button"
-                  onClick={confirmDelete}
-                >
-                  Eliminar
-                </button>
-              </div>
-            </section>
-          </Match>
+        <Show when={props.error !== undefined}>
+          <p aria-live="assertive" class="alarm-dialog__error" role="alert">
+            {props.error?.message}
+          </p>
+        </Show>
 
-          <Match when={activeMode() === 'create' || activeMode() === 'edit'}>
+        <div
+          class="alarm-dialog__content-switcher"
+          style={{
+            height:
+              contentHeight() === undefined ? 'auto' : `${contentHeight()}px`,
+          }}
+        >
+          <div
+            aria-hidden={isConfirmation()}
+            class="alarm-dialog__content-panel t-panel-slide"
+            data-open={String(!isConfirmation())}
+            inert={isConfirmation()}
+            ref={formPanel}
+          >
             <form class="alarm-dialog__form" onSubmit={submitForm}>
               <Show keyed when={formInstance()}>
                 <AlarmTimeInput initialValue={time()} onChange={setTime} />
@@ -177,26 +221,68 @@ export default function AlarmDialog(props: AlarmDialogProps) {
                 <Show when={activeMode() === 'edit' && props.alarm !== undefined}>
                   <button
                     class="alarm-dialog__button alarm-dialog__button--danger"
+                    disabled={props.busy === true}
                     type="button"
-                    onClick={requestDeleteConfirmation}
+                    onClick={() => switchToMode('confirm-delete')}
                   >
                     Eliminar
                   </button>
                 </Show>
                 <button
                   class="alarm-dialog__button alarm-dialog__button--secondary"
+                  disabled={props.busy === true}
                   type="button"
                   onClick={props.onClose}
                 >
                   Cancelar
                 </button>
-                <button class="alarm-dialog__button alarm-dialog__button--primary" type="submit">
+                <button
+                  class="alarm-dialog__button alarm-dialog__button--primary"
+                  disabled={props.busy === true}
+                  type="submit"
+                >
                   {activeMode() === 'edit' ? 'Guardar' : 'Añadir'}
                 </button>
               </div>
             </form>
-          </Match>
-        </Switch>
+          </div>
+
+          <div
+            aria-hidden={!isConfirmation()}
+            class="alarm-dialog__content-panel alarm-dialog__confirmation-panel t-panel-slide"
+            data-open={String(isConfirmation())}
+            inert={!isConfirmation()}
+            ref={confirmationPanel}
+          >
+            <section aria-labelledby="alarm-dialog-delete-title" class="alarm-dialog__confirmation">
+              <h3 class="alarm-dialog__confirmation-title" id="alarm-dialog-delete-title">
+                ¿Eliminar esta alarma?
+              </h3>
+              <p class="alarm-dialog__confirmation-description">
+                La alarma «{props.alarm?.label || 'Alarma'}» se eliminará cuando se confirme.
+              </p>
+              <div class="alarm-dialog__actions">
+                <button
+                  class="alarm-dialog__button alarm-dialog__button--secondary"
+                  disabled={props.busy === true}
+                  ref={confirmationCancelButton}
+                  type="button"
+                  onClick={() => switchToMode('edit')}
+                >
+                  Cancelar
+                </button>
+                <button
+                  class="alarm-dialog__button alarm-dialog__button--danger"
+                  disabled={props.alarm === undefined || props.busy === true}
+                  type="button"
+                  onClick={confirmDelete}
+                >
+                  Eliminar
+                </button>
+              </div>
+            </section>
+          </div>
+        </div>
       </div>
     </UiDialog>
   );

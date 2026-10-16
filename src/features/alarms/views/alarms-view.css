@@ -9,6 +9,8 @@
 .alarms-view__header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: var(--app-space-S);
   min-height: var(--app-logo);
 }
 
@@ -22,11 +24,21 @@
 
 .alarms-view__content {
   display: flex;
+  flex-direction: column;
+  flex: 1;
+  align-items: stretch;
+  min-height: 0;
+  gap: var(--app-space-S);
+  padding-block: var(--app-space-L);
+}
+
+.alarms-view__content-body {
+  display: flex;
   flex: 1;
   align-items: center;
   justify-content: center;
   min-height: 0;
-  padding-block: var(--app-space-L);
+  width: 100%;
 }
 
 .alarms-view__list {
