@@ -5,6 +5,7 @@ import type { RouteSectionProps } from '@solidjs/router';
 import { createAlarmsRuntime } from '../features/alarms/state/alarms-runtime';
 import { AlarmsStateProvider } from '../features/alarms/state/alarms-context';
 import { createAlarmsState } from '../features/alarms/state/alarms-state';
+import GlobalAlertHost from '@/app/global-alert/global-alert-host';
 
 /*—————————— Styles ——————————*/
 import './app-root.css';
@@ -29,13 +30,15 @@ export default function AppRoot(props: RouteSectionProps) {
   });
 
   return (
-    <AlarmsStateProvider value={alarms}>
-      <div class="app-shell">
-        <aside class="app-shell__sidebar">
-          <AppSidebar />
-        </aside>
-        <main class="app-shell__main">{props.children}</main>
-      </div>
-    </AlarmsStateProvider>
+    <GlobalAlertHost>
+      <AlarmsStateProvider value={alarms}>
+        <div class="app-shell">
+          <aside class="app-shell__sidebar">
+            <AppSidebar />
+          </aside>
+          <main class="app-shell__main">{props.children}</main>
+        </div>
+      </AlarmsStateProvider>
+    </GlobalAlertHost>
   );
 }
