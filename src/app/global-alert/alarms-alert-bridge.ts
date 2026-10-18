@@ -3,6 +3,8 @@ import { globalAlertService } from '@/core/alerts/global-alert-service';
 import type { GlobalAlertService } from '@/core/alerts/global-alert.types';
 import { audioService } from '@/core/services/audio.service';
 import type { AudioService } from '@/core/services/audio.service';
+import { notificationService } from '@/core/services/notification.service';
+import type { NotificationService } from '@/core/services/notification.service';
 import type { AlarmsRuntime } from '@/features/alarms/state/alarms-runtime';
 
 const MAX_ALARM_SOUND_DURATION_MS = 60_000;
@@ -10,6 +12,7 @@ const MAX_ALARM_SOUND_DURATION_MS = 60_000;
 export type AlarmsAlertBridgeOptions = {
   alerts?: GlobalAlertService;
   audio?: AudioService;
+  notifications?: NotificationService;
 };
 
 export function connectAlarmsToGlobalAlerts(
@@ -18,6 +21,7 @@ export function connectAlarmsToGlobalAlerts(
 ): () => void {
   const alerts = options.alerts ?? globalAlertService;
   const audio = options.audio ?? audioService;
+  const notifications = options.notifications ?? notificationService;
   const presentedActivations = new Set<string>();
 
   return runtime.subscribe(({ alarm }) => {
@@ -59,6 +63,23 @@ export function connectAlarmsToGlobalAlerts(
       primaryActionId: 'accept',
       onDismiss: acceptAlarm,
     });
+
+    try {
+      const notificationResult = notifications.show({
+        body: alarm.label.trim() || 'Alarma',
+        tag: `clock-app-alarm-${alarm.id}`,
+        title: `Alarma · ${alarm.time}`,
+      });
+
+      if (notificationResult.status === 'error') {
+        console.warn(
+          'The browser alarm notification could not be displayed.',
+          notificationResult.error,
+        );
+      }
+    } catch (error) {
+      console.warn('The browser alarm notification could not be displayed.', error);
+    }
 
     void audio
       .play({

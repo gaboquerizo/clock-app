@@ -14,6 +14,7 @@ import type { AlarmsStateError } from '../state/alarms-state';
 import { useAlarmNow } from '../state/use-alarm-now';
 import AppIcon from '../../../shared/ui/ui-icon/ui-icon';
 import UiEmptyState from '../../../shared/ui/ui-empty-state/ui-empty-state';
+import NotificationPermissionNotice from '../components/notification-permission-notice/notification-permission-notice';
 
 type AddAlarmButtonProps = {
   onClick: () => void;
@@ -220,6 +221,8 @@ export default function AlarmsView() {
       </header>
 
       <div class="alarms-view__content">
+        <NotificationPermissionNotice />
+
         <Show when={toggleError() !== undefined}>
           <p aria-live="assertive" class="alarms-view__message" role="alert">
             {toggleError()}

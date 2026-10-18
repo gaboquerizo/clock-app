@@ -1,0 +1,97 @@
+.notification-permission-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--app-space-M);
+  padding: var(--app-space-M);
+  border-radius: var(--app-radius-M);
+  background-color: var(--app-bg-2);
+  color: var(--app-txt-1);
+}
+
+.notification-permission-notice__copy {
+  display: grid;
+  gap: var(--app-gap-S);
+  min-width: 0;
+}
+
+.notification-permission-notice__title,
+.notification-permission-notice__description,
+.notification-permission-notice__feedback,
+.notification-permission-notice__save-feedback {
+  margin: 0;
+}
+
+.notification-permission-notice__title {
+  font-size: var(--body-M);
+  font-weight: 600;
+}
+
+.notification-permission-notice__description,
+.notification-permission-notice__feedback,
+.notification-permission-notice__save-feedback {
+  color: var(--app-txt-2);
+  font-size: var(--body-S);
+  line-height: 1.4;
+}
+
+.notification-permission-notice__actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--app-space-S);
+}
+
+.notification-permission-notice__enable,
+.notification-permission-notice__dismiss {
+  min-height: var(--app-logo);
+  padding: var(--app-gap-L) var(--app-space-S);
+  border: 0;
+  border-radius: var(--app-radius-S);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--body-S);
+}
+
+.notification-permission-notice__enable {
+  background-color: var(--app-accent);
+  color: var(--app-bg-1);
+}
+
+.notification-permission-notice__dismiss {
+  background-color: transparent;
+  color: var(--app-txt-2);
+}
+
+.notification-permission-notice__enable:hover,
+.notification-permission-notice__dismiss:hover {
+  filter: brightness(1.08);
+}
+
+.notification-permission-notice__enable:focus-visible,
+.notification-permission-notice__dismiss:focus-visible {
+  outline: var(--app-solid-M) var(--app-focus);
+  outline-offset: var(--app-offset);
+}
+
+.notification-permission-notice__enable:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.notification-permission-notice__save-feedback {
+  text-align: center;
+}
+
+@media (max-width: 42rem) {
+  .notification-permission-notice {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .notification-permission-notice__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
