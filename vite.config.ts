@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import solidPlugin from 'vite-plugin-solid';
 import devtools from 'solid-devtools/vite';
 
@@ -18,5 +18,9 @@ export default defineConfig({
   },
   build: {
     target: 'esnext',
+  },
+  test: {
+    environment: 'node',
+    include: ['src/**/*.test.ts'],
   },
 });

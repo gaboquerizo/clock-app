@@ -6,6 +6,7 @@
   "scripts": {
     "start": "vite",
     "dev": "vite",
+    "test": "vitest run",
     "build": "vite build",
     "serve": "vite preview"
   },
@@ -14,7 +15,8 @@
     "solid-devtools": "^0.34.3",
     "typescript": "^5.7.2",
     "vite": "^7.1.4",
-    "vite-plugin-solid": "^2.11.8"
+    "vite-plugin-solid": "^2.11.8",
+    "vitest": "^5.0.5"
   },
   "dependencies": {
     "@solidjs/router": "^1.0.0",
