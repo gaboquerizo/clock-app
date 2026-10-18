@@ -11,9 +11,12 @@ export type GlobalAlertAction = {
 };
 
 export type GlobalAlertRequest = {
+  /** Iconify identifier from the application's approved icon collections. */
+  readonly icon: string;
   readonly title: string;
   readonly message: string;
   readonly actions: readonly GlobalAlertAction[];
+  readonly primaryActionId: string;
   readonly onDismiss?: () => void | Promise<void>;
 };
 

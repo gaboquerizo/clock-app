@@ -43,6 +43,22 @@ export function createGlobalAlertService(): GlobalAlertService {
     },
 
     present(request: GlobalAlertRequest) {
+      if (request.actions.length === 0) {
+        throw new Error('A global alert must provide at least one action.');
+      }
+
+      const actionIds = request.actions.map(({ id }) => id);
+
+      if (new Set(actionIds).size !== actionIds.length) {
+        throw new Error('Global alert action identifiers must be unique.');
+      }
+
+      if (!actionIds.includes(request.primaryActionId)) {
+        throw new Error(
+          'The primary action must reference an action in the alert.',
+        );
+      }
+
       const alert: ActiveGlobalAlert = {
         id: `global-alert-${++nextAlertId}`,
         request: {

@@ -8,6 +8,7 @@ import {
   type ParentProps,
 } from 'solid-js';
 
+import GlobalAlertDialog from '@/app/global-alert/global-alert-dialog';
 import { globalAlertService } from '@/core/alerts/global-alert-service';
 import type {
   GlobalAlertService,
@@ -62,6 +63,11 @@ export default function GlobalAlertHost(props: GlobalAlertHostProps) {
   return (
     <GlobalAlertHostContext.Provider value={context}>
       {props.children}
+      <GlobalAlertDialog
+        alert={snapshot().active}
+        onDismiss={context.dismiss}
+        onSelectAction={context.selectAction}
+      />
     </GlobalAlertHostContext.Provider>
   );
 }

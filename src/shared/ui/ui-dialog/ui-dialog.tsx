@@ -3,6 +3,7 @@ import {
   createEffect,
   createUniqueId,
   onCleanup,
+  type JSX,
   type ParentProps,
 } from 'solid-js';
 
@@ -10,7 +11,10 @@ import {
 import './ui-dialog.css';
 
 export type UiDialogProps = ParentProps<{
+  class?: string;
+  closeOnBackdrop?: boolean;
   description?: string;
+  icon?: JSX.Element;
   onClose: () => void;
   open: boolean;
   title: string;
@@ -66,7 +70,11 @@ export default function UiDialog(props: UiDialogProps) {
       props.onClose();
     }
 
-    queueMicrotask(() => previousActiveElement?.focus());
+    queueMicrotask(() => {
+      if (previousActiveElement?.isConnected) {
+        previousActiveElement.focus();
+      }
+    });
   };
 
   const handleCancel = (event: Event) => {
@@ -75,7 +83,7 @@ export default function UiDialog(props: UiDialogProps) {
   };
 
   const handleSurfaceClick = (event: MouseEvent) => {
-    if (event.target === dialogElement) {
+    if (event.target === dialogElement && props.closeOnBackdrop !== false) {
       props.onClose();
     }
   };
@@ -84,7 +92,7 @@ export default function UiDialog(props: UiDialogProps) {
     <dialog
       aria-describedby={props.description ? descriptionId : undefined}
       aria-labelledby={titleId}
-      class="ui-dialog"
+      class={`ui-dialog ${props.class ?? ''}`}
       ref={dialogElement}
       onCancel={handleCancel}
       onClose={handleClose}
@@ -92,14 +100,21 @@ export default function UiDialog(props: UiDialogProps) {
     >
       <div class="ui-dialog__surface">
         <header class="ui-dialog__header">
-          <h2 class="ui-dialog__title" id={titleId}>
-            {props.title}
-          </h2>
-          {props.description && (
-            <p class="ui-dialog__description" id={descriptionId}>
-              {props.description}
-            </p>
+          {props.icon && (
+            <div aria-hidden="true" class="ui-dialog__icon">
+              {props.icon}
+            </div>
           )}
+          <div class="ui-dialog__heading">
+            <h2 class="ui-dialog__title" id={titleId}>
+              {props.title}
+            </h2>
+            {props.description && (
+              <p class="ui-dialog__description" id={descriptionId}>
+                {props.description}
+              </p>
+            )}
+          </div>
         </header>
         <div class="ui-dialog__content">{props.children}</div>
       </div>

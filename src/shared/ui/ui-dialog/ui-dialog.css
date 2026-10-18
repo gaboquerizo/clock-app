@@ -20,7 +20,19 @@
 }
 
 .ui-dialog__header {
+  display: flex;
+  align-items: center;
+  gap: var(--app-space-M);
   padding: var(--app-space-M) var(--app-space-M) 0;
+}
+
+.ui-dialog__heading {
+  min-width: 0;
+}
+
+.ui-dialog__icon {
+  display: inline-flex;
+  flex: 0 0 auto;
 }
 
 .ui-dialog__title {

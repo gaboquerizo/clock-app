@@ -1,0 +1,163 @@
+.ui-dialog.global-alert-dialog {
+  border: var(--app-solid-S) solid
+    rgb(from var(--app-txt-1) r g b / 10%);
+  background-color: rgb(from var(--app-bg-1) r g b / 88%);
+  backdrop-filter: blur(var(--global-alert-backdrop-blur));
+  opacity: 0;
+  transform: scale(var(--global-alert-scale));
+  transition:
+    opacity var(--global-alert-close-dur) var(--global-alert-ease),
+    transform var(--global-alert-close-dur) var(--global-alert-ease),
+    display var(--global-alert-close-dur) allow-discrete,
+    overlay var(--global-alert-close-dur) allow-discrete;
+}
+
+.ui-dialog.global-alert-dialog[open] {
+  opacity: 1;
+  transform: scale(1);
+  transition-duration:
+    var(--global-alert-open-dur),
+    var(--global-alert-open-dur),
+    var(--global-alert-open-dur),
+    var(--global-alert-open-dur);
+}
+
+.ui-dialog.global-alert-dialog::backdrop {
+  background-color: rgb(from var(--app-bg-2) r g b / 18%);
+  backdrop-filter: blur(var(--global-alert-backdrop-blur));
+  transition:
+    background-color var(--global-alert-close-dur) var(--global-alert-ease),
+    backdrop-filter var(--global-alert-close-dur) var(--global-alert-ease),
+    display var(--global-alert-close-dur) allow-discrete,
+    overlay var(--global-alert-close-dur) allow-discrete;
+}
+
+.ui-dialog.global-alert-dialog[open]::backdrop {
+  background-color: rgb(from var(--app-bg-2) r g b / 24%);
+  transition-duration:
+    var(--global-alert-open-dur),
+    var(--global-alert-open-dur),
+    var(--global-alert-open-dur),
+    var(--global-alert-open-dur);
+}
+
+@starting-style {
+  .ui-dialog.global-alert-dialog[open] {
+    opacity: 0;
+    transform: scale(var(--global-alert-scale));
+  }
+
+  .ui-dialog.global-alert-dialog[open]::backdrop {
+    background-color: rgb(from var(--app-bg-2) r g b / 0%);
+  }
+}
+
+.global-alert-dialog .ui-dialog__header {
+  align-items: flex-start;
+}
+
+.global-alert-dialog .ui-dialog__icon {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: var(--size-48);
+  height: var(--size-48);
+  border-radius: 50%;
+  background-color: var(--app-bg-2);
+  color: var(--app-accent);
+}
+
+.global-alert-dialog__icon {
+  width: var(--icon-L);
+  height: var(--icon-L);
+}
+
+.global-alert-dialog__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-space-S);
+  min-width: 0;
+}
+
+.global-alert-dialog__error {
+  margin: 0;
+  color: var(--app-txt-2);
+  font-size: var(--body-S);
+  line-height: 1.35;
+}
+
+.global-alert-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--app-gap-L);
+  padding-top: var(--app-space-S);
+}
+
+.global-alert-dialog__action {
+  min-height: var(--app-logo);
+  padding: var(--app-gap-L) var(--app-space-M);
+  border: var(--app-solid-S) transparent;
+  border-radius: var(--app-radius-M);
+  cursor: pointer;
+  font-size: var(--body-M);
+  line-height: 1.25;
+  transition: filter var(--global-alert-close-dur) var(--global-alert-ease);
+}
+
+.global-alert-dialog__action:focus-visible {
+  outline: var(--app-solid-M) var(--app-focus);
+  outline-offset: var(--app-offset);
+}
+
+.global-alert-dialog__action--primary {
+  background-color: var(--app-accent);
+  color: var(--app-bg-1);
+}
+
+.global-alert-dialog__action--secondary {
+  border-color: var(--app-focus);
+  background-color: transparent;
+  color: var(--app-txt-2);
+}
+
+.global-alert-dialog__action--danger {
+  border-color: var(--app-txt-3);
+  background-color: transparent;
+  color: var(--app-txt-2);
+}
+
+.global-alert-dialog__action[data-primary='true']:not(
+    .global-alert-dialog__action--danger
+  ) {
+  border-color: transparent;
+  background-color: var(--app-accent);
+  color: var(--app-bg-1);
+}
+
+.global-alert-dialog__action:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.global-alert-dialog__action:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .global-alert-dialog,
+  .global-alert-dialog::backdrop,
+  .global-alert-dialog__action {
+    transition: none !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .global-alert-dialog__actions {
+    justify-content: stretch;
+  }
+
+  .global-alert-dialog__action {
+    flex: 1 1 auto;
+  }
+}
