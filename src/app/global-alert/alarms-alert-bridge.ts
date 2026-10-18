@@ -1,8 +1,11 @@
+import bellsSoundUrl from '@/assets/sounds/bells.mp3';
 import { globalAlertService } from '@/core/alerts/global-alert-service';
 import type { GlobalAlertService } from '@/core/alerts/global-alert.types';
 import { audioService } from '@/core/services/audio.service';
 import type { AudioService } from '@/core/services/audio.service';
 import type { AlarmsRuntime } from '@/features/alarms/state/alarms-runtime';
+
+const MAX_ALARM_SOUND_DURATION_MS = 60_000;
 
 export type AlarmsAlertBridgeOptions = {
   alerts?: GlobalAlertService;
@@ -56,5 +59,24 @@ export function connectAlarmsToGlobalAlerts(
       primaryActionId: 'accept',
       onDismiss: acceptAlarm,
     });
+
+    void audio
+      .play({
+        sourceId: alarm.id,
+        sourceUrl: bellsSoundUrl,
+        maxDurationMs: MAX_ALARM_SOUND_DURATION_MS,
+        loop: true,
+      })
+      .then((result) => {
+        if (result.status === 'failed') {
+          console.warn(
+            'The default alarm sound could not be played.',
+            result.error,
+          );
+        }
+      })
+      .catch((error: unknown) => {
+        console.warn('The default alarm sound could not be played.', error);
+      });
   });
 }
