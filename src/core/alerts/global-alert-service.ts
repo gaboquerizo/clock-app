@@ -85,8 +85,23 @@ export function createGlobalAlertService(): GlobalAlertService {
       }
 
       const dismissed = active;
-      advanceQueue();
-      await dismissed.request.onDismiss?.();
+      active = { ...active, actionPending: true };
+      notify();
+
+      try {
+        await dismissed.request.onDismiss?.();
+      } catch (error) {
+        if (active?.id === alertId) {
+          active = { ...active, actionPending: false };
+          notify();
+        }
+
+        throw error;
+      }
+
+      if (active?.id === alertId) {
+        advanceQueue();
+      }
 
       return true;
     },
