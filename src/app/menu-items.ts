@@ -21,15 +21,15 @@ export const menuItems: MenuItem[] = [
   },
   {
     label: 'Temporizador',
-    icon: 'proicons:hourglass',
-  },
-  {
-    label: 'Cronómetro',
     icon: 'proicons:timer',
   },
   {
+    label: 'Cronómetro',
+    icon: 'proicons:watch',
+  },
+  {
     label: 'Pomodoro',
-    icon: 'proicons:pie-chart',
+    icon: 'proicons:hourglass',
   },
   {
     label: 'Sesiones',
