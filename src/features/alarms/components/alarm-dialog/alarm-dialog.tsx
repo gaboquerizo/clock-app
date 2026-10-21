@@ -52,16 +52,17 @@ export default function AlarmDialog(props: AlarmDialogProps) {
   let previousExternalMode = props.mode;
   let previousFormKey = '';
   let formPanel!: HTMLDivElement;
-  let confirmationPanel!: HTMLDivElement;
+  let formContent!: HTMLFormElement;
+  let confirmationContent!: HTMLElement;
   let confirmationCancelButton!: HTMLButtonElement;
 
   const isConfirmation = () => activeMode() === 'confirm-delete';
 
   const updateContentHeight = () => {
-    const activePanel = isConfirmation() ? confirmationPanel : formPanel;
+    const activeContent = isConfirmation() ? confirmationContent : formContent;
 
-    if (activePanel !== undefined) {
-      setContentHeight(activePanel.scrollHeight);
+    if (activeContent !== undefined) {
+      setContentHeight(activeContent.scrollHeight);
     }
   };
 
@@ -188,7 +189,7 @@ export default function AlarmDialog(props: AlarmDialogProps) {
           class="alarm-dialog__content-switcher"
           style={{
             height:
-              contentHeight() === undefined ? 'auto' : `${contentHeight()}px`,
+              contentHeight() === undefined ? 'auto' : `calc(${contentHeight()}px + 7px)`,
           }}
         >
           <div
@@ -198,7 +199,11 @@ export default function AlarmDialog(props: AlarmDialogProps) {
             inert={isConfirmation()}
             ref={formPanel}
           >
-            <form class="alarm-dialog__form" onSubmit={submitForm}>
+            <form
+              class="alarm-dialog__form"
+              onSubmit={submitForm}
+              ref={formContent}
+            >
               <Show keyed when={formInstance()}>
                 <AlarmTimeInput initialValue={time()} onChange={setTime} />
               </Show>
@@ -229,14 +234,16 @@ export default function AlarmDialog(props: AlarmDialogProps) {
                     Eliminar
                   </button>
                 </Show>
-                <button
-                  class="alarm-dialog__button alarm-dialog__button--secondary"
-                  disabled={props.busy === true}
-                  type="button"
-                  onClick={props.onClose}
-                >
-                  Cancelar
-                </button>
+                <Show when={activeMode() === 'create'}>
+                  <button
+                    class="alarm-dialog__button alarm-dialog__button--secondary"
+                    disabled={props.busy === true}
+                    type="button"
+                    onClick={props.onClose}
+                  >
+                    Cancelar
+                  </button>
+                </Show>
                 <button
                   class="alarm-dialog__button alarm-dialog__button--primary"
                   disabled={props.busy === true}
@@ -253,9 +260,12 @@ export default function AlarmDialog(props: AlarmDialogProps) {
             class="alarm-dialog__content-panel alarm-dialog__confirmation-panel t-panel-slide"
             data-open={String(isConfirmation())}
             inert={!isConfirmation()}
-            ref={confirmationPanel}
           >
-            <section aria-labelledby="alarm-dialog-delete-title" class="alarm-dialog__confirmation">
+            <section
+              aria-labelledby="alarm-dialog-delete-title"
+              class="alarm-dialog__confirmation"
+              ref={confirmationContent}
+            >
               <h3 class="alarm-dialog__confirmation-title" id="alarm-dialog-delete-title">
                 ¿Eliminar esta alarma?
               </h3>

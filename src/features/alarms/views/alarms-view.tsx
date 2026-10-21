@@ -217,7 +217,9 @@ export default function AlarmsView() {
         <h1 class="alarms-view__title" id="alarms-view-title">
           Alarma
         </h1>
-        <AddAlarmButton onClick={openCreateDialog} />
+        <Show when={alarms.state.alarms.length > 0}>
+          <AddAlarmButton onClick={openCreateDialog} />
+        </Show>
       </header>
 
       <div class="alarms-view__content">

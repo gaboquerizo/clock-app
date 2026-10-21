@@ -47,6 +47,11 @@ async function createAlarmFromUi(
   await expect(
     page.getByRole('button', { name: `Editar alarma ${time}, ${label || 'Alarma'}` }),
   ).toBeVisible();
+  await expect(
+    page
+      .locator('.alarms-view__header')
+      .getByRole('button', { name: 'Añadir Alarma' }),
+  ).toBeVisible();
 }
 
 async function createAlarmAndTrigger(page: Page) {
@@ -78,9 +83,14 @@ test.describe('Alarms', () => {
       name: 'No tienes alarmas todavía.',
     });
     await expect(emptyState).toBeVisible();
-    await emptyState.getByRole('button', { name: 'Añadir Alarma' }).click();
     await expect(
-      page.getByRole('dialog', { name: 'Añadir alarma' }),
+      page.getByRole('button', { name: 'Añadir Alarma' }),
+    ).toHaveCount(1);
+    await emptyState.getByRole('button', { name: 'Añadir Alarma' }).click();
+    const createDialog = page.getByRole('dialog', { name: 'Añadir alarma' });
+    await expect(createDialog).toBeVisible();
+    await expect(
+      createDialog.getByRole('button', { name: 'Cancelar', exact: true }),
     ).toBeVisible();
   });
 
@@ -99,6 +109,15 @@ test.describe('Alarms', () => {
     await originalCard.click();
     const editDialog = page.getByRole('dialog', { name: 'Editar alarma' });
     await expect(editDialog.locator('header')).toHaveCount(0);
+    await expect(
+      editDialog.getByRole('button', { name: 'Eliminar', exact: true }),
+    ).toBeVisible();
+    await expect(
+      editDialog.getByRole('button', { name: 'Guardar', exact: true }),
+    ).toBeVisible();
+    await expect(
+      editDialog.getByRole('button', { name: 'Cancelar', exact: true }),
+    ).toHaveCount(0);
     await editDialog.getByRole('spinbutton', { name: 'Minutos' }).fill('45');
     await editDialog
       .getByRole('textbox', { name: 'Etiqueta de la alarma' })
@@ -251,6 +270,36 @@ test.describe('Alarms', () => {
     const confirmDialog = page.getByRole('dialog', {
       name: 'Eliminar alarma',
     });
+    await expect(confirmDialog).toBeVisible();
+    const confirmationSwitcher = confirmDialog.locator(
+      '.alarm-dialog__content-switcher',
+    );
+    const confirmationContent = confirmationSwitcher.locator(
+      '.alarm-dialog__confirmation',
+    );
+    await expect
+      .poll(async () => {
+        const [containerHeight, contentHeight] = await Promise.all([
+          confirmationSwitcher.evaluate((element) =>
+            element.getBoundingClientRect().height,
+          ),
+          confirmationContent.evaluate((element) => element.scrollHeight),
+        ]);
+
+        return Math.abs(containerHeight - contentHeight);
+      })
+      .toBeLessThanOrEqual(1);
+    const [confirmationContainerHeight, confirmationContentHeight] =
+      await Promise.all([
+        confirmationSwitcher.evaluate((element) =>
+          element.getBoundingClientRect().height,
+        ),
+        confirmationContent.evaluate((element) => element.scrollHeight),
+      ]);
+    expect(
+      Math.abs(confirmationContainerHeight - confirmationContentHeight),
+    ).toBeLessThanOrEqual(1);
+
     const cancelButton = confirmDialog.getByRole('button', {
       name: 'Cancelar',
     });
