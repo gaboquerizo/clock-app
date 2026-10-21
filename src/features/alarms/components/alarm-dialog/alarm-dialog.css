@@ -59,6 +59,7 @@
   flex-direction: column;
   gap: var(--app-space-M);
   min-width: 0;
+  margin-inline: var(--app-gap-S);
 }
 
 .alarm-dialog__label-field {
@@ -67,6 +68,7 @@
   gap: var(--app-gap-L);
   min-width: 0;
   padding: var(--app-gap-S) var(--app-gap-L);
+  
   border: var(--app-solid-S) var(--app-bg-2);
   border-radius: var(--app-radius-S);
   background-color: var(--app-bg-2);

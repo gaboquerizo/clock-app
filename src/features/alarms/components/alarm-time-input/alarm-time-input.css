@@ -27,6 +27,8 @@
   grid-template-rows: var(--icon-L) auto var(--icon-L);
   justify-items: center;
   min-width: 0;
+  margin: var(--app-gap-S);
+  gap: var(--app-gap-S);
 }
 
 .alarm-time-input__step {
@@ -66,12 +68,11 @@
   box-sizing: border-box;
   width: var(--size-80);
   height: var(--size-80);
-  padding: var(--app-gap-M);
   border: var(--app-solid-S) var(--app-bg-2);
   border-radius: var(--app-radius-S);
   background-color: var(--app-bg-2);
   color: var(--app-txt-1);
-  font-size: var(--display-L);
+  font-size: var(--display-S);
   font-variant-numeric: tabular-nums;
   line-height: 1;
   text-align: center;

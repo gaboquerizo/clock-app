@@ -158,14 +158,13 @@ function renderIcon(name: IconName) {
       );
     case 'proicons:edit':
       return (
-        <path
+        <g
           fill="none"
           stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
           stroke-width="1"
-          d="M14.45 5.55L18.45 9.55M4.25 19.75l3.78-.83L20.08 6.87a2 2 0 0 0-2.83-2.83L5.2 16.09z"
-        />
+        >
+          <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M14.44 5.78L4.198 16.02a2 2 0 0 0-.565 1.125l-.553 3.774l3.775-.553A2 2 0 0 0 7.98 19.8L18.22 9.56m-3.78-3.78l2.229-2.23a1.6 1.6 0 0 1 2.263 0l1.518 1.518a1.6 1.6 0 0 1 0 2.263l-2.23 2.23M14.44 5.78l3.78 3.78" />
+        </g>
       );
     case 'proicons:delete':
       return (
