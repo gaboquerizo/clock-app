@@ -2,9 +2,15 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  position: fixed;
+  inset-block-start: var(--app-space-S);
+  inset-inline-start: var(--app-space-S);
+  width: var(--app-sidebar-expanded);
+  height: calc(100dvh - 2em);
   min-width: 0;
   padding: var(--app-space-M);
+  border-radius: var(--app-radius-M);
+  background-color: var(--app-bg-1);
   color: var(--app-txt-1);
 }
 
@@ -139,6 +145,7 @@
 @media (max-width: 768px) {
   .app-sidebar {
     align-items: center;
+    width: var(--app-sidebar-collapsed);
     padding: var(--app-space-M) var(--app-gap-M);
   }
 
