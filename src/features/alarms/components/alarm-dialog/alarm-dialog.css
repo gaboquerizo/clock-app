@@ -77,8 +77,8 @@
 
 .alarm-dialog__label-icon {
   flex: 0 0 auto;
-  width: var(--icon-L);
-  height: var(--icon-L);
+  width: var(--icon-M);
+  height: var(--icon-M);
 }
 
 .alarm-dialog__label-input {

@@ -35,8 +35,8 @@
 .alarms-view__content-body {
   display: flex;
   flex: 1;
-  align-items: center;
-  justify-content: center;
+  align-items: start;
+  justify-content: start;
   min-height: 0;
   width: 100%;
 }

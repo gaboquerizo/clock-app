@@ -1,8 +1,10 @@
 .ui-dialog {
   width: min(calc(100% - var(--app-space-L)), var(--w-20));
   max-width: var(--w-20);
+  margin: auto;
   padding: 0;
   border: 0;
+  inset: 0;
   border-radius: var(--app-radius-L);
   background-color: var(--app-bg-1);
   box-shadow: var(--shadow-slate-05);

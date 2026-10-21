@@ -1,24 +1,26 @@
 .alarm-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--app-space-S);
   min-width: 0;
   min-height: var(--size-144);
   padding: var(--app-space-M);
   border: var(--app-solid-S) var(--app-bg-2);
-  border-radius: var(--app-radius-L);
+  border-radius: var(--app-radius-M);
+  box-shadow: var(--shadow-slate-01);
   background-color: var(--app-bg-1);
   color: var(--app-txt-1);
 }
 
 .alarm-card:hover {
-  background-color: var(--app-bg-2);
+  background-color: var(--app-bg-1);
 }
 
 .alarm-card--disabled {
   color: var(--app-txt-3);
-  opacity: 0.62;
+  opacity: 0.5;
+  box-shadow: 0 0 0;
 }
 
 .alarm-card__edit {
@@ -42,7 +44,7 @@
 
 .alarm-card__time {
   color: inherit;
-  font-size: var(--display-L);
+  font-size: var(--display-S);
   font-variant-numeric: tabular-nums;
   line-height: 1;
   white-space: nowrap;
@@ -151,6 +153,6 @@
 
 @media (max-width: 768px) {
   .alarm-card__time {
-    font-size: var(--display-mobile-L);
+    font-size: var(--display-mobile-S);
   }
 }
