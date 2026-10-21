@@ -9,3 +9,25 @@ body {
     min-height: 100%;
     margin: 0;
 }
+
+/* Ancho de la barra */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* Fondo de la pista */
+::-webkit-scrollbar-track {
+  background: var(--app-bg-2);
+  border-radius: 6px;
+}
+
+/* El tirador (thumb) */
+::-webkit-scrollbar-thumb {
+  background: var(--app-bg-3);
+  border-radius: 6px;
+}
+
+/* Tirador al pasar el cursor */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--app-bg-5);
+}

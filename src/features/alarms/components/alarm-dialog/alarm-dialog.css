@@ -120,7 +120,7 @@
 
 .alarm-dialog__button {
   min-height: var(--app-logo);
-  padding: var(--app-gap-L) var(--app-space-M);
+  padding: var(--app-gap-M) var(--app-space-M);
   border: var(--app-solid-S) transparent;
   border-radius: var(--app-radius-M);
   cursor: pointer;

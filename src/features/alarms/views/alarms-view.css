@@ -35,10 +35,14 @@
 .alarms-view__content-body {
   display: flex;
   flex: 1;
-  align-items: start;
+  align-items: center;
   justify-content: start;
   min-height: 0;
   width: 100%;
+}
+
+.alarms-view__content-body:has(.alarms-view__list) {
+  align-items: start;
 }
 
 .alarms-view__list {
