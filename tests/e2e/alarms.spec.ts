@@ -33,6 +33,7 @@ async function createAlarmFromUi(
 
   const dialog = page.getByRole('dialog', { name: 'Añadir alarma' });
   await expect(dialog).toBeVisible();
+  await expect(dialog.locator('header')).toHaveCount(0);
   await dialog.getByRole('spinbutton', { name: 'Horas' }).fill(time.slice(0, 2));
   await dialog
     .getByRole('spinbutton', { name: 'Minutos' })
@@ -97,6 +98,7 @@ test.describe('Alarms', () => {
 
     await originalCard.click();
     const editDialog = page.getByRole('dialog', { name: 'Editar alarma' });
+    await expect(editDialog.locator('header')).toHaveCount(0);
     await editDialog.getByRole('spinbutton', { name: 'Minutos' }).fill('45');
     await editDialog
       .getByRole('textbox', { name: 'Etiqueta de la alarma' })
@@ -142,6 +144,7 @@ test.describe('Alarms', () => {
       name: 'Eliminar alarma',
     });
     await expect(confirmDialog).toBeVisible();
+    await expect(confirmDialog.locator('header')).toHaveCount(0);
     await expect(page.getByRole('dialog')).toHaveCount(1);
     await expect(confirmDialog.getByText('¿Eliminar esta alarma?')).toBeVisible();
     await expect(confirmDialog).toContainText(
@@ -198,6 +201,10 @@ test.describe('Alarms', () => {
     page,
   }) => {
     const alertDialog = await createAlarmAndTrigger(page);
+    await expect(alertDialog.locator('header')).toBeVisible();
+    await expect(
+      alertDialog.getByRole('heading', { name: 'Alarma · 06:01' }),
+    ).toBeVisible();
     const acceptButton = alertDialog.getByRole('button', { name: 'Aceptar' });
 
     await expect(acceptButton).toBeFocused();

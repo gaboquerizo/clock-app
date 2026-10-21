@@ -35,7 +35,7 @@ export type AlarmDialogProps = {
   open: boolean;
 };
 
-function getModeTitle(mode: AlarmDialogMode): string {
+function getAccessibleName(mode: AlarmDialogMode): string {
   if (mode === 'confirm-delete') {
     return 'Eliminar alarma';
   }
@@ -160,7 +160,8 @@ export default function AlarmDialog(props: AlarmDialogProps) {
   return (
     <UiDialog
       open={props.open}
-      title={getModeTitle(activeMode())}
+      showHeader={false}
+      title={getAccessibleName(activeMode())}
       onClose={props.onClose}
     >
       <div aria-busy={props.busy === true} class="alarm-dialog">

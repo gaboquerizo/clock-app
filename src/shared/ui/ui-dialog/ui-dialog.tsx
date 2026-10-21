@@ -3,6 +3,7 @@ import {
   createEffect,
   createUniqueId,
   onCleanup,
+  Show,
   type JSX,
   type ParentProps,
 } from 'solid-js';
@@ -17,6 +18,7 @@ export type UiDialogProps = ParentProps<{
   icon?: JSX.Element;
   onClose: () => void;
   open: boolean;
+  showHeader?: boolean;
   title: string;
 }>;
 
@@ -26,6 +28,7 @@ export default function UiDialog(props: UiDialogProps) {
   let suppressCloseCallback = false;
   const titleId = `ui-dialog-title-${createUniqueId()}`;
   const descriptionId = `ui-dialog-description-${createUniqueId()}`;
+  const showHeader = () => props.showHeader !== false;
 
   createEffect(() => {
     if (props.open) {
@@ -90,8 +93,11 @@ export default function UiDialog(props: UiDialogProps) {
 
   return (
     <dialog
-      aria-describedby={props.description ? descriptionId : undefined}
-      aria-labelledby={titleId}
+      aria-describedby={
+        props.description && showHeader() ? descriptionId : undefined
+      }
+      aria-label={showHeader() ? undefined : props.title}
+      aria-labelledby={showHeader() ? titleId : undefined}
       class={`ui-dialog ${props.class ?? ''}`}
       ref={dialogElement}
       onCancel={handleCancel}
@@ -99,23 +105,25 @@ export default function UiDialog(props: UiDialogProps) {
       onClick={handleSurfaceClick}
     >
       <div class="ui-dialog__surface">
-        <header class="ui-dialog__header">
-          {props.icon && (
-            <div aria-hidden="true" class="ui-dialog__icon">
-              {props.icon}
-            </div>
-          )}
-          <div class="ui-dialog__heading">
-            <h2 class="ui-dialog__title" id={titleId}>
-              {props.title}
-            </h2>
-            {props.description && (
-              <p class="ui-dialog__description" id={descriptionId}>
-                {props.description}
-              </p>
+        <Show when={showHeader()}>
+          <header class="ui-dialog__header">
+            {props.icon && (
+              <div aria-hidden="true" class="ui-dialog__icon">
+                {props.icon}
+              </div>
             )}
-          </div>
-        </header>
+            <div class="ui-dialog__heading">
+              <h2 class="ui-dialog__title" id={titleId}>
+                {props.title}
+              </h2>
+              {props.description && (
+                <p class="ui-dialog__description" id={descriptionId}>
+                  {props.description}
+                </p>
+              )}
+            </div>
+          </header>
+        </Show>
         <div class="ui-dialog__content">{props.children}</div>
       </div>
     </dialog>
