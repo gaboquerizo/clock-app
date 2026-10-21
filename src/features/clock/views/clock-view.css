@@ -50,6 +50,7 @@
   margin: 0;
   padding: var(--app-gap-L) var(--app-space-M);
   border-radius: var(--app-radius-S);
+  box-shadow: var(--shadow-slate-01);
   background-color: var(--app-bg-1);
   color: var(--app-txt-1);
 }

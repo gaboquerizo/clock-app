@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: var(--app-space-M);
+  gap: var(--app-space-S);
   min-width: 0;
 }
 
@@ -13,7 +13,7 @@
   align-self: center;
   width: var(--size-64);
   height: var(--size-64);
-  margin-top: calc(var(--app-space-S) * -1);
+  margin-top: calc(var(--app-space-S) * -3.3);
   border-radius: 50%;
   background-color: var(--app-bg-2);
   color: var(--app-accent);

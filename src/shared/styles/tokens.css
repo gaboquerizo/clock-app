@@ -23,6 +23,7 @@
     /* Provisional */
     --app-bg-1: var(--slate-100);
     --app-bg-2: var(--slate-200);
+    --app-bg-overlay: var(--blue-900);
 
     --app-txt-1: var(--slate-800);
     --app-txt-2: var(--slate-700);

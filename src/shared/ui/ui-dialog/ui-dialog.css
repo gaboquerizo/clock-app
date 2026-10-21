@@ -5,6 +5,7 @@
   padding: 0;
   border: 0;
   inset: 0;
+  overflow: visible;
   border-radius: var(--app-radius-L);
   background-color: var(--app-bg-1);
   box-shadow: var(--shadow-slate-05);
@@ -12,7 +13,7 @@
 }
 
 .ui-dialog::backdrop {
-  background-color: rgb(from var(--app-txt-1) r g b / 42%);
+  background-color: rgb(from var(--app-bg-overlay) r g b / 30%);
 }
 
 .ui-dialog__surface {
