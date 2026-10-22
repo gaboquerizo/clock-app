@@ -1,6 +1,7 @@
 import './timers-view.css';
 
 import AppIcon from '@/shared/ui/ui-icon/ui-icon';
+import UiEmptyState from '@/shared/ui/ui-empty-state/ui-empty-state';
 
 function AddTimerButton() {
   return (
@@ -18,11 +19,18 @@ export default function TimersView() {
         <h1 class="timers-view__title" id="timers-view-title">
           Temporizador
         </h1>
-        <AddTimerButton />
       </header>
 
       <div class="timers-view__content">
-        <div class="timers-view__content-body" />
+        <div class="timers-view__content-body">
+          <UiEmptyState
+            description="Crea tu primer temporizador con el botón «Añadir temporizador»."
+            icon="proicons:timer"
+            title="No tienes temporizadores todavía."
+          >
+            <AddTimerButton />
+          </UiEmptyState>
+        </div>
       </div>
     </section>
   );

@@ -18,10 +18,19 @@ test('navigates to Timers while keeping the app shell and existing routes availa
 
   await navigation.getByRole('link', { name: 'Temporizador' }).click();
   await expect(page).toHaveURL(/\/timers$/);
-  await expect(main.getByRole('heading', { name: 'Temporizador' })).toBeVisible();
+  await expect(
+    main.getByRole('heading', { name: 'Temporizador', exact: true }),
+  ).toBeVisible();
+  const emptyState = main.getByRole('region', {
+    name: 'No tienes temporizadores todavía.',
+  });
+  await expect(emptyState).toBeVisible();
+  await expect(
+    emptyState.getByRole('button', { name: 'Añadir temporizador' }),
+  ).toBeVisible();
   await expect(
     main.getByRole('button', { name: 'Añadir temporizador' }),
-  ).toBeVisible();
+  ).toHaveCount(1);
   await expect(main.locator('.timers-view__content-body')).toBeVisible();
   await expect(sidebar).toBeVisible();
   await expect(
