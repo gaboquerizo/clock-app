@@ -1,9 +1,16 @@
 import type {
+  CompletedTimer,
   CreateTimerInput,
+  PausedTimer,
+  ReadyTimer,
+  RunningTimer,
   Timer,
   TimerDomainError,
   TimerField,
+  TimerReconciliationResult,
   TimerResult,
+  TimerTransition,
+  UpdateTimerInput,
 } from './timer.types';
 import {
   hasDuplicateTimerId,
@@ -152,7 +159,7 @@ export function validateTimer(value: unknown): TimerResult<Timer> {
 export function createTimer(
   input: CreateTimerInput,
   existingTimers: readonly Timer[] = [],
-): TimerResult<Extract<Timer, { status: 'ready' }>> {
+): TimerResult<ReadyTimer> {
   if (hasDuplicateTimerId(existingTimers, input.id)) {
     return failure('duplicate-id', 'id');
   }
@@ -176,4 +183,193 @@ export function createTimer(
   }
 
   return success(timer.value);
+}
+
+export function updateTimer(
+  timer: Timer,
+  input: UpdateTimerInput,
+  timestamp: number,
+): TimerResult<ReadyTimer> {
+  const current = validateTimer(timer);
+
+  if (!current.ok) {
+    return current;
+  }
+
+  if (!isValidTimerDuration(input.durationMs)) {
+    return failure('invalid-duration', 'durationMs');
+  }
+
+  if (input.label !== undefined && typeof input.label !== 'string') {
+    return failure('invalid-label', 'label');
+  }
+
+  if (
+    !isValidTimerTimestamp(timestamp) ||
+    timestamp < current.value.updatedAt
+  ) {
+    return failure('invalid-timestamp', 'updatedAt');
+  }
+
+  const updated = validateTimer({
+    id: current.value.id,
+    durationMs: input.durationMs,
+    label: input.label ?? current.value.label,
+    status: 'ready',
+    remainingMs: input.durationMs,
+    createdAt: current.value.createdAt,
+    updatedAt: timestamp,
+  });
+
+  if (!updated.ok) {
+    return updated;
+  }
+
+  if (updated.value.status !== 'ready') {
+    return failure('invalid-state', 'status');
+  }
+
+  return success(updated.value);
+}
+
+function createRunningTimer(
+  timer: Timer,
+  remainingMs: number,
+  timestamp: number,
+): TimerResult<RunningTimer> {
+  const endsAt = timestamp + remainingMs;
+
+  if (!isValidTimerTimestamp(endsAt)) {
+    return failure('invalid-timestamp', 'endsAt');
+  }
+
+  return success({
+    id: timer.id,
+    durationMs: timer.durationMs,
+    label: timer.label,
+    status: 'running',
+    startedAt: timestamp,
+    endsAt,
+    remainingAtStartMs: remainingMs,
+    createdAt: timer.createdAt,
+    updatedAt: timestamp,
+  });
+}
+
+function toCompletedTimer(
+  timer: RunningTimer,
+  timestamp: number,
+): CompletedTimer {
+  return {
+    id: timer.id,
+    durationMs: timer.durationMs,
+    label: timer.label,
+    status: 'completed',
+    completedAt: timer.endsAt,
+    createdAt: timer.createdAt,
+    updatedAt: timestamp,
+  };
+}
+
+export function reconcileTimer(
+  timer: Timer,
+  timestamp: number,
+): TimerResult<TimerReconciliationResult> {
+  const validation = validateTimer(timer);
+
+  if (!validation.ok) {
+    return validation;
+  }
+
+  const current = validation.value;
+
+  if (
+    !isValidTimerTimestamp(timestamp) ||
+    timestamp < current.updatedAt
+  ) {
+    return failure('invalid-timestamp', 'updatedAt');
+  }
+
+  if (current.status !== 'running' || timestamp < current.endsAt) {
+    return success({ timer: current, completed: false });
+  }
+
+  return success({
+    timer: toCompletedTimer(current, timestamp),
+    completed: true,
+  });
+}
+
+export function transitionTimer(
+  timer: Timer,
+  transition: TimerTransition,
+  timestamp: number,
+): TimerResult<Timer> {
+  const reconciliation = reconcileTimer(timer, timestamp);
+
+  if (!reconciliation.ok) {
+    return reconciliation;
+  }
+
+  const current = reconciliation.value.timer;
+
+  if (transition === 'start' && current.status === 'ready') {
+    return createRunningTimer(current, current.durationMs, timestamp);
+  }
+
+  if (transition === 'pause' && current.status === 'running') {
+    const remainingMs = current.endsAt - timestamp;
+
+    if (!isValidTimerDuration(remainingMs)) {
+      return failure('invalid-transition', 'remainingMs');
+    }
+
+    const pausedTimer: PausedTimer = {
+      id: current.id,
+      durationMs: current.durationMs,
+      label: current.label,
+      status: 'paused',
+      remainingMs,
+      createdAt: current.createdAt,
+      updatedAt: timestamp,
+    };
+
+    return success(pausedTimer);
+  }
+
+  if (transition === 'resume' && current.status === 'paused') {
+    return createRunningTimer(current, current.remainingMs, timestamp);
+  }
+
+  if (transition === 'restart' && current.status === 'running') {
+    return createRunningTimer(current, current.durationMs, timestamp);
+  }
+
+  if (transition === 'restart' && current.status === 'paused') {
+    return success({
+      id: current.id,
+      durationMs: current.durationMs,
+      label: current.label,
+      status: 'paused',
+      remainingMs: current.durationMs,
+      createdAt: current.createdAt,
+      updatedAt: timestamp,
+    });
+  }
+
+  if (transition === 'restart' && current.status === 'completed') {
+    const readyTimer: ReadyTimer = {
+      id: current.id,
+      durationMs: current.durationMs,
+      label: current.label,
+      status: 'ready',
+      remainingMs: current.durationMs,
+      createdAt: current.createdAt,
+      updatedAt: timestamp,
+    };
+
+    return success(readyTimer);
+  }
+
+  return failure('invalid-transition');
 }

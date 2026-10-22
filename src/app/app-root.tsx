@@ -7,6 +7,8 @@ import GlobalAlertHost from '@/app/global-alert/global-alert-host';
 import { createAlarmsRuntime } from '@/features/alarms/state/alarms-runtime';
 import { AlarmsStateProvider } from '@/features/alarms/state/alarms-context';
 import { createAlarmsState } from '@/features/alarms/state/alarms-state';
+import { TimersStateProvider } from '@/features/timers/state/timers-context';
+import { createTimersState } from '@/features/timers/state/timers-state';
 
 /*—————————— Styles ——————————*/
 import './app-root.css';
@@ -17,6 +19,7 @@ import AppSidebar from '../shared/layouts/sidebar/app-sidebar';
 export default function AppRoot(props: RouteSectionProps) {
   const alarms = createAlarmsState();
   const alarmsRuntime = createAlarmsRuntime(alarms);
+  const timers = createTimersState();
   const unsubscribeAlarmAlertBridge =
     connectAlarmsToGlobalAlerts(alarmsRuntime);
 
@@ -26,6 +29,7 @@ export default function AppRoot(props: RouteSectionProps) {
 
   onMount(() => {
     void alarmsRuntime.start();
+    void timers.actions.load();
   });
 
   onCleanup(() => {
@@ -36,12 +40,14 @@ export default function AppRoot(props: RouteSectionProps) {
   return (
     <GlobalAlertHost>
       <AlarmsStateProvider value={alarms}>
-        <div class="app-shell">
-          <aside class="app-shell__sidebar">
-            <AppSidebar />
-          </aside>
-          <main class="app-shell__main">{props.children}</main>
-        </div>
+        <TimersStateProvider value={timers}>
+          <div class="app-shell">
+            <aside class="app-shell__sidebar">
+              <AppSidebar />
+            </aside>
+            <main class="app-shell__main">{props.children}</main>
+          </div>
+        </TimersStateProvider>
       </AlarmsStateProvider>
     </GlobalAlertHost>
   );

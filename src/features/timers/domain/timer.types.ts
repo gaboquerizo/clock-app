@@ -55,6 +55,11 @@ export type RemoveTimerInput = {
 
 export type TimerTransition = 'start' | 'pause' | 'resume' | 'restart';
 
+export type TimerReconciliationResult = {
+  timer: Timer;
+  completed: boolean;
+};
+
 export type TimerField =
   | 'id'
   | 'durationMs'
