@@ -13,3 +13,76 @@
   font-weight: 400;
   line-height: 1.2;
 }
+
+.timers-view__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--app-space-S);
+  min-height: var(--app-logo);
+}
+
+.timers-view__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: stretch;
+  min-height: 0;
+  padding-block: var(--app-space-L);
+}
+
+.timers-view__content-body {
+  display: flex;
+  flex: 1;
+  align-items: flex-start;
+  min-height: 0;
+  width: 100%;
+}
+
+.timers-view__add-button {
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: var(--app-gap-L);
+  min-height: var(--app-logo);
+  max-width: 100%;
+  padding: var(--app-gap-L) var(--app-space-M);
+  border: 0;
+  border-radius: var(--app-radius-S);
+  background-color: var(--app-accent);
+  color: var(--app-bg-1);
+  cursor: pointer;
+  font-size: var(--body-M);
+  line-height: 1.25;
+}
+
+.timers-view__add-button:hover {
+  filter: brightness(1.08);
+}
+
+.timers-view__add-button:active {
+  filter: brightness(0.96);
+}
+
+.timers-view__add-button:focus-visible {
+  outline: var(--app-solid-M) var(--app-focus);
+  outline-offset: var(--app-offset);
+}
+
+.timers-view__add-icon {
+  flex: 0 0 auto;
+  width: var(--icon-M);
+  height: var(--icon-M);
+}
+
+@media (max-width: 768px) {
+  .timers-view__header {
+    align-items: flex-start;
+  }
+
+  .timers-view__add-button {
+    flex-basis: 100%;
+  }
+}
