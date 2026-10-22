@@ -5,6 +5,7 @@ import { createComponent } from 'solid-js';
 /*—————————— Functions ——————————*/
 import AlarmsView from '../../features/alarms/views/alarms-view';
 import ClockView from '../../features/clock/views/clock-view';
+import TimersView from '@/features/timers/views/timers-view';
 import AppRoot from '../app-root';
 
 export const appRoutes: RouteDefinition[] = [
@@ -19,6 +20,10 @@ export const appRoutes: RouteDefinition[] = [
   {
     path: '/alarms',
     component: AlarmsView,
+  },
+  {
+    path: '/timers',
+    component: TimersView,
   },
 ];
 
