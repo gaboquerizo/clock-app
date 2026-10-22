@@ -1,0 +1,102 @@
+.timer-card {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--app-space-M);
+  min-width: 0;
+  min-height: var(--size-144);
+  padding: var(--app-space-M);
+  border: var(--app-solid-S) var(--app-bg-2);
+  border-radius: var(--app-radius-M);
+  box-shadow: var(--shadow-slate-01);
+  background-color: var(--app-bg-1);
+  color: var(--app-txt-1);
+}
+
+.timer-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--app-space-S);
+  min-width: 0;
+}
+
+.timer-card__label {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: inherit;
+  font-size: var(--body-L);
+  font-weight: 500;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timer-card__status {
+  flex: 0 0 auto;
+  padding: var(--app-gap-S) var(--app-gap-L);
+  border-radius: var(--app-radius-S);
+  background-color: var(--app-bg-2);
+  color: var(--app-txt-2);
+  font-size: var(--body-S);
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.timer-card--running .timer-card__status {
+  color: var(--app-accent);
+}
+
+.timer-card__reading {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  min-width: 0;
+  gap: var(--app-gap-M);
+}
+
+.timer-card__reading-label,
+.timer-card__duration-label {
+  color: var(--app-txt-3);
+  font-size: var(--body-S);
+  line-height: 1.25;
+}
+
+.timer-card__remaining {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--app-txt-1);
+  font-size: var(--display-S);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timer-card--completed .timer-card__remaining {
+  color: var(--app-txt-3);
+}
+
+.timer-card__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--app-gap-M);
+  min-width: 0;
+  padding-top: var(--app-space-S);
+  border-top: var(--app-solid-S) var(--app-bg-2);
+}
+
+.timer-card__duration {
+  color: var(--app-txt-2);
+  font-size: var(--body-M);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+}
+
+@media (max-width: 768px) {
+  .timer-card__remaining {
+    font-size: var(--display-mobile-S);
+  }
+}

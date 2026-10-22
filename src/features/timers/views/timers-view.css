@@ -41,6 +41,32 @@
   width: 100%;
 }
 
+.timers-view__content-body:has(.timers-view__list) {
+  align-items: flex-start;
+}
+
+.timers-view__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--w-18)), 1fr));
+  align-content: start;
+  gap: var(--app-space-S);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.timers-view__list-item {
+  min-width: 0;
+}
+
+.timers-view__message {
+  margin: 0;
+  color: var(--app-txt-2);
+  font-size: var(--body-M);
+  text-align: center;
+}
+
 .timers-view__add-button {
   display: inline-flex;
   flex: 0 1 auto;
