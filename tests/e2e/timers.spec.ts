@@ -185,6 +185,9 @@ test('renders persisted timer records as independent cards with real states', as
   );
 
   await expect(
-    list.getByRole('button', { name: /Iniciar|Pausar|Editar/ }),
+    list.getByRole('button', { name: /Iniciar|Pausar/ }),
   ).toHaveCount(0);
+  await expect(
+    list.getByRole('button', { name: /^Editar temporizador/ }),
+  ).toHaveCount(4);
 });

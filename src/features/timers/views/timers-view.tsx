@@ -21,13 +21,30 @@ function AddTimerButton(props: { onClick: () => void }) {
   );
 }
 
-function TimerList(props: { timers: Timer[] }) {
+function TimerList(props: { timers: Timer[]; onEdit: (timer: Timer) => void }) {
   return (
     <ul aria-label="Temporizadores configurados" class="timers-view__list">
       <For each={props.timers}>
         {(timer) => (
           <li class="timers-view__list-item">
-            <TimerCard timer={timer} />
+            <TimerCard
+              actions={
+                <button
+                  aria-label={`Editar temporizador ${timer.label.trim() || 'Temporizador'}`}
+                  class="timer-card__edit-button"
+                  type="button"
+                  onClick={() => props.onEdit(timer)}
+                >
+                  <AppIcon
+                    aria-hidden="true"
+                    class="timer-card__edit-icon"
+                    name="proicons:edit"
+                  />
+                  <span>Editar</span>
+                </button>
+              }
+              timer={timer}
+            />
           </li>
         )}
       </For>
@@ -38,29 +55,45 @@ function TimerList(props: { timers: Timer[] }) {
 export default function TimersView() {
   const timers = useTimersState();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = createSignal(false);
-  const [isCreating, setIsCreating] = createSignal(false);
-  const [creationError, setCreationError] = createSignal<string>();
+  const [dialogMode, setDialogMode] = createSignal<'create' | 'edit'>('create');
+  const [selectedTimer, setSelectedTimer] = createSignal<Timer>();
+  const [isSaving, setIsSaving] = createSignal(false);
+  const [dialogError, setDialogError] = createSignal<string>();
   const isLoading = () =>
     timers.state.status === 'idle' || timers.state.status === 'loading';
   const hasLoadError = () =>
     timers.state.status === 'error' && timers.state.error?.operation === 'load';
 
   const openCreateDialog = () => {
-    setCreationError(undefined);
+    setDialogError(undefined);
+    setSelectedTimer(undefined);
+    setDialogMode('create');
     setIsCreateDialogOpen(true);
   };
 
-  const createTimer = async (value: TimerDialogValue) => {
-    if (isCreating()) return;
+  const openEditDialog = (timer: Timer) => {
+    setDialogError(undefined);
+    setSelectedTimer(timer);
+    setDialogMode('edit');
+    setIsCreateDialogOpen(true);
+  };
 
-    setIsCreating(true);
-    setCreationError(undefined);
+  const saveTimer = async (value: TimerDialogValue) => {
+    if (isSaving()) return;
+
+    setIsSaving(true);
+    setDialogError(undefined);
 
     try {
-      const result = await timers.actions.create(value);
+      const currentTimer = selectedTimer();
+      const result =
+        dialogMode() === 'edit' && currentTimer !== undefined
+          ? await timers.actions.update(currentTimer.id, value)
+          : await timers.actions.create(value);
 
       if (result.ok) {
         setIsCreateDialogOpen(false);
+        setSelectedTimer(undefined);
         return;
       }
 
@@ -71,16 +104,25 @@ export default function TimersView() {
             ? 'No se pudo asignar una identidad única. Inténtalo de nuevo.'
             : result.error.code === 'invalid-duration'
               ? 'La duración debe ser mayor que cero y estar dentro del rango permitido.'
-              : 'No se pudo guardar el temporizador. Inténtalo de nuevo.';
+              : result.error.code === 'not-found'
+                ? 'El temporizador ya no está disponible.'
+                : 'No se pudo guardar el temporizador. Inténtalo de nuevo.';
 
-      setCreationError(message);
+      setDialogError(message);
       timers.actions.clearError();
     } catch {
-      setCreationError('No se pudo guardar el temporizador. Inténtalo de nuevo.');
+      setDialogError('No se pudo guardar el temporizador. Inténtalo de nuevo.');
       timers.actions.clearError();
     } finally {
-      setIsCreating(false);
+      setIsSaving(false);
     }
+  };
+
+  const closeDialog = () => {
+    if (isSaving()) return;
+    setIsCreateDialogOpen(false);
+    setSelectedTimer(undefined);
+    setDialogError(undefined);
   };
 
   return (
@@ -125,18 +167,19 @@ export default function TimersView() {
                 </UiEmptyState>
               }
             >
-              <TimerList timers={timers.state.timers} />
+              <TimerList onEdit={openEditDialog} timers={timers.state.timers} />
             </Show>
           </Show>
         </div>
       </div>
       <TimerDialog
-        busy={isCreating()}
-        error={creationError()}
-        mode="create"
+        busy={isSaving()}
+        error={dialogError()}
+        mode={dialogMode()}
         open={isCreateDialogOpen()}
-        onClose={() => setIsCreateDialogOpen(false)}
-        onSubmit={createTimer}
+        timer={selectedTimer()}
+        onClose={closeDialog}
+        onSubmit={saveTimer}
       />
     </section>
   );

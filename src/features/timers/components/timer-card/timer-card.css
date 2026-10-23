@@ -95,6 +95,38 @@
   line-height: 1.25;
 }
 
+.timer-card__edit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--app-gap-S);
+  min-height: var(--app-logo);
+  margin-inline-start: auto;
+  padding: var(--app-gap-S) var(--app-gap-L);
+  border: var(--app-solid-S) var(--app-focus);
+  border-radius: var(--app-radius-S);
+  background-color: transparent;
+  color: var(--app-txt-2);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--body-S);
+  line-height: 1.25;
+}
+
+.timer-card__edit-button:hover {
+  color: var(--app-accent);
+}
+
+.timer-card__edit-button:focus-visible {
+  outline: var(--app-solid-M) var(--app-focus);
+  outline-offset: var(--app-offset);
+}
+
+.timer-card__edit-icon {
+  width: var(--icon-S);
+  height: var(--icon-S);
+}
+
 @media (max-width: 768px) {
   .timer-card__remaining {
     font-size: var(--display-mobile-S);
