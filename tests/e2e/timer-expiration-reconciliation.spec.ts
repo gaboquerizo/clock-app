@@ -58,6 +58,14 @@ test('completes expired timers on restore and preserves paused remaining time', 
   }, timerIds);
 
   await page.reload();
+
+  const recoveredAlert = page.getByRole('dialog', {
+    name: 'Temporizador finalizado',
+  });
+  await expect(recoveredAlert).toContainText('Expired after suspension');
+  await page.keyboard.press('Enter');
+  await expect(recoveredAlert).not.toBeVisible();
+
   await page.getByRole('link', { name: 'Temporizador' }).click();
 
   const expiredCard = page.locator(`[data-timer-id="${timerIds[0]}"]`);

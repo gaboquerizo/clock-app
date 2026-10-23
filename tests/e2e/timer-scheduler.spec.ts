@@ -54,6 +54,14 @@ test('keeps independent timer schedules active while navigating between routes',
 
   await page.getByRole('link', { name: 'Reloj' }).click();
   await page.clock.runFor(2_000);
+
+  const shortTimerAlert = page.getByRole('dialog', {
+    name: 'Temporizador finalizado',
+  });
+  await expect(shortTimerAlert).toContainText('Short timer');
+  await page.keyboard.press('Enter');
+  await expect(shortTimerAlert).not.toBeVisible();
+
   await page.getByRole('link', { name: 'Temporizador' }).click();
 
   await expect(
@@ -65,6 +73,14 @@ test('keeps independent timer schedules active while navigating between routes',
 
   await page.getByRole('link', { name: 'Reloj' }).click();
   await page.clock.runFor(2_000);
+
+  const longTimerAlert = page.getByRole('dialog', {
+    name: 'Temporizador finalizado',
+  });
+  await expect(longTimerAlert).toContainText('Long timer');
+  await page.keyboard.press('Enter');
+  await expect(longTimerAlert).not.toBeVisible();
+
   await page.getByRole('link', { name: 'Temporizador' }).click();
 
   await expect(

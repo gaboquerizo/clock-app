@@ -3,6 +3,7 @@ import { createEffect, onCleanup, onMount } from 'solid-js';
 import type { RouteSectionProps } from '@solidjs/router';
 
 import { connectAlarmsToGlobalAlerts } from '@/app/global-alert/alarms-alert-bridge';
+import { connectTimersToGlobalAlerts } from '@/app/global-alert/timers-alert-bridge';
 import { createScheduler } from '@/core/time/scheduler';
 import GlobalAlertHost from '@/app/global-alert/global-alert-host';
 import { createAlarmsRuntime } from '@/features/alarms/state/alarms-runtime';
@@ -30,6 +31,8 @@ export default function AppRoot(props: RouteSectionProps) {
   cancelTimerProcess = timersRuntime.cancel;
   const unsubscribeAlarmAlertBridge =
     connectAlarmsToGlobalAlerts(alarmsRuntime);
+  const unsubscribeTimerAlertBridge =
+    connectTimersToGlobalAlerts(timersRuntime);
 
   createEffect(() => {
     alarmsRuntime.sync(alarms.state.alarms);
@@ -47,6 +50,7 @@ export default function AppRoot(props: RouteSectionProps) {
 
   onCleanup(() => {
     unsubscribeAlarmAlertBridge();
+    unsubscribeTimerAlertBridge();
     alarmsRuntime.stop();
     timersRuntime.stop();
     scheduler.stop();
