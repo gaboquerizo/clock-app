@@ -3,7 +3,7 @@ import { render } from 'solid-js/web';
 
 import '@/shared/styles/main.css';
 import TimerDialog, {
-  type TimerDialogMode,
+  type TimerDialogEntryMode,
 } from '@/features/timers/components/timer-dialog/timer-dialog';
 
 const root = document.querySelector('#test-root');
@@ -14,11 +14,11 @@ if (!(root instanceof HTMLElement)) {
 
 render(() => {
   const [open, setOpen] = createSignal(false);
-  const [mode, setMode] = createSignal<TimerDialogMode>('create');
+  const [mode, setMode] = createSignal<TimerDialogEntryMode>('create');
   const [result, setResult] = createSignal('');
   const timer = { id: 'timer-1', durationMs: 90_000, label: 'Lectura' };
 
-  const openDialog = (nextMode: TimerDialogMode) => {
+  const openDialog = (nextMode: TimerDialogEntryMode) => {
     setMode(nextMode);
     setOpen(true);
   };

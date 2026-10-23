@@ -59,20 +59,30 @@ export default function TimersView() {
   const [selectedTimer, setSelectedTimer] = createSignal<Timer>();
   const [isSaving, setIsSaving] = createSignal(false);
   const [dialogError, setDialogError] = createSignal<string>();
+  let viewElement!: HTMLElement;
   const isLoading = () =>
     timers.state.status === 'idle' || timers.state.status === 'loading';
   const hasLoadError = () =>
     timers.state.status === 'error' && timers.state.error?.operation === 'load';
 
-  const openCreateDialog = () => {
+  const clearDialogError = () => {
+    const hadDialogError = dialogError() !== undefined;
     setDialogError(undefined);
+
+    if (hadDialogError && timers.state.status === 'error') {
+      timers.actions.clearError();
+    }
+  };
+
+  const openCreateDialog = () => {
+    clearDialogError();
     setSelectedTimer(undefined);
     setDialogMode('create');
     setIsCreateDialogOpen(true);
   };
 
   const openEditDialog = (timer: Timer) => {
-    setDialogError(undefined);
+    clearDialogError();
     setSelectedTimer(timer);
     setDialogMode('edit');
     setIsCreateDialogOpen(true);
@@ -122,11 +132,56 @@ export default function TimersView() {
     if (isSaving()) return;
     setIsCreateDialogOpen(false);
     setSelectedTimer(undefined);
-    setDialogError(undefined);
+    clearDialogError();
+  };
+
+  const deleteTimer = async (timerId: string) => {
+    if (isSaving() || selectedTimer()?.id !== timerId) return;
+
+    setIsSaving(true);
+    clearDialogError();
+
+    try {
+      const result = await timers.actions.remove(timerId);
+
+      if (result.ok) {
+        setIsCreateDialogOpen(false);
+        setSelectedTimer(undefined);
+        queueMicrotask(() => {
+          const nextEditButton =
+            viewElement.querySelector<HTMLButtonElement>(
+              '.timer-card__edit-button',
+            );
+          const addButton = viewElement.querySelector<HTMLButtonElement>(
+            '.timers-view__add-button',
+          );
+
+          (nextEditButton ?? addButton ?? viewElement).focus();
+        });
+        return;
+      }
+
+      setDialogError(
+        result.error.code === 'not-found'
+          ? 'El temporizador ya no está disponible.'
+          : 'No se pudo eliminar el temporizador. Inténtalo de nuevo.',
+      );
+      timers.actions.clearError();
+    } catch {
+      setDialogError('No se pudo eliminar el temporizador. Inténtalo de nuevo.');
+      timers.actions.clearError();
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
-    <section aria-labelledby="timers-view-title" class="timers-view">
+    <section
+      aria-labelledby="timers-view-title"
+      class="timers-view"
+      ref={viewElement}
+      tabIndex={-1}
+    >
       <header class="timers-view__header">
         <h1 class="timers-view__title" id="timers-view-title">
           Temporizador
@@ -178,7 +233,9 @@ export default function TimersView() {
         mode={dialogMode()}
         open={isCreateDialogOpen()}
         timer={selectedTimer()}
+        onCancelDelete={clearDialogError}
         onClose={closeDialog}
+        onConfirmDelete={deleteTimer}
         onSubmit={saveTimer}
       />
     </section>

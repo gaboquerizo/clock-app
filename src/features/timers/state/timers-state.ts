@@ -59,6 +59,7 @@ export type TimerRepositoryPort = {
 export type CreateTimerParams = Omit<CreateTimerInput, 'id' | 'createdAt'>;
 
 export type TimersStateOptions = {
+  cancelScheduledExecution?: (timerId: string) => void;
   repository?: TimerRepositoryPort;
   now?: () => number;
   createId?: () => string;
@@ -142,6 +143,8 @@ export function createTimersState(
   options: TimersStateOptions = {},
 ): TimersStateController {
   const repository = options.repository ?? timerRepository;
+  const cancelScheduledExecution =
+    options.cancelScheduledExecution ?? (() => undefined);
   const now = options.now ?? (() => Date.now());
   const createId = options.createId ?? defaultCreateId;
   const [state, setState] = createStore<TimersState>({
@@ -284,6 +287,7 @@ export function createTimersState(
         }
 
         await repository.remove(id);
+        cancelScheduledExecution(id);
         setState('timers', (timers) =>
           timers.filter((timer) => timer.id !== id),
         );

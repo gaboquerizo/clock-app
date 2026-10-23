@@ -8,6 +8,7 @@ import AppIcon from '@/shared/ui/ui-icon/ui-icon';
 import './timer-dialog.css';
 
 export type TimerDialogMode = 'create' | 'edit' | 'confirm-delete';
+export type TimerDialogEntryMode = Exclude<TimerDialogMode, 'confirm-delete'>;
 
 export type TimerDialogValue = {
   durationMs: number;
@@ -17,13 +18,14 @@ export type TimerDialogValue = {
 export type TimerDialogTimer = Pick<Timer, 'id' | 'durationMs' | 'label'>;
 
 export type TimerDialogProps = {
-  mode: TimerDialogMode;
+  mode: TimerDialogEntryMode;
   open: boolean;
   onClose: () => void;
   busy?: boolean;
   error?: string;
   timer?: TimerDialogTimer;
   onSubmit?: (value: TimerDialogValue) => void | Promise<void>;
+  onCancelDelete?: () => void;
   onConfirmDelete?: (timerId: string) => void | Promise<void>;
 };
 
@@ -40,7 +42,7 @@ export default function TimerDialog(props: TimerDialogProps) {
   const [formError, setFormError] = createSignal<string>();
   const [contentHeight, setContentHeight] = createSignal<number>();
   const id = createUniqueId();
-  let previousExternalMode = props.mode;
+  let previousExternalMode: TimerDialogEntryMode = props.mode;
   let previousFormKey = '';
   let formPanel!: HTMLDivElement;
   let formContent!: HTMLFormElement;
@@ -67,7 +69,14 @@ export default function TimerDialog(props: TimerDialogProps) {
 
   const switchToMode = (mode: TimerDialogMode) => {
     if (mode === activeMode()) return;
-    if (mode === 'confirm-delete' && props.timer === undefined) return;
+    if (
+      mode === 'confirm-delete' &&
+      (activeMode() !== 'edit' || props.timer === undefined)
+    ) {
+      return;
+    }
+    if (mode === 'edit' && activeMode() !== 'confirm-delete') return;
+
     setActiveMode(mode);
     setFormError(undefined);
     focusContent(mode);
@@ -77,10 +86,7 @@ export default function TimerDialog(props: TimerDialogProps) {
     const isOpen = props.open;
     const externalMode = props.mode;
     const timer = props.timer;
-    const resolvedMode =
-      externalMode === 'confirm-delete' && timer === undefined
-        ? 'create'
-        : externalMode;
+    const resolvedMode = externalMode;
 
     if (!isOpen) {
       setActiveMode(resolvedMode);
@@ -138,7 +144,14 @@ export default function TimerDialog(props: TimerDialogProps) {
   };
 
   const confirmDelete = () => {
-    if (props.timer) void props.onConfirmDelete?.(props.timer.id);
+    if (
+      isConfirmation() &&
+      props.busy !== true &&
+      props.timer !== undefined
+    ) {
+      confirmationCancelButton.focus();
+      void props.onConfirmDelete?.(props.timer.id);
+    }
   };
 
   return (
@@ -170,7 +183,7 @@ export default function TimerDialog(props: TimerDialogProps) {
             </p>
           )}
         </Show>
-        <Show when={!isConfirmation() && props.error}>
+        <Show when={props.error}>
           {(error) => (
             <p aria-live="assertive" class="timer-dialog__error" role="alert">
               {error()}
@@ -274,13 +287,18 @@ export default function TimerDialog(props: TimerDialogProps) {
                   class="timer-dialog__button timer-dialog__button--secondary"
                   ref={confirmationCancelButton}
                   type="button"
-                  onClick={() => switchToMode('edit')}
+                  aria-disabled={props.busy === true}
+                  onClick={() => {
+                    if (props.busy === true) return;
+                    props.onCancelDelete?.();
+                    switchToMode('edit');
+                  }}
                 >
                   Cancelar
                 </button>
                 <button
                   class="timer-dialog__button timer-dialog__button--danger"
-                  disabled={props.timer === undefined}
+                  disabled={props.timer === undefined || props.busy === true}
                   type="button"
                   onClick={confirmDelete}
                 >

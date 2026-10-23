@@ -238,6 +238,51 @@ describe('Timers state', () => {
     expect(controller.state.timers).toEqual([]);
   });
 
+  it('invalidates the scheduled execution after a successful removal', async () => {
+    const { repository } = createMemoryRepository([makeTimer()]);
+    const invalidatedTimerIds: string[] = [];
+    const controller = createTimersState({
+      repository,
+      cancelScheduledExecution: (timerId) => {
+        invalidatedTimerIds.push(timerId);
+      },
+    });
+
+    await controller.actions.load();
+    const result = await controller.actions.remove('timer-one');
+
+    expect(result).toEqual({ ok: true, value: undefined });
+    expect(invalidatedTimerIds).toEqual(['timer-one']);
+    expect(controller.state.timers).toEqual([]);
+  });
+
+  it('keeps a failed removal and its schedule intact', async () => {
+    const timer = makeTimer();
+    const { repository } = createMemoryRepository([timer]);
+    const invalidatedTimerIds: string[] = [];
+    repository.remove = async () => {
+      throw new TimerStorageError('delete-failed', 'Storage unavailable.', {
+        timerId: timer.id,
+      });
+    };
+    const controller = createTimersState({
+      repository,
+      cancelScheduledExecution: (timerId) => {
+        invalidatedTimerIds.push(timerId);
+      },
+    });
+
+    await controller.actions.load();
+    const result = await controller.actions.remove(timer.id);
+
+    expect(result).toMatchObject({
+      ok: false,
+      error: { operation: 'remove', code: 'delete-failed' },
+    });
+    expect(invalidatedTimerIds).toEqual([]);
+    expect(controller.state.timers).toEqual([timer]);
+  });
+
   it('keeps the in-memory timer unchanged when persistence fails', async () => {
     const timer = makeTimer();
     const { repository } = createMemoryRepository([timer]);
