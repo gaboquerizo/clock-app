@@ -6,6 +6,7 @@ import TimerDialog, {
   type TimerDialogValue,
 } from '@/features/timers/components/timer-dialog/timer-dialog';
 import { useTimersState } from '@/features/timers/state/timers-context';
+import { useTimerNow } from '@/features/timers/state/use-timer-now';
 
 import './timers-view.css';
 
@@ -21,13 +22,18 @@ function AddTimerButton(props: { onClick: () => void }) {
   );
 }
 
-function TimerList(props: { timers: Timer[]; onEdit: (timer: Timer) => void }) {
+function TimerList(props: {
+  timers: Timer[];
+  now: number;
+  onEdit: (timer: Timer) => void;
+}) {
   return (
     <ul aria-label="Temporizadores configurados" class="timers-view__list">
       <For each={props.timers}>
         {(timer) => (
           <li class="timers-view__list-item">
             <TimerCard
+              now={props.now}
               actions={
                 <button
                   aria-label={`Editar temporizador ${timer.label.trim() || 'Temporizador'}`}
@@ -54,6 +60,7 @@ function TimerList(props: { timers: Timer[]; onEdit: (timer: Timer) => void }) {
 
 export default function TimersView() {
   const timers = useTimersState();
+  const now = useTimerNow();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = createSignal(false);
   const [dialogMode, setDialogMode] = createSignal<'create' | 'edit'>('create');
   const [selectedTimer, setSelectedTimer] = createSignal<Timer>();
@@ -222,7 +229,11 @@ export default function TimersView() {
                 </UiEmptyState>
               }
             >
-              <TimerList onEdit={openEditDialog} timers={timers.state.timers} />
+              <TimerList
+                now={now()}
+                onEdit={openEditDialog}
+                timers={timers.state.timers}
+              />
             </Show>
           </Show>
         </div>

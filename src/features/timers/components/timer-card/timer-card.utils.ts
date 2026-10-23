@@ -1,17 +1,5 @@
 import type { Timer } from '@/features/timers/domain/timer.types';
 
-export function getTimerRemainingMs(timer: Timer, now: number): number {
-  if (timer.status === 'completed') {
-    return 0;
-  }
-
-  if (timer.status === 'running') {
-    return Math.max(0, timer.endsAt - now);
-  }
-
-  return timer.remainingMs;
-}
-
 export function formatTimerDuration(durationMs: number): string {
   const totalSeconds = Math.ceil(Math.max(0, durationMs) / 1_000);
   const hours = Math.floor(totalSeconds / 3_600);

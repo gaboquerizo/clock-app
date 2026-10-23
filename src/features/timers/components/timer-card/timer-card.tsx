@@ -1,10 +1,10 @@
 import { createMemo, type JSX } from 'solid-js';
 
+import { getTimerRemainingMs } from '@/features/timers/domain/timer';
 import type { Timer } from '@/features/timers/domain/timer.types';
 import {
   describeTimerDuration,
   formatTimerDuration,
-  getTimerRemainingMs,
   getTimerStatusLabel,
   toTimerDurationDateTime,
 } from './timer-card.utils';
@@ -12,6 +12,7 @@ import {
 import './timer-card.css';
 
 type TimerCardProps = {
+  now: number;
   timer: Timer;
   actions?: JSX.Element;
 };
@@ -22,7 +23,7 @@ function getTimerLabel(timer: Timer): string {
 
 export default function TimerCard(props: TimerCardProps) {
   const remainingMs = createMemo(() =>
-    getTimerRemainingMs(props.timer, Date.now()),
+    getTimerRemainingMs(props.timer, props.now),
   );
   const accessibleRemaining = () =>
     `${describeTimerDuration(remainingMs())} restantes`;

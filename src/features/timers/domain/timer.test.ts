@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   createTimer,
+  getTimerRemainingMs,
   reconcileTimer,
   transitionTimer,
   updateTimer,
@@ -29,6 +30,51 @@ function makeReadyTimer(durationMs = timerDurationMs) {
 }
 
 describe('timer domain model', () => {
+  it('derives running time from an absolute deadline and clamps elapsed timers to zero', () => {
+    const startedAt = createdAt + 1_000;
+    const started = transitionTimer(makeReadyTimer(), 'start', startedAt);
+
+    if (!started.ok || started.value.status !== 'running') {
+      throw new Error('Expected the timer to start.');
+    }
+
+    expect(getTimerRemainingMs(started.value, startedAt + 30_000)).toBe(
+      timerDurationMs - 30_000,
+    );
+    expect(getTimerRemainingMs(started.value, started.value.endsAt)).toBe(0);
+    expect(getTimerRemainingMs(started.value, started.value.endsAt + 5_000)).toBe(
+      0,
+    );
+  });
+
+  it('uses stored remaining time while ready or paused and zero when completed', () => {
+    const ready = makeReadyTimer();
+    const paused: Timer = {
+      id: ready.id,
+      durationMs: ready.durationMs,
+      label: ready.label,
+      status: 'paused',
+      remainingMs: 45_000,
+      createdAt: ready.createdAt,
+      updatedAt: ready.updatedAt,
+    };
+    const completed: Timer = {
+      id: ready.id,
+      durationMs: ready.durationMs,
+      label: ready.label,
+      status: 'completed',
+      completedAt: createdAt,
+      createdAt,
+      updatedAt: createdAt,
+    };
+
+    expect(getTimerRemainingMs(ready, createdAt + 10_000)).toBe(
+      timerDurationMs,
+    );
+    expect(getTimerRemainingMs(paused, createdAt + 10_000)).toBe(45_000);
+    expect(getTimerRemainingMs(completed, createdAt + 10_000)).toBe(0);
+  });
+
   it('creates an independent ready timer using millisecond units', () => {
     expect(
       createTimer({

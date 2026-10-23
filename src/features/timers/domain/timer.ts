@@ -156,6 +156,18 @@ export function validateTimer(value: unknown): TimerResult<Timer> {
   return failure('invalid-state', 'status');
 }
 
+export function getTimerRemainingMs(timer: Timer, timestamp: number): number {
+  if (timer.status === 'completed') {
+    return 0;
+  }
+
+  if (timer.status === 'running') {
+    return Math.max(0, timer.endsAt - timestamp);
+  }
+
+  return timer.remainingMs;
+}
+
 export function createTimer(
   input: CreateTimerInput,
   existingTimers: readonly Timer[] = [],
