@@ -122,4 +122,24 @@ describe('timer record mapping', () => {
       error: { code: 'invalid-duration', field: 'durationMs' },
     });
   });
+
+  it.each([
+    [
+      'running deadline inconsistent with its duration',
+      () => ({ ...toTimerRecord(makeRunningTimer()), endsAt: 92_001 }),
+    ],
+    [
+      'paused timer with no time remaining',
+      () => ({ ...toTimerRecord(makePausedTimer()), remainingMs: 0 }),
+    ],
+    [
+      'completion timestamp later than the last update',
+      () => ({ ...toTimerRecord(makeCompletedTimer()), completedAt: 93_001 }),
+    ],
+  ])('rejects a %s during restoration', (_, createRecord) => {
+    expect(fromTimerRecord(createRecord())).toMatchObject({
+      ok: false,
+      error: { code: 'invalid-state' },
+    });
+  });
 });

@@ -3,6 +3,9 @@ import { expect, test, type Page } from '@playwright/test';
 declare global {
   interface Window {
     __timerAudioPlayCalls: number;
+    __timerAudioPauseCalls: number;
+    __notificationConstructorCount: number;
+    __notificationPermissionRequestCount: number;
   }
 }
 
@@ -126,4 +129,75 @@ test('shows one global alert for a timer completed during suspension and uses th
   await expect(
     page.getByRole('article', { name: 'Temporizador, Finalizado' }),
   ).toBeVisible();
+});
+
+test('keeps the global alert available when notifications are denied and Escape accepts it', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    window.__timerAudioPlayCalls = 0;
+    window.__timerAudioPauseCalls = 0;
+    window.__notificationConstructorCount = 0;
+    window.__notificationPermissionRequestCount = 0;
+
+    class DeniedNotification {
+      static get permission(): NotificationPermission {
+        return 'denied';
+      }
+
+      static requestPermission(): Promise<NotificationPermission> {
+        window.__notificationPermissionRequestCount += 1;
+        return Promise.resolve('denied');
+      }
+
+      constructor(_title: string, _options?: NotificationOptions) {
+        window.__notificationConstructorCount += 1;
+      }
+    }
+
+    Object.defineProperty(window, 'Notification', {
+      configurable: true,
+      value: DeniedNotification,
+    });
+
+    HTMLMediaElement.prototype.play = function () {
+      window.__timerAudioPlayCalls += 1;
+      return Promise.resolve();
+    };
+    HTMLMediaElement.prototype.pause = function () {
+      window.__timerAudioPauseCalls += 1;
+    };
+  });
+  await page.clock.install({ time: new Date('2026-10-23T10:00:00.000Z') });
+  await page.goto('/clock');
+  await seedRunningTimer(page, 'denied-notification-timer', 'Focus timer', 1_000);
+  await page.reload();
+  await page.clock.runFor(1_000);
+
+  const alertDialog = page.getByRole('dialog', {
+    name: 'Temporizador finalizado',
+  });
+  await expect(alertDialog).toBeVisible();
+  await expect(alertDialog).toContainText('Focus timer');
+  await expect(
+    page.evaluate(() => Notification.permission),
+  ).resolves.toBe('denied');
+  const acceptButton = alertDialog.getByRole('button', { name: 'Aceptar' });
+  await expect(acceptButton).toBeFocused();
+  await expect
+    .poll(() => page.evaluate(() => window.__timerAudioPlayCalls))
+    .toBe(1);
+  await expect(
+    page.evaluate(() => window.__notificationPermissionRequestCount),
+  ).resolves.toBe(0);
+  await expect(
+    page.evaluate(() => window.__notificationConstructorCount),
+  ).resolves.toBe(0);
+
+  await page.keyboard.press('Escape');
+
+  await expect(alertDialog).toBeHidden();
+  await expect
+    .poll(() => page.evaluate(() => window.__timerAudioPauseCalls))
+    .toBeGreaterThan(0);
 });

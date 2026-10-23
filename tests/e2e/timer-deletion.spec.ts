@@ -85,3 +85,49 @@ test('cancels deletion in the edit dialog, then removes the timer permanently', 
     page.getByRole('list', { name: 'Temporizadores configurados' }),
   ).toHaveCount(0);
 });
+
+test('disables timer confirmation motion when reduced motion is requested', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/timers');
+  await page
+    .getByRole('region', { name: 'No tienes temporizadores todavía.' })
+    .getByRole('button', { name: 'Añadir temporizador' })
+    .click();
+
+  const createDialog = page.getByRole('dialog', {
+    name: 'Añadir temporizador',
+  });
+  await createDialog.getByRole('textbox', { name: 'Minutos' }).fill('01');
+  await createDialog.getByRole('button', { name: 'Añadir' }).click();
+  await expect(createDialog).toBeHidden();
+
+  await page
+    .getByRole('button', { name: 'Editar temporizador Temporizador' })
+    .click();
+  const editDialog = page.getByRole('dialog', { name: 'Editar temporizador' });
+  await editDialog.getByRole('button', { name: 'Eliminar' }).click();
+
+  const confirmDialog = page.getByRole('dialog', {
+    name: 'Eliminar temporizador',
+  });
+  const activePanel = confirmDialog.locator('[data-open="true"]');
+  await expect(activePanel).toHaveCount(1);
+  await expect(
+    confirmDialog.getByRole('button', { name: 'Cancelar' }),
+  ).toBeFocused();
+
+  const transitionDuration = await activePanel.evaluate(
+    (element) => getComputedStyle(element).transitionDuration,
+  );
+  expect(
+    transitionDuration
+      .split(',')
+      .every((duration) => Number.parseFloat(duration.trim()) === 0),
+  ).toBe(true);
+
+  await page.keyboard.press('Enter');
+  await expect(editDialog.getByRole('textbox', { name: 'Horas' })).toBeFocused();
+  await expect(editDialog.getByRole('button', { name: 'Guardar' })).toBeVisible();
+});

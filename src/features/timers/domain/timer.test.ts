@@ -114,7 +114,14 @@ describe('timer domain model', () => {
     expect(normalized.ok && normalized.value.label).toBe('Tea');
   });
 
-  it.each([0, -1, Number.NaN, Number.POSITIVE_INFINITY, 1.5])(
+  it.each([
+    0,
+    -1,
+    Number.NaN,
+    Number.POSITIVE_INFINITY,
+    1.5,
+    Number.MAX_SAFE_INTEGER + 1,
+  ])(
     'rejects invalid duration %s',
     (durationMs) => {
       expect(isValidTimerDuration(durationMs)).toBe(false);
@@ -282,6 +289,51 @@ describe('timer domain model', () => {
     });
   });
 
+  it('keeps repeated transitions deterministic and rejects duplicate state changes', () => {
+    const startedAt = createdAt + 1_000;
+    const pausedAt = startedAt + 10_000;
+    const resumedAt = pausedAt + 5_000;
+    const started = transitionTimer(makeReadyTimer(), 'start', startedAt);
+
+    if (!started.ok) {
+      throw new Error('Expected the timer to start.');
+    }
+
+    expect(transitionTimer(started.value, 'start', startedAt)).toMatchObject({
+      ok: false,
+      error: { code: 'invalid-transition' },
+    });
+
+    const paused = transitionTimer(started.value, 'pause', pausedAt);
+    if (!paused.ok) {
+      throw new Error('Expected the timer to pause.');
+    }
+
+    expect(transitionTimer(paused.value, 'pause', pausedAt)).toMatchObject({
+      ok: false,
+      error: { code: 'invalid-transition' },
+    });
+
+    const resumed = transitionTimer(paused.value, 'resume', resumedAt);
+    if (!resumed.ok) {
+      throw new Error('Expected the timer to resume.');
+    }
+
+    expect(transitionTimer(resumed.value, 'resume', resumedAt)).toMatchObject({
+      ok: false,
+      error: { code: 'invalid-transition' },
+    });
+
+    expect(transitionTimer(resumed.value, 'restart', resumedAt)).toMatchObject({
+      ok: true,
+      value: {
+        status: 'running',
+        remainingAtStartMs: timerDurationMs,
+        endsAt: resumedAt + timerDurationMs,
+      },
+    });
+  });
+
   it('restarts a running timer in running state with its original duration', () => {
     const startedAt = createdAt + 1_000;
     const restartedAt = startedAt + 15_000;
@@ -372,6 +424,42 @@ describe('timer domain model', () => {
         timer: firstReconciliation.value.timer,
         completed: false,
       },
+    });
+  });
+
+  it('remains running before its deadline and completes at the exact deadline', () => {
+    const started = transitionTimer(makeReadyTimer(), 'start', createdAt + 1_000);
+
+    if (!started.ok || started.value.status !== 'running') {
+      throw new Error('Expected the timer to start.');
+    }
+
+    expect(reconcileTimer(started.value, started.value.endsAt - 1)).toEqual({
+      ok: true,
+      value: { timer: started.value, completed: false },
+    });
+
+    const completed = reconcileTimer(started.value, started.value.endsAt);
+
+    expect(completed).toMatchObject({
+      ok: true,
+      value: {
+        completed: true,
+        timer: {
+          status: 'completed',
+          completedAt: started.value.endsAt,
+          updatedAt: started.value.endsAt,
+        },
+      },
+    });
+
+    if (!completed.ok) {
+      throw new Error('Expected the timer to complete at its deadline.');
+    }
+
+    expect(reconcileTimer(completed.value.timer, started.value.endsAt)).toEqual({
+      ok: true,
+      value: { timer: completed.value.timer, completed: false },
     });
   });
 

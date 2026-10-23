@@ -282,4 +282,55 @@ describe('Timers runtime', () => {
     runtime.stop();
     scheduler.stop();
   });
+
+  it('cancels only the removed timer while other scheduled timers continue', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(referenceTimestamp);
+
+    const { records, repository } = createMemoryRepository();
+    const ids = ['removed-timer', 'surviving-timer'];
+    let runtime: TimersRuntime | undefined;
+    const controller = createTimersState({
+      repository,
+      cancelScheduledExecution: (timerId) => runtime?.cancel(timerId),
+      now: () => Date.now(),
+      createId: () => ids.shift() ?? 'unexpected-timer',
+    });
+    const scheduler = createScheduler();
+    runtime = createTimersRuntime(controller, { scheduler });
+    const completions: string[] = [];
+    runtime.subscribe(({ timer }) => {
+      completions.push(timer.id);
+    });
+
+    scheduler.start();
+    await runtime.start();
+    await controller.actions.create({ durationMs: 3_000 });
+    await controller.actions.create({ durationMs: 5_000 });
+    await controller.actions.start('removed-timer');
+    await controller.actions.start('surviving-timer');
+    runtime.sync();
+
+    await controller.actions.remove('removed-timer');
+    runtime.sync();
+    await vi.advanceTimersByTimeAsync(3_000);
+    await flushMicrotasks();
+
+    expect(completions).toEqual([]);
+    expect(controller.state.timers).toMatchObject([
+      { id: 'surviving-timer', status: 'running' },
+    ]);
+    expect(records.map(({ id }) => id)).toEqual(['surviving-timer']);
+
+    await vi.advanceTimersByTimeAsync(2_000);
+    await flushMicrotasks();
+
+    expect(completions).toEqual(['surviving-timer']);
+    expect(controller.state.timers).toMatchObject([
+      { id: 'surviving-timer', status: 'completed' },
+    ]);
+
+    runtime.stop();
+    scheduler.stop();
+  });
 });
