@@ -5,6 +5,7 @@ test('persists a timer and its absolute timestamps across a page reload', async 
 }) => {
   const timerId = `timer-persistence-${Date.now()}`;
 
+  await page.clock.install({ time: new Date(2_000) });
   await page.goto('/clock');
   await page.evaluate(async (id) => {
     const repositoryModuleUrl =

@@ -2,6 +2,7 @@ import { createStore } from 'solid-js/store';
 
 import {
   createTimer,
+  reconcileTimer,
   transitionTimer,
   updateTimer,
   validateTimer,
@@ -34,6 +35,7 @@ export type TimersOperation =
   | 'create'
   | 'update'
   | 'remove'
+  | 'reconcile'
   | TimerTransition;
 
 export type TimersStateError = {
@@ -81,6 +83,10 @@ export type TimersActions = {
   pause(id: string): Promise<TimersActionResult<Timer>>;
   resume(id: string): Promise<TimersActionResult<Timer>>;
   restart(id: string): Promise<TimersActionResult<Timer>>;
+  reconcile(
+    id: string,
+    timestamp?: number,
+  ): Promise<TimersActionResult<Timer>>;
   clearError(): void;
 };
 
@@ -309,6 +315,29 @@ export function createTimersState(
 
     restart(id) {
       return transition('restart', id);
+    },
+
+    reconcile(id, timestamp = now()) {
+      return runDomainMutation('reconcile', async () => {
+        const currentTimer = state.timers.find((timer) => timer.id === id);
+
+        if (currentTimer === undefined) {
+          return { ok: false, error: { code: 'not-found' } };
+        }
+
+        const result = reconcileTimer(currentTimer, timestamp);
+
+        if (!result.ok) {
+          return result;
+        }
+
+        if (result.value.completed) {
+          await repository.update(result.value.timer);
+          replaceTimer(result.value.timer);
+        }
+
+        return { ok: true, value: result.value.timer };
+      });
     },
 
     clearError() {

@@ -41,6 +41,7 @@ export function createAlarmsRuntime(
   controller: AlarmsStateController,
   options: AlarmsRuntimeOptions = {},
 ): AlarmsRuntime {
+  const ownsScheduler = options.scheduler === undefined;
   const scheduler = options.scheduler ?? createScheduler();
   const registeredAt = new Map<string, number>();
   const listeners = new Set<AlarmActivationListener>();
@@ -135,7 +136,10 @@ export function createAlarmsRuntime(
       }
 
       isStarted = true;
-      scheduler.start();
+
+      if (ownsScheduler) {
+        scheduler.start();
+      }
 
       startPromise = (async () => {
         const loaded = await controller.actions.load();
@@ -170,8 +174,16 @@ export function createAlarmsRuntime(
 
       isStarted = false;
       isReady = false;
+
+      for (const alarmId of registeredAt.keys()) {
+        scheduler.unregister(getProcessId(alarmId));
+      }
+
       registeredAt.clear();
-      scheduler.stop();
+
+      if (ownsScheduler) {
+        scheduler.stop();
+      }
     },
 
     subscribe(listener) {
