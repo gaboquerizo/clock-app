@@ -185,8 +185,25 @@ test('renders persisted timer records as independent cards with real states', as
   );
 
   await expect(
-    list.getByRole('button', { name: /Iniciar|Pausar/ }),
-  ).toHaveCount(0);
+    list.locator(`[data-timer-id="${timerIds.ready}"]`).getByRole('button', {
+      name: 'Iniciar temporizador Temporizador',
+    }),
+  ).toBeVisible();
+  await expect(
+    list.locator(`[data-timer-id="${timerIds.running}"]`).getByRole('button', {
+      name: 'Pausar temporizador En curso',
+    }),
+  ).toBeVisible();
+  await expect(
+    list.locator(`[data-timer-id="${timerIds.paused}"]`).getByRole('button', {
+      name: 'Reanudar temporizador Pausa breve',
+    }),
+  ).toBeVisible();
+  await expect(
+    list.locator(`[data-timer-id="${timerIds.completed}"]`).getByRole('button', {
+      name: 'Reiniciar temporizador Terminado',
+    }),
+  ).toBeVisible();
   await expect(
     list.getByRole('button', { name: /^Editar temporizador/ }),
   ).toHaveCount(4);

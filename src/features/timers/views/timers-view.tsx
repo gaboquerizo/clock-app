@@ -1,6 +1,9 @@
-import { createSignal, For, Show } from 'solid-js';
+import { createMemo, createSignal, For, Show } from 'solid-js';
 
-import type { Timer } from '@/features/timers/domain/timer.types';
+import type {
+  Timer,
+  TimerTransition,
+} from '@/features/timers/domain/timer.types';
 import TimerCard from '@/features/timers/components/timer-card/timer-card';
 import TimerDialog, {
   type TimerDialogValue,
@@ -26,33 +29,49 @@ function TimerList(props: {
   timers: Timer[];
   now: number;
   onEdit: (timer: Timer) => void;
+  onPlaybackAction: (
+    timerId: string,
+    transition: TimerTransition,
+  ) => Promise<void>;
+  playbackPendingIds: ReadonlySet<string>;
+  playbackErrors: Readonly<Record<string, string>>;
 }) {
   return (
     <ul aria-label="Temporizadores configurados" class="timers-view__list">
-      <For each={props.timers}>
-        {(timer) => (
-          <li class="timers-view__list-item">
-            <TimerCard
-              now={props.now}
-              actions={
-                <button
-                  aria-label={`Editar temporizador ${timer.label.trim() || 'Temporizador'}`}
-                  class="timer-card__edit-button"
-                  type="button"
-                  onClick={() => props.onEdit(timer)}
-                >
-                  <AppIcon
-                    aria-hidden="true"
-                    class="timer-card__edit-icon"
-                    name="proicons:edit"
-                  />
-                  <span>Editar</span>
-                </button>
-              }
-              timer={timer}
-            />
-          </li>
-        )}
+      <For each={props.timers.map((timer) => timer.id)}>
+        {(timerId) => {
+          const timer = createMemo(
+            () => props.timers.find((current) => current.id === timerId)!,
+          );
+
+          return (
+            <li class="timers-view__list-item">
+              <TimerCard
+                now={props.now}
+                onPlaybackAction={props.onPlaybackAction}
+                playbackError={props.playbackErrors[timerId]}
+                playbackPending={props.playbackPendingIds.has(timerId)}
+                actions={
+                  <button
+                    aria-label={`Editar temporizador ${timer().label.trim() || 'Temporizador'}`}
+                    class="timer-card__edit-button"
+                    disabled={props.playbackPendingIds.has(timerId)}
+                    type="button"
+                    onClick={() => props.onEdit(timer())}
+                  >
+                    <AppIcon
+                      aria-hidden="true"
+                      class="timer-card__edit-icon"
+                      name="proicons:edit"
+                    />
+                    <span>Editar</span>
+                  </button>
+                }
+                timer={timer()}
+              />
+            </li>
+          );
+        }}
       </For>
     </ul>
   );
@@ -66,6 +85,12 @@ export default function TimersView() {
   const [selectedTimer, setSelectedTimer] = createSignal<Timer>();
   const [isSaving, setIsSaving] = createSignal(false);
   const [dialogError, setDialogError] = createSignal<string>();
+  const [playbackPendingIds, setPlaybackPendingIds] = createSignal<
+    ReadonlySet<string>
+  >(new Set());
+  const [playbackErrors, setPlaybackErrors] = createSignal<
+    Readonly<Record<string, string>>
+  >({});
   let viewElement!: HTMLElement;
   const isLoading = () =>
     timers.state.status === 'idle' || timers.state.status === 'loading';
@@ -140,6 +165,47 @@ export default function TimersView() {
     setIsCreateDialogOpen(false);
     setSelectedTimer(undefined);
     clearDialogError();
+  };
+
+  const runPlaybackAction = async (
+    timerId: string,
+    transition: TimerTransition,
+  ) => {
+    if (playbackPendingIds().has(timerId)) return;
+
+    setPlaybackPendingIds((current) => new Set(current).add(timerId));
+    setPlaybackErrors((current) => {
+      const next = { ...current };
+      delete next[timerId];
+      return next;
+    });
+
+    try {
+      const result = await timers.actions[transition](timerId);
+
+      if (!result.ok) {
+        setPlaybackErrors((current) => ({
+          ...current,
+          [timerId]:
+            result.error.code === 'invalid-transition'
+              ? 'El temporizador cambió de estado. Actualiza la acción e inténtalo de nuevo.'
+              : 'No se pudo actualizar el temporizador. Inténtalo de nuevo.',
+        }));
+        timers.actions.clearError();
+      }
+    } catch {
+      setPlaybackErrors((current) => ({
+        ...current,
+        [timerId]: 'No se pudo actualizar el temporizador. Inténtalo de nuevo.',
+      }));
+      timers.actions.clearError();
+    } finally {
+      setPlaybackPendingIds((current) => {
+        const next = new Set(current);
+        next.delete(timerId);
+        return next;
+      });
+    }
   };
 
   const deleteTimer = async (timerId: string) => {
@@ -231,7 +297,10 @@ export default function TimersView() {
             >
               <TimerList
                 now={now()}
+                onPlaybackAction={runPlaybackAction}
                 onEdit={openEditDialog}
+                playbackErrors={playbackErrors()}
+                playbackPendingIds={playbackPendingIds()}
                 timers={timers.state.timers}
               />
             </Show>

@@ -1,7 +1,11 @@
-import { createMemo, type JSX } from 'solid-js';
+import { createMemo, Show, type JSX } from 'solid-js';
 
 import { getTimerRemainingMs } from '@/features/timers/domain/timer';
-import type { Timer } from '@/features/timers/domain/timer.types';
+import type {
+  Timer,
+  TimerStatus,
+  TimerTransition,
+} from '@/features/timers/domain/timer.types';
 import {
   describeTimerDuration,
   formatTimerDuration,
@@ -16,6 +20,24 @@ type TimerCardProps = {
   now: number;
   timer: Timer;
   actions?: JSX.Element;
+  playbackError?: string;
+  playbackPending: boolean;
+  onPlaybackAction: (
+    timerId: string,
+    transition: TimerTransition,
+  ) => Promise<void>;
+};
+
+type PlaybackAction = {
+  transition: TimerTransition;
+  label: string;
+};
+
+const primaryPlaybackActionByStatus: Record<TimerStatus, PlaybackAction> = {
+  ready: { transition: 'start', label: 'Iniciar' },
+  running: { transition: 'pause', label: 'Pausar' },
+  paused: { transition: 'resume', label: 'Reanudar' },
+  completed: { transition: 'restart', label: 'Reiniciar' },
 };
 
 function getTimerLabel(timer: Timer): string {
@@ -36,6 +58,10 @@ export default function TimerCard(props: TimerCardProps) {
     `${describeTimerDuration(remainingMs())} restantes`;
   const accessibleProgress = () => `${progressPercent()} % completado`;
   const label = () => getTimerLabel(props.timer);
+  const primaryPlaybackAction = () =>
+    primaryPlaybackActionByStatus[props.timer.status];
+  const canRestartInCurrentState = () =>
+    props.timer.status === 'running' || props.timer.status === 'paused';
 
   return (
     <article
@@ -90,14 +116,55 @@ export default function TimerCard(props: TimerCardProps) {
       </div>
 
       <footer class="timer-card__footer">
-        <span class="timer-card__duration-label">Duración</span>
-        <time
-          class="timer-card__duration"
-          datetime={toTimerDurationDateTime(props.timer.durationMs)}
-        >
-          {formatTimerDuration(props.timer.durationMs)}
-        </time>
+        <div class="timer-card__duration-group">
+          <span class="timer-card__duration-label">Duración</span>
+          <time
+            class="timer-card__duration"
+            datetime={toTimerDurationDateTime(props.timer.durationMs)}
+          >
+            {formatTimerDuration(props.timer.durationMs)}
+          </time>
+        </div>
         {props.actions}
+        <div
+          aria-busy={props.playbackPending}
+          aria-label={`Controles del temporizador ${label()}`}
+          class="timer-card__playback-controls"
+          role="group"
+        >
+          <button
+            aria-disabled={props.playbackPending}
+            aria-label={`${primaryPlaybackAction().label} temporizador ${label()}`}
+            class="timer-card__playback-button timer-card__playback-button--primary"
+            type="button"
+            onClick={() =>
+              props.onPlaybackAction(
+                props.timer.id,
+                primaryPlaybackAction().transition,
+              )
+            }
+          >
+            {primaryPlaybackAction().label}
+          </button>
+          <Show when={canRestartInCurrentState()}>
+            <button
+              aria-disabled={props.playbackPending}
+              aria-label={`Reiniciar temporizador ${label()}`}
+              class="timer-card__playback-button"
+              type="button"
+              onClick={() =>
+                props.onPlaybackAction(props.timer.id, 'restart')
+              }
+            >
+              Reiniciar
+            </button>
+          </Show>
+        </div>
+        {props.playbackError && (
+          <p class="timer-card__playback-error" role="alert">
+            {props.playbackError}
+          </p>
+        )}
       </footer>
     </article>
   );

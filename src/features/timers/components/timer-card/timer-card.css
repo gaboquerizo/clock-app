@@ -125,13 +125,20 @@
 }
 
 .timer-card__footer {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: baseline;
   gap: var(--app-gap-M);
   min-width: 0;
   padding-top: var(--app-space-S);
   border-top: var(--app-solid-S) var(--app-bg-2);
+}
+
+.timer-card__duration-group {
+  display: flex;
+  align-items: baseline;
+  gap: var(--app-gap-M);
+  min-width: 0;
 }
 
 .timer-card__duration {
@@ -141,13 +148,81 @@
   line-height: 1.25;
 }
 
+.timer-card__playback-controls {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--app-gap-S);
+  min-width: 0;
+}
+
+.timer-card__playback-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--app-logo);
+  padding: var(--app-gap-S) var(--app-gap-L);
+  border: var(--app-solid-S) var(--app-focus);
+  border-radius: var(--app-radius-S);
+  background-color: var(--app-bg-1);
+  color: var(--app-txt-2);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--body-S);
+  line-height: 1.25;
+}
+
+.timer-card__playback-button:hover:not([aria-disabled='true']) {
+  border-color: var(--app-accent);
+  color: var(--app-accent);
+}
+
+.timer-card__playback-button:active:not([aria-disabled='true']) {
+  background-color: var(--app-bg-2);
+}
+
+.timer-card__playback-button--primary {
+  border-color: var(--app-accent);
+  background-color: var(--app-accent);
+  color: var(--app-bg-1);
+}
+
+.timer-card__playback-button--primary:hover:not([aria-disabled='true']) {
+  background-color: var(--app-accent);
+  color: var(--app-bg-1);
+  filter: brightness(1.08);
+}
+
+.timer-card__playback-button--primary:active:not([aria-disabled='true']) {
+  filter: brightness(0.96);
+}
+
+.timer-card__playback-button:focus-visible {
+  outline: var(--app-solid-M) var(--app-focus);
+  outline-offset: var(--app-offset);
+}
+
+.timer-card__playback-button[aria-disabled='true'] {
+  cursor: progress;
+  opacity: 0.65;
+}
+
+.timer-card__playback-error {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--app-txt-2);
+  font-size: var(--body-S);
+  line-height: 1.4;
+}
+
 .timer-card__edit-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--app-gap-S);
   min-height: var(--app-logo);
-  margin-inline-start: auto;
   padding: var(--app-gap-S) var(--app-gap-L);
   border: var(--app-solid-S) var(--app-focus);
   border-radius: var(--app-radius-S);
