@@ -4,6 +4,7 @@ import type { Timer } from '@/features/timers/domain/timer.types';
 import {
   describeTimerDuration,
   formatTimerDuration,
+  getTimerProgress,
   getTimerStatusLabel,
   toTimerDurationDateTime,
 } from './timer-card.utils';
@@ -35,6 +36,15 @@ describe('timer card presentation utilities', () => {
     expect(toTimerDurationDateTime(3_661_000)).toBe('PT1H1M1S');
     expect(toTimerDurationDateTime(60_000)).toBe('PT1M');
     expect(toTimerDurationDateTime(0)).toBe('PT0S');
+  });
+
+  it('derives bounded progress from the original duration and remaining time', () => {
+    expect(getTimerProgress(60_000, 60_000)).toBe(0);
+    expect(getTimerProgress(60_000, 30_000)).toBe(0.5);
+    expect(getTimerProgress(60_000, 0)).toBe(1);
+    expect(getTimerProgress(60_000, -1)).toBe(1);
+    expect(getTimerProgress(60_000, 90_000)).toBe(0);
+    expect(getTimerProgress(0, 0)).toBe(0);
   });
 
   it('exposes Spanish labels for every timer state', () => {

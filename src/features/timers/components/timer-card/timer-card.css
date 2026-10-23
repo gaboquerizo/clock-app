@@ -51,9 +51,49 @@
 .timer-card__reading {
   display: grid;
   align-content: center;
-  justify-items: start;
+  justify-items: center;
   min-width: 0;
   gap: var(--app-gap-M);
+}
+
+.timer-card__dial {
+  display: grid;
+  place-items: center;
+  width: min(100%, var(--w-14));
+  aspect-ratio: 1;
+}
+
+.timer-card__progress-ring,
+.timer-card__remaining {
+  grid-area: 1 / 1;
+}
+
+.timer-card__progress-ring {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform: rotate(-90deg);
+}
+
+.timer-card__progress-track,
+.timer-card__progress-value {
+  fill: none;
+  stroke-width: var(--size-04);
+}
+
+.timer-card__progress-track {
+  stroke: var(--app-bg-2);
+}
+
+.timer-card__progress-value {
+  stroke: var(--app-accent);
+  stroke-dasharray: 402.124;
+  stroke-linecap: round;
+}
+
+.timer-card__progress-value[data-progress-visible='false'] {
+  stroke-opacity: 0;
 }
 
 .timer-card__reading-label,
@@ -64,18 +104,24 @@
 }
 
 .timer-card__remaining {
+  width: 100%;
   max-width: 100%;
   overflow: hidden;
   color: var(--app-txt-1);
   font-size: var(--display-S);
   font-variant-numeric: tabular-nums;
   line-height: 1;
+  text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .timer-card--completed .timer-card__remaining {
   color: var(--app-txt-3);
+}
+
+.timer-card--completed .timer-card__progress-value {
+  stroke: var(--app-txt-3);
 }
 
 .timer-card__footer {

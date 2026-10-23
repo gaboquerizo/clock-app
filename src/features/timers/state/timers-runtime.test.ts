@@ -112,6 +112,118 @@ describe('Timers runtime', () => {
     scheduler.stop();
   });
 
+  it('completes expired persisted timers on restore and preserves paused time', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(referenceTimestamp + 10_000);
+
+    const expiredTimer: Timer = {
+      id: 'expired-timer',
+      durationMs: 5_000,
+      label: 'Expired',
+      status: 'running',
+      startedAt: referenceTimestamp,
+      endsAt: referenceTimestamp + 5_000,
+      remainingAtStartMs: 5_000,
+      createdAt: referenceTimestamp,
+      updatedAt: referenceTimestamp,
+    };
+    const pausedTimer: Timer = {
+      id: 'paused-timer',
+      durationMs: 60_000,
+      label: 'Paused',
+      status: 'paused',
+      remainingMs: 25_000,
+      createdAt: referenceTimestamp,
+      updatedAt: referenceTimestamp + 1_000,
+    };
+    const { records, repository } = createMemoryRepository([
+      expiredTimer,
+      pausedTimer,
+    ]);
+    const scheduler = createScheduler();
+    const controller = createTimersState({ repository });
+    const runtime = createTimersRuntime(controller, { scheduler });
+    const events: Array<{ id: string; reason: string }> = [];
+    runtime.subscribe(({ timer, reason }) => {
+      events.push({ id: timer.id, reason });
+    });
+
+    scheduler.start();
+    await runtime.start();
+    await flushMicrotasks();
+
+    expect(controller.state.timers).toEqual([
+      expect.objectContaining({
+        id: 'expired-timer',
+        status: 'completed',
+        completedAt: referenceTimestamp + 5_000,
+      }),
+      pausedTimer,
+    ]);
+    expect(records[0]).toMatchObject({
+      status: 'completed',
+      completedAt: referenceTimestamp + 5_000,
+      updatedAt: referenceTimestamp + 10_000,
+    });
+    expect(events).toEqual([{ id: 'expired-timer', reason: 'recovery' }]);
+
+    await scheduler.reconcile();
+    await flushMicrotasks();
+
+    expect(events).toEqual([{ id: 'expired-timer', reason: 'recovery' }]);
+    expect(controller.state.timers[1]).toEqual(pausedTimer);
+
+    runtime.stop();
+    scheduler.stop();
+  });
+
+  it('reconciles a deadline on activity recovery exactly once', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(referenceTimestamp);
+
+    const runningTimer: Timer = {
+      id: 'recovering-timer',
+      durationMs: 5_000,
+      label: 'Recovering',
+      status: 'running',
+      startedAt: referenceTimestamp,
+      endsAt: referenceTimestamp + 5_000,
+      remainingAtStartMs: 5_000,
+      createdAt: referenceTimestamp,
+      updatedAt: referenceTimestamp,
+    };
+    const { records, repository } = createMemoryRepository([runningTimer]);
+    const scheduler = createScheduler();
+    const controller = createTimersState({ repository });
+    const runtime = createTimersRuntime(controller, { scheduler });
+    const events: string[] = [];
+    runtime.subscribe(({ timer }) => {
+      events.push(timer.id);
+    });
+
+    scheduler.start();
+    await runtime.start();
+    await scheduler.reconcile(referenceTimestamp + 2_000);
+
+    expect(controller.state.timers[0]).toMatchObject({ status: 'running' });
+
+    await scheduler.reconcile(referenceTimestamp + 8_000);
+    await flushMicrotasks();
+
+    expect(controller.state.timers[0]).toMatchObject({
+      status: 'completed',
+      completedAt: referenceTimestamp + 5_000,
+    });
+    expect(records[0]?.status).toBe('completed');
+    expect(events).toEqual(['recovering-timer']);
+
+    await scheduler.reconcile(referenceTimestamp + 9_000);
+    expect(events).toEqual(['recovering-timer']);
+
+    runtime.stop();
+    scheduler.stop();
+  });
+
   it('updates deadlines after pause and restart and cancels a removed timer', async () => {
     vi.useFakeTimers();
     vi.setSystemTime(referenceTimestamp);

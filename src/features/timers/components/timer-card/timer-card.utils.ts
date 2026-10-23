@@ -11,6 +11,19 @@ export function formatTimerDuration(durationMs: number): string {
     .join(':');
 }
 
+export function getTimerProgress(
+  durationMs: number,
+  remainingMs: number,
+): number {
+  if (!Number.isFinite(durationMs) || durationMs <= 0) {
+    return 0;
+  }
+
+  const elapsedRatio = (durationMs - Math.max(0, remainingMs)) / durationMs;
+
+  return Math.min(1, Math.max(0, elapsedRatio));
+}
+
 export function describeTimerDuration(durationMs: number): string {
   const totalSeconds = Math.ceil(Math.max(0, durationMs) / 1_000);
   const hours = Math.floor(totalSeconds / 3_600);
