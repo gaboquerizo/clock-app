@@ -20,6 +20,8 @@ export type TimerDialogProps = {
   mode: TimerDialogMode;
   open: boolean;
   onClose: () => void;
+  busy?: boolean;
+  error?: string;
   timer?: TimerDialogTimer;
   onSubmit?: (value: TimerDialogValue) => void | Promise<void>;
   onConfirmDelete?: (timerId: string) => void | Promise<void>;
@@ -120,7 +122,7 @@ export default function TimerDialog(props: TimerDialogProps) {
 
   const submitForm = (event: SubmitEvent) => {
     event.preventDefault();
-    if (isConfirmation()) return;
+    if (isConfirmation() || props.busy === true) return;
 
     const currentDuration = durationMs();
     if (currentDuration === undefined) {
@@ -147,7 +149,7 @@ export default function TimerDialog(props: TimerDialogProps) {
       title={getAccessibleName(activeMode())}
       onClose={props.onClose}
     >
-      <div class="timer-dialog">
+      <div aria-busy={props.busy === true} class="timer-dialog">
         <div
           aria-hidden="true"
           class="timer-dialog__mode-icon t-icon-swap"
@@ -162,6 +164,13 @@ export default function TimerDialog(props: TimerDialogProps) {
         </div>
 
         <Show when={!isConfirmation() && formError()}>
+          {(error) => (
+            <p aria-live="assertive" class="timer-dialog__error" role="alert">
+              {error()}
+            </p>
+          )}
+        </Show>
+        <Show when={!isConfirmation() && props.error}>
           {(error) => (
             <p aria-live="assertive" class="timer-dialog__error" role="alert">
               {error()}
@@ -211,6 +220,7 @@ export default function TimerDialog(props: TimerDialogProps) {
                 <Show when={activeMode() === 'edit' && props.timer !== undefined}>
                   <button
                     class="timer-dialog__button timer-dialog__button--danger"
+                    disabled={props.busy === true}
                     type="button"
                     onClick={() => switchToMode('confirm-delete')}
                   >
@@ -220,6 +230,7 @@ export default function TimerDialog(props: TimerDialogProps) {
                 <Show when={activeMode() === 'create'}>
                   <button
                     class="timer-dialog__button timer-dialog__button--secondary"
+                    disabled={props.busy === true}
                     type="button"
                     onClick={props.onClose}
                   >
@@ -228,6 +239,7 @@ export default function TimerDialog(props: TimerDialogProps) {
                 </Show>
                 <button
                   class="timer-dialog__button timer-dialog__button--primary"
+                  disabled={props.busy === true}
                   type="submit"
                 >
                   {activeMode() === 'edit' ? 'Guardar' : 'Añadir'}
