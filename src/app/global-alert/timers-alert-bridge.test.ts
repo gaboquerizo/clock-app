@@ -2,6 +2,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createGlobalAlertService } from '@/core/alerts/global-alert-service';
 import type { AudioPlaybackRequest, AudioService } from '@/core/services/audio.service';
+import type {
+  NotificationDisplayRequest,
+  NotificationDisplayResult,
+  NotificationRequestResult,
+  NotificationService,
+} from '@/core/services/notification.service';
 import type { CompletedTimer } from '@/features/timers/domain/timer.types';
 import type { TimerCompletionEvent } from '@/features/timers/state/timers-runtime';
 import {
@@ -46,6 +52,34 @@ function createAudioService(
   };
 
   return { service, requests, stoppedSources };
+}
+
+function createNotificationService(
+  result: NotificationDisplayResult = { status: 'shown' },
+) {
+  const requests: NotificationDisplayRequest[] = [];
+  let permissionRequests = 0;
+  const service: NotificationService = {
+    getPermission() {
+      return 'granted';
+    },
+    async requestPermission(): Promise<NotificationRequestResult> {
+      permissionRequests += 1;
+      return { status: 'granted' };
+    },
+    show(request) {
+      requests.push(request);
+      return result;
+    },
+  };
+
+  return {
+    service,
+    requests,
+    get permissionRequests() {
+      return permissionRequests;
+    },
+  };
 }
 
 function createCompletion(
@@ -122,9 +156,11 @@ describe('Timers global alert bridge', () => {
     const alerts = createGlobalAlertService();
     const emitter = createRuntimeEmitter();
     const audio = createAudioService();
+    const notifications = createNotificationService();
     const disconnect = connectTimersToGlobalAlerts(emitter.runtime, {
       alerts,
       audio: audio.service,
+      notifications: notifications.service,
     });
     const firstCompletion = createCompletion(
       'timer-1',
@@ -138,14 +174,94 @@ describe('Timers global alert bridge', () => {
 
     expect(alerts.getSnapshot().queuedCount).toBe(0);
     expect(audio.requests).toHaveLength(1);
+    expect(notifications.requests).toEqual([
+      {
+        title: 'Temporizador finalizado',
+        body: 'One',
+        tag: 'clock-app-timer-timer-1',
+      },
+    ]);
 
     emitter.emit(createCompletion('timer-2', 'Two', 40_000, 'activation'));
     expect(alerts.getSnapshot().queuedCount).toBe(1);
+    expect(notifications.requests).toHaveLength(2);
 
     disconnect();
     emitter.emit(createCompletion('timer-3', 'Three', 40_000, 'activation'));
 
     expect(alerts.getSnapshot().queuedCount).toBe(1);
+    expect(notifications.requests).toHaveLength(2);
+  });
+
+  it('uses a fallback label and stable tag for a notification', () => {
+    const alerts = createGlobalAlertService();
+    const emitter = createRuntimeEmitter();
+    const notifications = createNotificationService();
+    const disconnect = connectTimersToGlobalAlerts(emitter.runtime, {
+      alerts,
+      notifications: notifications.service,
+    });
+
+    emitter.emit(createCompletion('untitled-timer', '  ', 45_000, 'activation'));
+
+    expect(notifications.requests).toEqual([
+      {
+        title: 'Temporizador finalizado',
+        body: 'Temporizador',
+        tag: 'clock-app-timer-untitled-timer',
+      },
+    ]);
+    expect(alerts.getSnapshot().active?.request.message).toBe('Temporizador');
+    expect(notifications.permissionRequests).toBe(0);
+    disconnect();
+  });
+
+  it.each([
+    { status: 'permission-required' as const },
+    { status: 'unsupported' as const },
+  ])('keeps the app alert and sound when notifications are $status', (result) => {
+    const alerts = createGlobalAlertService();
+    const emitter = createRuntimeEmitter();
+    const notifications = createNotificationService(result);
+    const audio = createAudioService();
+    const warning = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const disconnect = connectTimersToGlobalAlerts(emitter.runtime, {
+      alerts,
+      audio: audio.service,
+      notifications: notifications.service,
+    });
+
+    emitter.emit(createCompletion('restricted-timer', 'Focus', 46_000, 'activation'));
+
+    expect(alerts.getSnapshot().active?.request.message).toBe('Focus');
+    expect(audio.requests).toHaveLength(1);
+    expect(warning).not.toHaveBeenCalled();
+    expect(notifications.permissionRequests).toBe(0);
+    disconnect();
+  });
+
+  it('contains notification API failures without interrupting the app alert or sound', () => {
+    const alerts = createGlobalAlertService();
+    const emitter = createRuntimeEmitter();
+    const notifications = createNotificationService({
+      status: 'error',
+      error: new Error('Notification constructor failed.'),
+    });
+    const audio = createAudioService();
+    const warning = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const disconnect = connectTimersToGlobalAlerts(emitter.runtime, {
+      alerts,
+      audio: audio.service,
+      notifications: notifications.service,
+    });
+
+    emitter.emit(createCompletion('api-error-timer', 'Read', 47_000, 'activation'));
+
+    expect(alerts.getSnapshot().active?.request.message).toBe('Read');
+    expect(audio.requests).toHaveLength(1);
+    expect(warning).toHaveBeenCalledOnce();
+    expect(notifications.permissionRequests).toBe(0);
+    disconnect();
   });
 
   it('plays the approved sound in a bounded loop and stops on acceptance or dismissal', async () => {

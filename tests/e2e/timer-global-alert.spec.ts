@@ -6,6 +6,13 @@ declare global {
     __timerAudioPauseCalls: number;
     __notificationConstructorCount: number;
     __notificationPermissionRequestCount: number;
+    __notificationPermission: NotificationPermission;
+    __timerNotifications: Array<{
+      title: string;
+      body: string;
+      tag?: string;
+      silent?: boolean;
+    }>;
   }
 }
 
@@ -95,6 +102,111 @@ test('shows a timer completion globally without dismissing a contextual dialog',
   await expect(contextualDialog).toBeVisible();
   await expect(draftLabel).toHaveValue('Draft alarm');
   await expect(draftLabel).toBeFocused();
+});
+
+test('shows a browser notification after permission is granted explicitly', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    window.__notificationPermission = 'default';
+    window.__notificationPermissionRequestCount = 0;
+    window.__timerNotifications = [];
+    window.__timerAudioPlayCalls = 0;
+
+    class GrantedOnRequestNotification {
+      static get permission(): NotificationPermission {
+        return window.__notificationPermission;
+      }
+
+      static requestPermission(): Promise<NotificationPermission> {
+        window.__notificationPermissionRequestCount += 1;
+        window.__notificationPermission = 'granted';
+        return Promise.resolve('granted');
+      }
+
+      constructor(title: string, options?: NotificationOptions) {
+        window.__timerNotifications.push({
+          title,
+          body: options?.body ?? '',
+          tag: options?.tag,
+          silent: options?.silent ?? undefined,
+        });
+      }
+    }
+
+    Object.defineProperty(window, 'Notification', {
+      configurable: true,
+      value: GrantedOnRequestNotification,
+    });
+
+    HTMLMediaElement.prototype.play = function () {
+      window.__timerAudioPlayCalls += 1;
+      return Promise.resolve();
+    };
+    HTMLMediaElement.prototype.pause = function () {};
+  });
+  await page.clock.install({ time: new Date('2026-10-23T10:00:00.000Z') });
+  await page.goto('/alarms');
+
+  const requestPermissionButton = page.getByRole('button', {
+    name: 'Activar notificaciones',
+  });
+  await expect(requestPermissionButton).toBeVisible();
+  await expect(
+    page.evaluate(() => window.__notificationPermissionRequestCount),
+  ).resolves.toBe(0);
+  await requestPermissionButton.click();
+
+  await expect(
+    page.evaluate(() => window.__notificationPermissionRequestCount),
+  ).resolves.toBe(1);
+  await expect(requestPermissionButton).toHaveCount(0);
+
+  await page.getByRole('link', { name: 'Temporizador' }).click();
+  const emptyState = page.getByRole('region', {
+    name: 'No tienes temporizadores todavía.',
+  });
+  await emptyState.getByRole('button', { name: 'Añadir temporizador' }).click();
+
+  const dialog = page.getByRole('dialog', { name: 'Añadir temporizador' });
+  await dialog.getByRole('textbox', { name: 'Horas' }).fill('00');
+  await dialog.getByRole('textbox', { name: 'Minutos' }).fill('00');
+  await dialog.getByRole('textbox', { name: 'Segundos' }).fill('01');
+  await dialog
+    .getByRole('textbox', { name: 'Etiqueta del temporizador (opcional)' })
+    .fill('Tea break');
+  await dialog.getByRole('button', { name: 'Añadir' }).click();
+
+  await page
+    .getByRole('button', { name: 'Iniciar temporizador Tea break' })
+    .click();
+  await page.clock.runFor(1_000);
+
+  const alertDialog = page.getByRole('dialog', {
+    name: 'Temporizador finalizado',
+  });
+  await expect(alertDialog).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => window.__timerNotifications.length))
+    .toBe(1);
+  await expect
+    .poll(() => page.evaluate(() => window.__timerAudioPlayCalls))
+    .toBe(1);
+  await expect(
+    page.evaluate(() => window.__timerNotifications[0]),
+  ).resolves.toMatchObject({
+    title: 'Temporizador finalizado',
+    body: 'Tea break',
+    silent: true,
+  });
+  await expect
+    .poll(() =>
+      page.evaluate(() => window.__timerNotifications[0]?.tag ?? ''),
+    )
+    .toMatch(/^clock-app-timer-/);
+  await expect(
+    page.evaluate(() => window.__notificationPermissionRequestCount),
+  ).resolves.toBe(1);
 });
 
 test('shows one global alert for a timer completed during suspension and uses the fallback label', async ({
