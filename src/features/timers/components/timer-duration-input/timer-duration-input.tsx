@@ -16,9 +16,9 @@ type TimerDurationInputProps = {
 };
 
 const fieldLabels: Record<TimerDurationField, string> = {
-  hours: 'Horas',
-  minutes: 'Minutos',
-  seconds: 'Segundos',
+  hours: 'H',
+  minutes: 'M',
+  seconds: 'S',
 };
 
 export default function TimerDurationInput(props: TimerDurationInputProps) {
@@ -107,7 +107,7 @@ export default function TimerDurationInput(props: TimerDurationInputProps) {
 
     return (
       <label class="timer-duration-input__unit" for={inputId}>
-        <span class="timer-duration-input__label">{fieldLabels[field]}</span>
+        
         <input
           aria-describedby={`${rangeId}${showError() ? ` ${errorId}` : ''}`}
           aria-invalid={isFieldInvalid(field)}
@@ -125,18 +125,13 @@ export default function TimerDurationInput(props: TimerDurationInputProps) {
           onFocus={(event) => event.currentTarget.select()}
           onInput={(event) => handleInput(field, event.currentTarget.value)}
         />
-        <span class="timer-duration-input__range" id={rangeId}>
-          00–{formatTimerDurationField(maximum)}
-        </span>
+        <span class="timer-duration-input__label">{fieldLabels[field]}</span>
       </label>
     );
   };
 
   return (
     <fieldset class="timer-duration-input">
-      <legend class="timer-duration-input__legend">
-        Duración del temporizador
-      </legend>
       <div class="timer-duration-input__fields">
         {renderField('hours')}
         <span aria-hidden="true" class="timer-duration-input__separator">

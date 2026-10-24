@@ -2,7 +2,7 @@
   display: grid;
   min-width: 0;
   margin: 0;
-  padding: 0;
+  padding-block: var(--app-space-S);
   border: 0;
   gap: var(--app-space-S);
 }
@@ -40,11 +40,11 @@
   width: var(--size-64);
   height: var(--size-64);
   padding: var(--app-gap-S);
-  border: var(--app-solid-S) var(--app-bg-3);
+  border: var(--app-solid-S) var(--app-bg-2);
   border-radius: var(--app-radius-S);
   background-color: var(--app-bg-2);
   color: var(--app-txt-1);
-  font-size: var(--display-M);
+  font-size: var(--display-S);
   font-variant-numeric: tabular-nums;
   line-height: 1;
   text-align: center;
@@ -76,7 +76,9 @@
 }
 
 .timer-duration-input__separator {
-  padding-bottom: var(--size-64);
+  height: 100%;
+  display: flex;
+  align-items: start;
   color: var(--app-txt-2);
   font-size: var(--display-M);
   line-height: 1;
@@ -98,9 +100,5 @@
     width: var(--size-56);
     height: var(--size-56);
     font-size: var(--display-S);
-  }
-
-  .timer-duration-input__separator {
-    padding-bottom: var(--size-56);
   }
 }

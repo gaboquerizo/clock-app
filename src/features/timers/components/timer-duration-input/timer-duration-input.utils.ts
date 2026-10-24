@@ -109,7 +109,7 @@ export function parseTimerDuration(
     return {
       ok: false,
       code: 'zero-duration',
-      message: 'La duración debe ser mayor que 00:00:00.',
+      message: 'La duración debe ser mayor que cero.',
     };
   }
 

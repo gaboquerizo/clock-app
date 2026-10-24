@@ -132,7 +132,7 @@ export default function TimerDialog(props: TimerDialogProps) {
 
     const currentDuration = durationMs();
     if (currentDuration === undefined) {
-      setFormError('Introduce una duración mayor que 00:00:00.');
+      setFormError('Falta establecer un tiempo de duración.');
       return;
     }
 
@@ -194,7 +194,7 @@ export default function TimerDialog(props: TimerDialogProps) {
         <div
           class="timer-dialog__content-switcher"
           style={{
-            height: contentHeight() === undefined ? 'auto' : `${contentHeight()}px`,
+            height: contentHeight() === undefined ? 'auto' : `calc(${contentHeight()}px + 7px)`,
           }}
         >
           <div
