@@ -189,7 +189,7 @@ export default function AlarmDialog(props: AlarmDialogProps) {
           class="alarm-dialog__content-switcher"
           style={{
             height:
-              contentHeight() === undefined ? 'auto' : `calc(${contentHeight()}px + 7px)`,
+              contentHeight() === undefined ? 'auto' : `calc(${contentHeight()}px + 8px)`,
           }}
         >
           <div

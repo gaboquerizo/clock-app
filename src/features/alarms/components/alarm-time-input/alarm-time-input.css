@@ -68,9 +68,9 @@
   box-sizing: border-box;
   width: var(--size-80);
   height: var(--size-80);
-  border: var(--app-solid-S) var(--app-bg-2);
+  border: var(--app-solid-S) var(--app-bg-3);
   border-radius: var(--app-radius-S);
-  background-color: var(--app-bg-2);
+  background: transparent;
   color: var(--app-txt-1);
   font-size: var(--display-S);
   font-variant-numeric: tabular-nums;
@@ -84,6 +84,7 @@
 
 .alarm-time-input__field:focus {
   border-color: var(--app-focus);
+  background-color: var(--app-bg-2);
   outline: var(--app-solid-M) var(--app-focus);
   outline-offset: var(--app-offset);
 }

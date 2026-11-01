@@ -13,8 +13,8 @@
     --app-gap-S: var(--space-025);
 
     --app-radius-L: var(--radius-200);
-    --app-radius-M: var(--radius-150);
-    --app-radius-S: var(--radius-075);
+    --app-radius-M: var(--radius-100);
+    --app-radius-S: var(--radius-050);
 
     --app-solid-L: var(--border-solid-L);
     --app-solid-M: var(--border-solid-M);
@@ -31,7 +31,11 @@
     --app-txt-1: var(--slate-800);
     --app-txt-2: var(--slate-700);
     --app-txt-3: var(--slate-600);
+
     --app-accent: var(--blue-600);
+    --app-accent-1: var(--blue-600);
+    --app-accent-2: var(--blue-400);
+    --app-accent-3: var(--blue-100);
 
     --app-focus: var(--blue-400);
     --app-offset: var(--size-02);

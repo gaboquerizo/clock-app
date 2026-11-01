@@ -57,7 +57,7 @@
 .alarm-dialog__confirmation {
   display: flex;
   flex-direction: column;
-  gap: var(--app-space-M);
+  gap: var(--app-space-S);
   min-width: 0;
   margin-inline: var(--app-gap-S);
 }
@@ -68,11 +68,21 @@
   gap: var(--app-gap-L);
   min-width: 0;
   padding: var(--app-gap-S) var(--app-gap-L);
-  
-  border: var(--app-solid-S) var(--app-bg-2);
+  border: var(--app-solid-S) var(--app-bg-3);
   border-radius: var(--app-radius-S);
-  background-color: var(--app-bg-2);
+  background: transparent;
   color: var(--app-txt-3);
+}
+
+.alarm-dialog__label-field:hover {
+  border-color: var(--app-focus);
+}
+
+.alarm-dialog__label-field:focus-within {
+  border-color: var(--app-focus);
+  outline: var(--app-solid-M) var(--app-focus);
+  outline-offset: var(--app-offset);
+  background-color: var(--app-bg-2);
 }
 
 .alarm-dialog__label-icon {
@@ -90,12 +100,6 @@
   background: transparent;
   color: var(--app-txt-1);
   font-size: var(--body-M);
-}
-
-.alarm-dialog__label-field:focus-within {
-  border-color: var(--app-focus);
-  outline: var(--app-solid-M) var(--app-focus);
-  outline-offset: var(--app-offset);
 }
 
 .alarm-dialog__label-input::placeholder {
@@ -139,19 +143,18 @@
 }
 
 .alarm-dialog__button--secondary {
-  border-color: var(--app-focus);
-  background-color: transparent;
-  color: var(--app-txt-2);
-}
-
-.alarm-dialog__button--danger {
   border-color: var(--app-txt-3);
   background-color: transparent;
   color: var(--app-txt-2);
 }
 
+.alarm-dialog__button--danger {
+  background-color: var(--app-bg-5);
+  color: var(--app-bg-1);
+}
+
 .alarm-dialog__button:hover:not(:disabled) {
-  filter: brightness(1.08);
+  filter: brightness(1.1);
 }
 
 .alarm-dialog__button:disabled {

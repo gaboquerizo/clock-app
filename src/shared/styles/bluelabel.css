@@ -113,10 +113,9 @@
     --space-500: var(--size-80);
 
     /* Border Sizes */
-    --border-solid-S: solid var(--size-01);
-    --border-solid-M: solid var(--size-02);
-    --border-solid-L: solid var(--size-04);
-    --border-solid-XL: solid var(--size-06);
+    --border-solid-S: var(--size-01) solid;
+    --border-solid-M: var(--size-02) solid;
+    --border-solid-L: var(--size-04) solid;
 
     /* Radius Scale */
     --radius-025: var(--size-04);

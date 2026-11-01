@@ -55,7 +55,8 @@
 
 .ui-dialog__content {
   min-width: 0;
-  padding: var(--app-space-M);
+  padding-inline: var(--app-space-M);
+  padding-block: var(--app-space-M) var(--app-space-S);
 }
 
 @media (max-width: 420px) {

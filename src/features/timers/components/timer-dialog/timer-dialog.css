@@ -138,19 +138,18 @@
 }
 
 .timer-dialog__button--secondary {
-  border-color: var(--app-focus);
+  border-color: var(--app-txt-3);
   background-color: transparent;
-  color: var(--app-txt-2);
+  color: var(--app-txt-3);
 }
 
 .timer-dialog__button--danger {
-  border-color: var(--app-txt-3);
-  background-color: transparent;
-  color: var(--app-txt-2);
+  background-color: var(--app-bg-5);
+  color: var(--app-bg-1);
 }
 
 .timer-dialog__button:hover:not(:disabled) {
-  filter: brightness(1.08);
+  filter: brightness(1.1);
 }
 
 .timer-dialog__button:disabled {
