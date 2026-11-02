@@ -75,7 +75,7 @@
 }
 
 .alarm-dialog__label-field:hover {
-  border-color: var(--app-focus);
+  border-color: var(--app-accent);
 }
 
 .alarm-dialog__label-field:focus-within {
@@ -94,7 +94,7 @@
 .alarm-dialog__label-input {
   min-width: 0;
   width: 100%;
-  padding: var(--app-gap-M) 0;
+  padding: var(--app-gap-S) 0;
   border: 0;
   outline: 0;
   background: transparent;

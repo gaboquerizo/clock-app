@@ -40,9 +40,9 @@
   width: var(--size-64);
   height: var(--size-64);
   padding: var(--app-gap-S);
-  border: var(--app-solid-S) var(--app-bg-2);
+  border: var(--app-solid-S) var(--app-bg-3);
   border-radius: var(--app-radius-S);
-  background-color: var(--app-bg-2);
+  background: transparent;
   color: var(--app-txt-1);
   font-size: var(--display-S);
   font-variant-numeric: tabular-nums;

@@ -75,16 +75,17 @@
 }
 
 .app-sidebar__menu-link:hover {
-  background-color: rgb(from var(--app-bg-2) r g b / 50%);
+  /*background-color: rgb(from var(--app-bg-2) r g b / 50%);*/
+  background-color: var(--app-bg-2);
 }
 
 .app-sidebar__menu-link--active {
-  background-color: var(--app-bg-2);
+  background-color: var(--app-accent-3);
   color: var(--app-accent);
 }
 
 .app-sidebar__menu-link--active:hover {
-  background-color: var(--app-bg-2);
+  background-color: var(--app-accent-3);
 }
 
 .app-sidebar__menu-link:focus-visible {
