@@ -44,10 +44,6 @@
   white-space: nowrap;
 }
 
-.timer-card--running .timer-card__status {
-  color: var(--app-accent);
-}
-
 .timer-card__reading {
   position: relative;
   display: grid;
@@ -97,7 +93,6 @@
   stroke-opacity: 0;
 }
 
-.timer-card__reading-label,
 .timer-card__duration-label {
   color: var(--app-txt-3);
   font-size: var(--body-S);
@@ -117,19 +112,10 @@
   white-space: nowrap;
 }
 
-.timer-card--completed .timer-card__remaining {
-  color: var(--app-txt-3);
-}
-
-.timer-card--completed .timer-card__progress-value {
-  stroke: var(--app-txt-3);
-}
-
 .timer-card__footer {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: baseline;
-  gap: var(--app-gap-M);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   min-width: 0;
   padding-top: var(--app-space-S);
   border-top: var(--app-solid-S) var(--app-bg-2);
@@ -163,12 +149,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: var(--app-gap-S);
   min-height: var(--app-logo);
   padding: var(--app-gap-S) var(--app-gap-L);
-  border: var(--app-solid-S) var(--app-focus);
+  border: var(--app-solid-S) var(--app-txt-3);
   border-radius: var(--app-radius-S);
   background-color: var(--app-bg-1);
-  color: var(--app-txt-2);
+  color: var(--app-txt-3);
   cursor: pointer;
   font: inherit;
   font-size: var(--body-S);
@@ -230,10 +217,6 @@
   color: inherit;
   cursor: pointer;
   font: inherit;
-}
-
-.timer-card__reading-edit-surface:active:not(:disabled) {
-  background-color: color-mix(in srgb, var(--app-accent) 10%, transparent);
 }
 
 .timer-card__reading-edit-surface:focus-visible {

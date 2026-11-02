@@ -47,7 +47,7 @@
 
 .timers-view__list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--w-18)), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--w-24)), 1fr));
   align-content: start;
   gap: var(--app-space-S);
   width: 100%;

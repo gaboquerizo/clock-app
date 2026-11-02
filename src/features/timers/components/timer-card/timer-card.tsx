@@ -76,7 +76,6 @@ export default function TimerCard(props: TimerCardProps) {
       </header>
 
       <div class="timer-card__reading">
-        <span class="timer-card__reading-label">Tiempo restante</span>
         <div class="timer-card__dial">
           <svg
             aria-label={`Progreso de ${label()}`}
@@ -151,7 +150,9 @@ export default function TimerCard(props: TimerCardProps) {
               )
             }
           >
-            {primaryPlaybackAction().label}
+            <span>
+              {primaryPlaybackAction().label}
+            </span>
           </button>
           <Show when={canRestartInCurrentState()}>
             <button

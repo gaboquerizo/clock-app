@@ -19,10 +19,6 @@
   color: var(--app-accent);
 }
 
-.alarm-dialog__mode-icon[data-mode='confirm-delete'] {
-  color: var(--app-txt-2);
-}
-
 .alarm-dialog__mode-icon-svg {
   width: var(--icon-L);
   height: var(--icon-L);
