@@ -8,6 +8,7 @@
 
 .alarms-view__header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--app-space-S);
@@ -96,4 +97,14 @@
   flex: 0 0 auto;
   width: var(--icon-M);
   height: var(--icon-M);
+}
+
+@media (max-width: 768px) {
+  .alarms-view__header {
+    align-items: flex-start;
+  }
+
+  .alarms-view__add-button {
+    flex-basis: 100%;
+  }
 }

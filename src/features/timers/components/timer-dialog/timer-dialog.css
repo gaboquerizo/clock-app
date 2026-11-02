@@ -1,7 +1,3 @@
-.timer-dialog-shell .ui-dialog__content {
-  padding: var(--app-space-M);
-}
-
 .timer-dialog {
   display: flex;
   flex-direction: column;
@@ -57,7 +53,7 @@
 .timer-dialog__confirmation {
   display: flex;
   flex-direction: column;
-  gap: var(--app-space-M);
+  gap: var(--app-space-S);
   min-width: 0;
   margin-inline: var(--app-gap-S);
 }

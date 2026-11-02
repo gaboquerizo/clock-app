@@ -156,7 +156,6 @@ export default function TimerDialog(props: TimerDialogProps) {
 
   return (
     <UiDialog
-      class="timer-dialog-shell"
       open={props.open}
       showHeader={false}
       title={getAccessibleName(activeMode())}
