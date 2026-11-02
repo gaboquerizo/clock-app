@@ -17,12 +17,12 @@ test('shows the create form without a delete action and emits valid input', asyn
 
   await dialog.getByRole('button', { name: 'Añadir' }).click();
   await expect(
-    dialog.getByText('Introduce una duración mayor que 00:00:00.'),
+    dialog.getByText('Falta establecer un tiempo de duración.'),
   ).toBeVisible();
 
-  await dialog.getByRole('textbox', { name: 'Horas' }).fill('00');
-  await dialog.getByRole('textbox', { name: 'Minutos' }).fill('02');
-  await dialog.getByRole('textbox', { name: 'Segundos' }).fill('05');
+  await dialog.getByRole('textbox', { name: 'H', exact: true }).fill('00');
+  await dialog.getByRole('textbox', { name: 'M', exact: true }).fill('02');
+  await dialog.getByRole('textbox', { name: 'S', exact: true }).fill('05');
   await dialog
     .getByRole('textbox', { name: 'Etiqueta del temporizador (opcional)' })
     .fill('Estudio');
@@ -39,8 +39,8 @@ test('confirms deletion inside the edit dialog and restores edit values on cance
 
   const dialog = page.getByRole('dialog', { name: 'Editar temporizador' });
   await expect(dialog).toBeVisible();
-  await expect(dialog.getByRole('textbox', { name: 'Minutos' })).toHaveValue('01');
-  await expect(dialog.getByRole('textbox', { name: 'Segundos' })).toHaveValue('30');
+  await expect(dialog.getByRole('textbox', { name: 'M', exact: true })).toHaveValue('01');
+  await expect(dialog.getByRole('textbox', { name: 'S', exact: true })).toHaveValue('30');
   await expect(dialog.getByRole('button', { name: 'Guardar' })).toBeVisible();
   await expect(dialog.getByRole('button', { name: 'Cancelar' })).toHaveCount(0);
 
@@ -57,9 +57,9 @@ test('confirms deletion inside the edit dialog and restores edit values on cance
 
   await confirmationDialog.getByRole('button', { name: 'Cancelar' }).click();
   await expect(dialog.getByRole('button', { name: 'Guardar' })).toBeVisible();
-  await expect(dialog.getByRole('textbox', { name: 'Minutos' })).toHaveValue('01');
-  await expect(dialog.getByRole('textbox', { name: 'Segundos' })).toHaveValue('30');
-  await expect(dialog.getByRole('textbox', { name: 'Horas' })).toBeFocused();
+  await expect(dialog.getByRole('textbox', { name: 'M', exact: true })).toHaveValue('01');
+  await expect(dialog.getByRole('textbox', { name: 'S', exact: true })).toHaveValue('30');
+  await expect(dialog.getByRole('textbox', { name: 'H', exact: true })).toBeFocused();
 
   await dialog.getByRole('button', { name: 'Eliminar' }).click();
   await page

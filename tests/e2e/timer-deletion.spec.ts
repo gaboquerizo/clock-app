@@ -12,7 +12,7 @@ test('cancels deletion in the edit dialog, then removes the timer permanently', 
   const createDialog = page.getByRole('dialog', {
     name: 'Añadir temporizador',
   });
-  await createDialog.getByRole('textbox', { name: 'Minutos' }).fill('02');
+  await createDialog.getByRole('textbox', { name: 'M', exact: true }).fill('02');
   await createDialog
     .getByRole('textbox', {
       name: 'Etiqueta del temporizador (opcional)',
@@ -31,7 +31,7 @@ test('cancels deletion in the edit dialog, then removes the timer permanently', 
   await editButton.click();
 
   const editDialog = page.getByRole('dialog', { name: 'Editar temporizador' });
-  await editDialog.getByRole('textbox', { name: 'Minutos' }).fill('03');
+  await editDialog.getByRole('textbox', { name: 'M', exact: true }).fill('03');
   await editDialog
     .getByRole('textbox', {
       name: 'Etiqueta del temporizador (opcional)',
@@ -51,8 +51,8 @@ test('cancels deletion in the edit dialog, then removes the timer permanently', 
   ).toBeFocused();
 
   await confirmationDialog.getByRole('button', { name: 'Cancelar' }).click();
-  await expect(editDialog.getByRole('textbox', { name: 'Horas' })).toBeFocused();
-  await expect(editDialog.getByRole('textbox', { name: 'Minutos' })).toHaveValue(
+  await expect(editDialog.getByRole('textbox', { name: 'H', exact: true })).toBeFocused();
+  await expect(editDialog.getByRole('textbox', { name: 'M', exact: true })).toHaveValue(
     '03',
   );
   await expect(
@@ -86,6 +86,45 @@ test('cancels deletion in the edit dialog, then removes the timer permanently', 
   ).toHaveCount(0);
 });
 
+test('restores focus to a remaining timer reading surface after deletion', async ({
+  page,
+}) => {
+  await page.goto('/timers');
+  const emptyState = page.getByRole('region', {
+    name: 'No tienes temporizadores todavía.',
+  });
+  await emptyState.getByRole('button', { name: 'Añadir temporizador' }).click();
+
+  const createDialog = page.getByRole('dialog', {
+    name: 'Añadir temporizador',
+  });
+  await createDialog.getByRole('textbox', { name: 'M', exact: true }).fill('02');
+  await createDialog
+    .getByRole('textbox', { name: 'Etiqueta del temporizador (opcional)' })
+    .fill('Remove me');
+  await createDialog.getByRole('button', { name: 'Añadir' }).click();
+
+  await page.getByRole('button', { name: 'Añadir temporizador' }).click();
+  await createDialog.getByRole('textbox', { name: 'M', exact: true }).fill('03');
+  await createDialog
+    .getByRole('textbox', { name: 'Etiqueta del temporizador (opcional)' })
+    .fill('Keep me');
+  await createDialog.getByRole('button', { name: 'Añadir' }).click();
+
+  await page.getByRole('button', { name: 'Editar temporizador Remove me' }).click();
+  const editDialog = page.getByRole('dialog', { name: 'Editar temporizador' });
+  await editDialog.getByRole('button', { name: 'Eliminar' }).click();
+  await page
+    .getByRole('dialog', { name: 'Eliminar temporizador' })
+    .getByRole('button', { name: 'Eliminar' })
+    .click();
+
+  await expect(editDialog).toBeHidden();
+  await expect(
+    page.getByRole('button', { name: 'Editar temporizador Keep me' }),
+  ).toBeFocused();
+});
+
 test('disables timer confirmation motion when reduced motion is requested', async ({
   page,
 }) => {
@@ -99,7 +138,7 @@ test('disables timer confirmation motion when reduced motion is requested', asyn
   const createDialog = page.getByRole('dialog', {
     name: 'Añadir temporizador',
   });
-  await createDialog.getByRole('textbox', { name: 'Minutos' }).fill('01');
+  await createDialog.getByRole('textbox', { name: 'M', exact: true }).fill('01');
   await createDialog.getByRole('button', { name: 'Añadir' }).click();
   await expect(createDialog).toBeHidden();
 
@@ -128,6 +167,6 @@ test('disables timer confirmation motion when reduced motion is requested', asyn
   ).toBe(true);
 
   await page.keyboard.press('Enter');
-  await expect(editDialog.getByRole('textbox', { name: 'Horas' })).toBeFocused();
+  await expect(editDialog.getByRole('textbox', { name: 'H', exact: true })).toBeFocused();
   await expect(editDialog.getByRole('button', { name: 'Guardar' })).toBeVisible();
 });

@@ -12,9 +12,9 @@ test('edits a timer without duplicating it and persists the approved reset state
   const createDialog = page.getByRole('dialog', {
     name: 'Añadir temporizador',
   });
-  await createDialog.getByRole('textbox', { name: 'Horas' }).fill('00');
-  await createDialog.getByRole('textbox', { name: 'Minutos' }).fill('02');
-  await createDialog.getByRole('textbox', { name: 'Segundos' }).fill('00');
+  await createDialog.getByRole('textbox', { name: 'H', exact: true }).fill('00');
+  await createDialog.getByRole('textbox', { name: 'M', exact: true }).fill('02');
+  await createDialog.getByRole('textbox', { name: 'S', exact: true }).fill('00');
   await createDialog
     .getByRole('textbox', { name: 'Etiqueta del temporizador (opcional)' })
     .fill('Lectura');
@@ -35,13 +35,13 @@ test('edits a timer without duplicating it and persists the approved reset state
 
   const editDialog = page.getByRole('dialog', { name: 'Editar temporizador' });
   await expect(editDialog).toBeVisible();
-  await expect(editDialog.getByRole('textbox', { name: 'Horas' })).toHaveValue(
+  await expect(editDialog.getByRole('textbox', { name: 'H', exact: true })).toHaveValue(
     '00',
   );
-  await expect(editDialog.getByRole('textbox', { name: 'Minutos' })).toHaveValue(
+  await expect(editDialog.getByRole('textbox', { name: 'M', exact: true })).toHaveValue(
     '02',
   );
-  await expect(editDialog.getByRole('textbox', { name: 'Segundos' })).toHaveValue(
+  await expect(editDialog.getByRole('textbox', { name: 'S', exact: true })).toHaveValue(
     '00',
   );
   await expect(
@@ -50,8 +50,8 @@ test('edits a timer without duplicating it and persists the approved reset state
     }),
   ).toHaveValue('Lectura');
 
-  await editDialog.getByRole('textbox', { name: 'Minutos' }).fill('03');
-  await editDialog.getByRole('textbox', { name: 'Segundos' }).fill('10');
+  await editDialog.getByRole('textbox', { name: 'M', exact: true }).fill('03');
+  await editDialog.getByRole('textbox', { name: 'S', exact: true }).fill('10');
   await editDialog
     .getByRole('textbox', {
       name: 'Etiqueta del temporizador (opcional)',
@@ -94,4 +94,57 @@ test('edits a timer without duplicating it and persists the approved reset state
   await expect(restoredList.getByRole('listitem')).toHaveCount(1);
   await expect(restoredCard).toContainText('00:03:10');
   await expect(restoredCard).toHaveAttribute('data-timer-id', timerId);
+});
+
+test('edits only from the reading surface while playback controls stay independent', async ({
+  page,
+}) => {
+  await page.goto('/timers');
+  await page
+    .getByRole('region', { name: 'No tienes temporizadores todavía.' })
+    .getByRole('button', { name: 'Añadir temporizador' })
+    .click();
+
+  const createDialog = page.getByRole('dialog', {
+    name: 'Añadir temporizador',
+  });
+  await createDialog.getByRole('textbox', { name: 'M', exact: true }).fill('05');
+  await createDialog
+    .getByRole('textbox', { name: 'Etiqueta del temporizador (opcional)' })
+    .fill('Focus');
+  await createDialog.getByRole('button', { name: 'Añadir' }).click();
+  await expect(createDialog).toBeHidden();
+
+  const card = page.getByRole('article', { name: 'Focus, Listo' });
+  const readingEditButton = page.getByRole('button', {
+    name: 'Editar temporizador Focus',
+  });
+  const editDialog = page.getByRole('dialog', { name: 'Editar temporizador' });
+
+  await card.getByRole('heading', { name: 'Focus' }).click();
+  await expect(editDialog).toBeHidden();
+
+  await readingEditButton.focus();
+  await expect(readingEditButton).toBeFocused();
+  await readingEditButton.press('Space');
+  await expect(editDialog).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(editDialog).toBeHidden();
+  await expect(readingEditButton).toBeFocused();
+
+  await page
+    .getByRole('button', { name: 'Iniciar temporizador Focus' })
+    .click();
+  await expect(
+    page.getByRole('article', { name: 'Focus, En marcha' }),
+  ).toBeVisible();
+  await expect(editDialog).toBeHidden();
+
+  await page
+    .getByRole('button', { name: 'Pausar temporizador Focus' })
+    .click();
+  await expect(page.getByRole('article', { name: 'Focus, Pausado' })).toBeVisible();
+  await expect(editDialog).toBeHidden();
+  await readingEditButton.click();
+  await expect(editDialog).toBeVisible();
 });

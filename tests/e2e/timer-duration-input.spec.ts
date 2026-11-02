@@ -5,9 +5,9 @@ test('accepts keyboard duration entry and explains invalid values', async ({
 }) => {
   await page.goto('/tests/e2e/fixtures/timer-duration-input.html');
 
-  const hours = page.getByRole('textbox', { name: 'Horas' });
-  const minutes = page.getByRole('textbox', { name: 'Minutos' });
-  const seconds = page.getByRole('textbox', { name: 'Segundos' });
+  const hours = page.getByRole('textbox', { name: 'H', exact: true });
+  const minutes = page.getByRole('textbox', { name: 'M', exact: true });
+  const seconds = page.getByRole('textbox', { name: 'S', exact: true });
   const output = page.getByTestId('duration-output');
 
   await hours.focus();

@@ -49,24 +49,10 @@ function TimerList(props: {
               <TimerCard
                 now={props.now}
                 onPlaybackAction={props.onPlaybackAction}
+                onEdit={() => props.onEdit(timer())}
+                editDisabled={props.playbackPendingIds.has(timerId)}
                 playbackError={props.playbackErrors[timerId]}
                 playbackPending={props.playbackPendingIds.has(timerId)}
-                actions={
-                  <button
-                    aria-label={`Editar temporizador ${timer().label.trim() || 'Temporizador'}`}
-                    class="timer-card__edit-button"
-                    disabled={props.playbackPendingIds.has(timerId)}
-                    type="button"
-                    onClick={() => props.onEdit(timer())}
-                  >
-                    <AppIcon
-                      aria-hidden="true"
-                      class="timer-card__edit-icon"
-                      name="proicons:edit"
-                    />
-                    <span>Editar</span>
-                  </button>
-                }
                 timer={timer()}
               />
             </li>
@@ -223,7 +209,7 @@ export default function TimersView() {
         queueMicrotask(() => {
           const nextEditButton =
             viewElement.querySelector<HTMLButtonElement>(
-              '.timer-card__edit-button',
+              '.timer-card__reading-edit-surface',
             );
           const addButton = viewElement.querySelector<HTMLButtonElement>(
             '.timers-view__add-button',

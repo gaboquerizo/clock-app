@@ -49,6 +49,7 @@
 }
 
 .timer-card__reading {
+  position: relative;
   display: grid;
   align-content: center;
   justify-items: center;
@@ -217,35 +218,31 @@
   line-height: 1.4;
 }
 
-.timer-card__edit-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--app-gap-S);
-  min-height: var(--app-logo);
-  padding: var(--app-gap-S) var(--app-gap-L);
-  border: var(--app-solid-S) var(--app-focus);
+.timer-card__reading-edit-surface {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  appearance: none;
+  padding: 0;
+  border: 0;
   border-radius: var(--app-radius-S);
-  background-color: transparent;
-  color: var(--app-txt-2);
+  background: transparent;
+  color: inherit;
   cursor: pointer;
   font: inherit;
-  font-size: var(--body-S);
-  line-height: 1.25;
 }
 
-.timer-card__edit-button:hover {
-  color: var(--app-accent);
+.timer-card__reading-edit-surface:active:not(:disabled) {
+  background-color: color-mix(in srgb, var(--app-accent) 10%, transparent);
 }
 
-.timer-card__edit-button:focus-visible {
+.timer-card__reading-edit-surface:focus-visible {
   outline: var(--app-solid-M) var(--app-focus);
   outline-offset: var(--app-offset);
 }
 
-.timer-card__edit-icon {
-  width: var(--icon-S);
-  height: var(--icon-S);
+.timer-card__reading-edit-surface:disabled {
+  cursor: progress;
 }
 
 @media (max-width: 768px) {

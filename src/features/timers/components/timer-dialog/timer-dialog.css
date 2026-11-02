@@ -64,10 +64,21 @@
   gap: var(--app-gap-L);
   min-width: 0;
   padding: var(--app-gap-S) var(--app-gap-L);
-  border: var(--app-solid-S) var(--app-bg-2);
+  border: var(--app-solid-S) var(--app-bg-3);
   border-radius: var(--app-radius-S);
-  background-color: var(--app-bg-2);
+  background: transparent;
   color: var(--app-txt-3);
+}
+
+.timer-dialog__label-field:hover {
+  border-color: var(--app-focus);
+}
+
+.timer-dialog__label-field:focus-within {
+  border-color: var(--app-focus);
+  outline: var(--app-solid-M) var(--app-focus);
+  outline-offset: var(--app-offset);
+  background-color: var(--app-bg-2);
 }
 
 .timer-dialog__label-icon {
@@ -79,18 +90,12 @@
 .timer-dialog__label-input {
   width: 100%;
   min-width: 0;
-  padding: var(--app-gap-M) 0;
+  padding: var(--app-gap-S) 0;
   border: 0;
   outline: 0;
   background: transparent;
   color: var(--app-txt-1);
   font-size: var(--body-M);
-}
-
-.timer-dialog__label-field:focus-within {
-  border-color: var(--app-focus);
-  outline: var(--app-solid-M) var(--app-focus);
-  outline-offset: var(--app-offset);
 }
 
 .timer-dialog__label-input::placeholder {

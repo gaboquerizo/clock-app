@@ -169,9 +169,9 @@ test('shows a browser notification after permission is granted explicitly', asyn
   await emptyState.getByRole('button', { name: 'Añadir temporizador' }).click();
 
   const dialog = page.getByRole('dialog', { name: 'Añadir temporizador' });
-  await dialog.getByRole('textbox', { name: 'Horas' }).fill('00');
-  await dialog.getByRole('textbox', { name: 'Minutos' }).fill('00');
-  await dialog.getByRole('textbox', { name: 'Segundos' }).fill('01');
+  await dialog.getByRole('textbox', { name: 'H', exact: true }).fill('00');
+  await dialog.getByRole('textbox', { name: 'M', exact: true }).fill('00');
+  await dialog.getByRole('textbox', { name: 'S', exact: true }).fill('01');
   await dialog
     .getByRole('textbox', { name: 'Etiqueta del temporizador (opcional)' })
     .fill('Tea break');

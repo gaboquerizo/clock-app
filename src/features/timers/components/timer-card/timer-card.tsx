@@ -1,4 +1,4 @@
-import { createMemo, Show, type JSX } from 'solid-js';
+import { createMemo, Show } from 'solid-js';
 
 import { getTimerRemainingMs } from '@/features/timers/domain/timer';
 import type {
@@ -19,7 +19,8 @@ import './timer-card.css';
 type TimerCardProps = {
   now: number;
   timer: Timer;
-  actions?: JSX.Element;
+  onEdit: () => void;
+  editDisabled: boolean;
   playbackError?: string;
   playbackPending: boolean;
   onPlaybackAction: (
@@ -113,6 +114,13 @@ export default function TimerCard(props: TimerCardProps) {
             {formatTimerDuration(remainingMs())}
           </time>
         </div>
+        <button
+          aria-label={`Editar temporizador ${label()}`}
+          class="timer-card__reading-edit-surface"
+          disabled={props.editDisabled}
+          type="button"
+          onClick={props.onEdit}
+        />
       </div>
 
       <footer class="timer-card__footer">
@@ -125,7 +133,6 @@ export default function TimerCard(props: TimerCardProps) {
             {formatTimerDuration(props.timer.durationMs)}
           </time>
         </div>
-        {props.actions}
         <div
           aria-busy={props.playbackPending}
           aria-label={`Controles del temporizador ${label()}`}
