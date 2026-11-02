@@ -79,7 +79,7 @@
 }
 
 .alarm-time-input__field:hover {
-  border-color: var(--app-accent);
+  border-color: var(--app-focus);
 }
 
 .alarm-time-input__field:focus {

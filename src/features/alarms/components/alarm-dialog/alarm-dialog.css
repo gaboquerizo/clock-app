@@ -75,7 +75,7 @@
 }
 
 .alarm-dialog__label-field:hover {
-  border-color: var(--app-accent);
+  border-color: var(--app-focus);
 }
 
 .alarm-dialog__label-field:focus-within {
