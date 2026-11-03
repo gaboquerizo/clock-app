@@ -12,6 +12,8 @@ import { createAlarmsState } from '@/features/alarms/state/alarms-state';
 import { TimersStateProvider } from '@/features/timers/state/timers-context';
 import { createTimersState } from '@/features/timers/state/timers-state';
 import { createTimersRuntime } from '@/features/timers/state/timers-runtime';
+import { StopwatchStateProvider } from '@/features/stopwatch/state/stopwatch-context';
+import { createStopwatchState } from '@/features/stopwatch/state/stopwatch-state';
 
 /*—————————— Styles ——————————*/
 import './app-root.css';
@@ -28,6 +30,7 @@ export default function AppRoot(props: RouteSectionProps) {
     cancelScheduledExecution: (timerId) => cancelTimerProcess(timerId),
   });
   const timersRuntime = createTimersRuntime(timers, { scheduler });
+  const stopwatch = createStopwatchState();
   cancelTimerProcess = timersRuntime.cancel;
   const unsubscribeAlarmAlertBridge =
     connectAlarmsToGlobalAlerts(alarmsRuntime);
@@ -46,6 +49,7 @@ export default function AppRoot(props: RouteSectionProps) {
     scheduler.start();
     void alarmsRuntime.start();
     void timersRuntime.start();
+    void stopwatch.actions.load();
   });
 
   onCleanup(() => {
@@ -60,12 +64,14 @@ export default function AppRoot(props: RouteSectionProps) {
     <GlobalAlertHost>
       <AlarmsStateProvider value={alarms}>
         <TimersStateProvider value={timers}>
-          <div class="app-shell">
-            <aside class="app-shell__sidebar">
-              <AppSidebar />
-            </aside>
-            <main class="app-shell__main">{props.children}</main>
-          </div>
+          <StopwatchStateProvider value={stopwatch}>
+            <div class="app-shell">
+              <aside class="app-shell__sidebar">
+                <AppSidebar />
+              </aside>
+              <main class="app-shell__main">{props.children}</main>
+            </div>
+          </StopwatchStateProvider>
         </TimersStateProvider>
       </AlarmsStateProvider>
     </GlobalAlertHost>
