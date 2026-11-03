@@ -63,6 +63,7 @@ export type StopwatchCommand =
   | RecordStopwatchLapCommand;
 
 export type StopwatchDomainErrorCode =
+  | 'invalid-state'
   | 'invalid-transition'
   | 'invalid-timestamp'
   | 'invalid-elapsed-time'
