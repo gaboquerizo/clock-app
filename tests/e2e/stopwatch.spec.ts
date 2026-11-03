@@ -18,10 +18,32 @@ test('navigates to Stopwatch from the sidebar and loads its route directly', asy
   await expect(
     main.getByRole('heading', { name: 'Cronómetro', exact: true }),
   ).toBeVisible();
+  for (const regionName of [
+    'Tiempo transcurrido',
+    'Controles principales',
+    'Registro de vueltas',
+  ]) {
+    await expect(
+      main.getByRole('region', { name: regionName, exact: true }),
+    ).toBeVisible();
+  }
   await expect(sidebar).toBeVisible();
   await expect(
     navigation.getByRole('link', { name: 'Cronómetro' }),
   ).toHaveClass(/app-sidebar__menu-link--active/);
+
+  const stopwatchContent = main.locator('.stopwatch-view__content');
+  await page.setViewportSize({ width: 1280, height: 800 });
+  const desktopColumns = await stopwatchContent.evaluate(
+    (element) => getComputedStyle(element).gridTemplateColumns,
+  );
+  expect(desktopColumns.trim().split(/\s+/)).toHaveLength(2);
+
+  await page.setViewportSize({ width: 900, height: 900 });
+  const tabletColumns = await stopwatchContent.evaluate(
+    (element) => getComputedStyle(element).gridTemplateColumns,
+  );
+  expect(tabletColumns.trim().split(/\s+/)).toHaveLength(1);
 
   await page.goto('/stopwatch');
   await expect(
