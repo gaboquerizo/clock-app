@@ -1,4 +1,5 @@
 import type {
+  StopwatchElapsedMs,
   IdleStopwatch,
   RecordStopwatchLapCommand,
   RunningStopwatch,
@@ -6,6 +7,7 @@ import type {
   StopwatchDomainErrorCode,
   StopwatchLap,
   StopwatchResult,
+  StopwatchTimestampMs,
   StopwatchTransitionCommand,
 } from './stopwatch.types';
 import {
@@ -30,6 +32,43 @@ export function createStopwatch(): IdleStopwatch {
     accumulatedMs: 0,
     laps: [],
   };
+}
+
+/** Derives the elapsed duration from the active segment and prior pauses. */
+export function getStopwatchElapsedMs(
+  stopwatch: Stopwatch,
+  timestampMs: StopwatchTimestampMs,
+): StopwatchResult<StopwatchElapsedMs> {
+  if (!isValidStopwatchTimestamp(timestampMs)) {
+    return failure('invalid-timestamp');
+  }
+
+  if (!isValidStopwatchElapsed(stopwatch.accumulatedMs)) {
+    return failure('invalid-elapsed-time');
+  }
+
+  if (stopwatch.status !== 'running') {
+    return success(stopwatch.accumulatedMs);
+  }
+
+  if (
+    !isValidStopwatchTimestamp(stopwatch.startedAt) ||
+    timestampMs < stopwatch.startedAt
+  ) {
+    return failure('invalid-timestamp');
+  }
+
+  const activeSegmentMs = timestampMs - stopwatch.startedAt;
+  const elapsedMs = stopwatch.accumulatedMs + activeSegmentMs;
+
+  if (
+    !isValidStopwatchElapsed(activeSegmentMs) ||
+    !isValidStopwatchElapsed(elapsedMs)
+  ) {
+    return failure('invalid-elapsed-time');
+  }
+
+  return success(elapsedMs);
 }
 
 export function transitionStopwatch(
