@@ -65,7 +65,8 @@ export type StopwatchCommand =
 export type StopwatchDomainErrorCode =
   | 'invalid-transition'
   | 'invalid-timestamp'
-  | 'invalid-elapsed-time';
+  | 'invalid-elapsed-time'
+  | 'invalid-lap-history';
 
 export type StopwatchDomainError = {
   code: StopwatchDomainErrorCode;
