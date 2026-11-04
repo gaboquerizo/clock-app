@@ -75,8 +75,85 @@
 }
 
 .stopwatch-view__controls {
+  display: flex;
+  flex-direction: column;
   grid-area: controls;
-  min-height: 6rem;
+  gap: var(--app-space-S);
+  min-height: 7rem;
+}
+
+.stopwatch-view__control-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--app-gap-S);
+  min-width: 0;
+}
+
+.stopwatch-view__control-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--app-gap-S);
+  min-height: var(--app-logo);
+  padding: var(--app-gap-S) var(--app-space-M);
+  border: var(--app-solid-S) var(--app-txt-3);
+  border-radius: var(--app-radius-S);
+  background-color: var(--app-bg-1);
+  color: var(--app-txt-3);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--body-S);
+  line-height: 1.25;
+}
+
+.stopwatch-view__control-button:hover:not(:disabled) {
+  border-color: var(--app-accent);
+  color: var(--app-accent);
+}
+
+.stopwatch-view__control-button:active:not(:disabled) {
+  background-color: var(--app-bg-2);
+}
+
+.stopwatch-view__control-button--primary {
+  border-color: var(--app-accent);
+  background-color: var(--app-accent);
+  color: var(--app-bg-1);
+}
+
+.stopwatch-view__control-button--primary:hover:not(:disabled) {
+  background-color: var(--app-accent);
+  color: var(--app-bg-1);
+  filter: brightness(1.08);
+}
+
+.stopwatch-view__control-button--primary:active:not(:disabled) {
+  filter: brightness(0.96);
+}
+
+.stopwatch-view__control-button:focus-visible {
+  outline: var(--app-solid-M) var(--app-focus);
+  outline-offset: var(--app-offset);
+}
+
+.stopwatch-view__control-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.stopwatch-view__control-icon {
+  width: var(--icon-M);
+  height: var(--icon-M);
+  flex: 0 0 auto;
+}
+
+.stopwatch-view__control-error {
+  margin: 0;
+  color: var(--app-txt-2);
+  font-size: var(--body-S);
+  line-height: 1.4;
 }
 
 .stopwatch-view__laps {
@@ -110,6 +187,6 @@
   }
 
   .stopwatch-view__controls {
-    min-height: 5rem;
+    min-height: 7rem;
   }
 }

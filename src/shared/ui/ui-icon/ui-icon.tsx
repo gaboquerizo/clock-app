@@ -9,6 +9,10 @@ export type IconName =
   | 'proicons:history'
   | 'proicons:settings'
   | 'proicons:timer'
+  | 'proicons:play'
+  | 'proicons:pause'
+  | 'proicons:flag'
+  | 'proicons:arrow-counterclockwise'
   | 'proicons:chevron-up'
   | 'proicons:chevron-down'
   | 'proicons:edit'
@@ -101,6 +105,50 @@ function renderIcon(name: IconName) {
           <circle cx="12" cy="13.5" r="7.75" />
           <path stroke-linecap="round" d="m19.75 5.818l-2.236 2.236" />
         </g>
+      );
+    case 'proicons:play':
+      return (
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          d="M5.5 12V5.624c0-1.974 2.18-3.17 3.844-2.108l10 6.376c1.541.983 1.541 3.233 0 4.216l-10 6.376C7.68 21.545 5.5 20.35 5.5 18.376z"
+        />
+      );
+    case 'proicons:pause':
+      return (
+        <g
+          fill="none"
+          stroke="currentColor"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+        >
+          <rect width="5" height="16.5" x="5" y="3.75" rx="2" />
+          <rect width="5" height="16.5" x="14" y="3.75" rx="2" />
+        </g>
+      );
+    case 'proicons:flag':
+      return (
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          d="M5.25 21.25v-6m0 0v-10a1.5 1.5 0 0 1 1.5-1.5h11.086a1 1 0 0 1 .821 1.571L15.75 9.5l2.907 4.179a1 1 0 0 1-.82 1.571z"
+        />
+      );
+    case 'proicons:arrow-counterclockwise':
+      return (
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          d="M4.281 14.385a8.25 8.25 0 1 0 .824-6.26l-.477.88m-.523-4.63v3.75a1 1 0 0 0 .523.88m4.227.12h-3.75a1 1 0 0 1-.477-.12"
+        />
       );
     case 'proicons:hourglass':
       return (
