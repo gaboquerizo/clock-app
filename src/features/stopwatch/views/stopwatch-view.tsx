@@ -2,6 +2,7 @@ import {
   createEffect,
   createMemo,
   createSignal,
+  For,
   onCleanup,
   Show,
 } from 'solid-js';
@@ -33,6 +34,9 @@ export default function StopwatchView() {
   });
   const elapsedText = createMemo(() =>
     formatStopwatchElapsed(elapsedMs()),
+  );
+  const lapsNewestFirst = createMemo(() =>
+    [...stopwatch.state.stopwatch.laps].reverse(),
   );
   const isBusy = () =>
     isActionPending() ||
@@ -237,9 +241,99 @@ export default function StopwatchView() {
             class="stopwatch-view__region-title"
             id="stopwatch-view-laps-title"
           >
-            Registro de vueltas
+            Vueltas
           </h2>
-          <div aria-hidden="true" class="stopwatch-view__laps-space" />
+          <Show
+            when={lapsNewestFirst().length > 0}
+            fallback={(
+              <p class="stopwatch-view__laps-empty">
+                Aún no hay vueltas registradas.
+              </p>
+            )}
+          >
+            <div
+              aria-label="Tabla de vueltas"
+              class="stopwatch-view__laps-table-wrap"
+              role="region"
+              tabIndex={0}
+            >
+              <table class="stopwatch-view__laps-table">
+                <caption class="stopwatch-view__visually-hidden">
+                  Vueltas registradas del cronómetro
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Vuelta</th>
+                    <th scope="col">Duración</th>
+                    <th scope="col">Tiempo acumulado</th>
+                    <th scope="col">Clasificación</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <For each={lapsNewestFirst()}>
+                    {(lap) => {
+                      const classification = createMemo(() => {
+                        const ranking = stopwatch.selectors.lapRanking();
+
+                        if (ranking === undefined) {
+                          return undefined;
+                        }
+
+                        if (ranking.fastestLapNumber === lap.number) {
+                          return {
+                            kind: 'fastest' as const,
+                            label: 'Más rápido',
+                          };
+                        }
+
+                        if (ranking.slowestLapNumber === lap.number) {
+                          return {
+                            kind: 'slowest' as const,
+                            label: 'Más lento',
+                          };
+                        }
+
+                        return undefined;
+                      });
+
+                      return (
+                        <tr>
+                          <th scope="row">Vuelta {lap.number}</th>
+                          <td
+                            classList={{
+                              'stopwatch-view__lap-duration--fastest':
+                                classification()?.kind === 'fastest',
+                            }}
+                          >
+                            {formatStopwatchElapsed(lap.durationMs)}
+                          </td>
+                          <td>
+                            {formatStopwatchElapsed(lap.elapsedMs)}
+                          </td>
+                          <td>
+                            <Show when={classification()}>
+                              {(result) => (
+                                <span
+                                  classList={{
+                                    'stopwatch-view__lap-classification--fastest':
+                                      result().kind === 'fastest',
+                                    'stopwatch-view__lap-classification--slowest':
+                                      result().kind === 'slowest',
+                                  }}
+                                >
+                                  {result().label}
+                                </span>
+                              )}
+                            </Show>
+                          </td>
+                        </tr>
+                      );
+                    }}
+                  </For>
+                </tbody>
+              </table>
+            </div>
+          </Show>
         </section>
       </div>
       <StopwatchResetDialog
