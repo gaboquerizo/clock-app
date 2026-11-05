@@ -7,8 +7,30 @@ export type PomodoroBlockExecutionId = string;
 /** Block duration measured in milliseconds. */
 export type PomodoroDurationMs = number;
 
+/** Configured Pomodoro block duration measured in whole minutes. */
+export type PomodoroDurationMinutes = number;
+
 /** Absolute Unix timestamp measured in milliseconds. */
 export type PomodoroTimestampMs = number;
+
+export type PomodoroPreferences = {
+  focusDurationMinutes: PomodoroDurationMinutes;
+  shortBreakDurationMinutes: PomodoroDurationMinutes;
+  longBreakDurationMinutes: PomodoroDurationMinutes;
+};
+
+export type PomodoroPreferenceField = keyof PomodoroPreferences;
+
+export type PomodoroPreferencesValidationError =
+  | { code: 'invalid-preferences' }
+  | { code: 'invalid-duration'; field: PomodoroPreferenceField };
+
+export type PomodoroPreferencesValidationResult =
+  | { ok: true; value: PomodoroPreferences }
+  | {
+      ok: false;
+      errors: readonly PomodoroPreferencesValidationError[];
+    };
 
 export type PomodoroBlockType = 'focus' | 'short-break' | 'long-break';
 
