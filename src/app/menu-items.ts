@@ -4,7 +4,7 @@ import type { IconName } from '../shared/ui/ui-icon/ui-icon';
 export type MenuItem = {
   label: string;
   icon: IconName;
-  href?: '/alarms' | '/clock' | '/stopwatch' | '/timers';
+  href?: '/alarms' | '/clock' | '/pomodoro' | '/stopwatch' | '/timers';
   dividerBefore?: boolean;
 };
 
@@ -32,6 +32,7 @@ export const menuItems: MenuItem[] = [
   {
     label: 'Pomodoro',
     icon: 'proicons:hourglass',
+    href: '/pomodoro',
   },
   {
     label: 'Sesiones',
