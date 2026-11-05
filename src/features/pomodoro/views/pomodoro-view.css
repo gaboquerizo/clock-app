@@ -1,7 +1,18 @@
 .pomodoro-view {
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   min-height: 100%;
   padding: var(--app-space-L) var(--app-space-S);
+}
+
+.pomodoro-view__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--app-space-S);
+  min-height: var(--app-logo);
 }
 
 .pomodoro-view__title {
@@ -10,4 +21,101 @@
   font-size: var(--headline-L);
   font-weight: 400;
   line-height: 1.2;
+}
+
+.pomodoro-view__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--app-gap-S);
+}
+
+.pomodoro-view__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--app-gap-S);
+  min-height: var(--app-logo);
+  padding: var(--app-gap-L) var(--app-space-M);
+  border: var(--app-solid-S) var(--app-bg-3);
+  border-radius: var(--app-radius-S);
+  background-color: var(--app-bg-1);
+  color: var(--app-txt-3);
+  cursor: not-allowed;
+  font: inherit;
+  font-size: var(--body-M);
+  line-height: 1.25;
+  opacity: 0.55;
+}
+
+.pomodoro-view__action-icon {
+  flex: 0 0 auto;
+  width: var(--icon-M);
+  height: var(--icon-M);
+}
+
+.pomodoro-view__content {
+  display: grid;
+  flex: 1;
+  grid-template-areas:
+    'timer cycle'
+    'controls cycle';
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: var(--app-space-S);
+  min-height: 0;
+  padding-block: var(--app-space-L);
+}
+
+.pomodoro-view__region {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: var(--app-space-M);
+  border-radius: var(--app-radius-M);
+  box-shadow: var(--shadow-slate-01);
+  background-color: var(--app-bg-1);
+  color: var(--app-txt-1);
+}
+
+.pomodoro-view__region-title {
+  margin: 0;
+  color: var(--app-txt-2);
+  font-size: var(--body-L);
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.pomodoro-view__timer {
+  grid-area: timer;
+}
+
+.pomodoro-view__controls {
+  grid-area: controls;
+}
+
+.pomodoro-view__cycle {
+  grid-area: cycle;
+}
+
+@media (max-width: 768px) {
+  .pomodoro-view__header {
+    align-items: flex-start;
+  }
+
+  .pomodoro-view__actions {
+    flex-basis: 100%;
+  }
+
+  .pomodoro-view__content {
+    grid-template-areas:
+      'timer'
+      'controls'
+      'cycle';
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
 }
