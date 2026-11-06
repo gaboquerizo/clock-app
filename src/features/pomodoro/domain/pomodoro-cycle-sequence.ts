@@ -5,7 +5,7 @@ import {
   isValidPomodoroTimestampMs,
   validatePomodoroCycle,
 } from './pomodoro.rules';
-import { validatePomodoroPreferences } from './pomodoro-preferences';
+import { assignPomodoroBlockDuration } from './pomodoro-duration-assignment';
 import type {
   PomodoroBlockCompletedEvent,
   PomodoroBlockExecutionId,
@@ -49,20 +49,6 @@ function failure<T>(code: PomodoroDomainErrorCode): PomodoroResult<T> {
   return { ok: false, error: { code } };
 }
 
-function durationForBlock(
-  type: PomodoroBlockType,
-  preferences: PomodoroPreferences,
-): number {
-  const durationMinutes =
-    type === 'focus'
-      ? preferences.focusDurationMinutes
-      : type === 'short-break'
-        ? preferences.shortBreakDurationMinutes
-        : preferences.longBreakDurationMinutes;
-
-  return durationMinutes * 60_000;
-}
-
 /** Prepares the next block after a matching completion event; it never starts it. */
 export function advancePomodoroCycle(
   cycle: PomodoroCycle,
@@ -96,12 +82,6 @@ export function advancePomodoroCycle(
     return failure('invalid-identity');
   }
 
-  const preferencesValidation = validatePomodoroPreferences(input.preferences);
-
-  if (!preferencesValidation.ok) {
-    return failure('invalid-preferences');
-  }
-
   let cycleId = current.id;
   let completedFocusCount = current.completedFocusCount;
   let nextBlockType: PomodoroBlockType;
@@ -124,6 +104,15 @@ export function advancePomodoroCycle(
     nextBlockType = 'focus';
   }
 
+  const assignedDuration = assignPomodoroBlockDuration(
+    nextBlockType,
+    input.preferences,
+  );
+
+  if (!assignedDuration.ok) {
+    return assignedDuration;
+  }
+
   return {
     ok: true,
     value: {
@@ -133,10 +122,7 @@ export function advancePomodoroCycle(
       currentBlock: {
         id: input.nextBlockExecutionId,
         type: nextBlockType,
-        durationMs: durationForBlock(
-          nextBlockType,
-          preferencesValidation.value,
-        ),
+        durationMs: assignedDuration.value,
       },
     },
   };

@@ -3,7 +3,7 @@ import {
   isValidPomodoroCycleId,
   validatePomodoroCycle,
 } from './pomodoro.rules';
-import { validatePomodoroPreferences } from './pomodoro-preferences';
+import { assignPomodoroBlockDuration } from './pomodoro-duration-assignment';
 import type {
   PomodoroBlockExecutionId,
   PomodoroCycle,
@@ -80,10 +80,13 @@ export function resetPomodoroCycle(
     return failure('invalid-identity');
   }
 
-  const preferencesValidation = validatePomodoroPreferences(input.preferences);
+  const assignedDuration = assignPomodoroBlockDuration(
+    'focus',
+    input.preferences,
+  );
 
-  if (!preferencesValidation.ok) {
-    return failure('invalid-preferences');
+  if (!assignedDuration.ok) {
+    return assignedDuration;
   }
 
   return {
@@ -95,7 +98,7 @@ export function resetPomodoroCycle(
       currentBlock: {
         id: input.nextBlockExecutionId,
         type: 'focus',
-        durationMs: preferencesValidation.value.focusDurationMinutes * 60_000,
+        durationMs: assignedDuration.value,
       },
     },
   };
