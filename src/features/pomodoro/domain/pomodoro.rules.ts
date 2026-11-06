@@ -53,6 +53,21 @@ export function isValidPomodoroTimestampMs(
   );
 }
 
+function isValidPomodoroProgress(
+  completedFocusCount: number,
+  blockType: PomodoroBlockType,
+): boolean {
+  if (completedFocusCount === 0) {
+    return blockType === 'focus';
+  }
+
+  if (completedFocusCount < 4) {
+    return blockType === 'focus' || blockType === 'short-break';
+  }
+
+  return completedFocusCount === 4 && blockType === 'long-break';
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
@@ -81,6 +96,7 @@ export function validatePomodoroCycle(
     typeof completedFocusCount !== 'number' ||
     !Number.isSafeInteger(completedFocusCount) ||
     completedFocusCount < 0 ||
+    completedFocusCount > 4 ||
     !isRecord(currentBlockValue)
   ) {
     return failure('invalid-cycle');
@@ -93,7 +109,8 @@ export function validatePomodoroCycle(
   if (
     !isValidPomodoroBlockExecutionId(blockId) ||
     !isValidPomodoroBlockType(blockType) ||
-    !isValidPomodoroDurationMs(durationMs)
+    !isValidPomodoroDurationMs(durationMs) ||
+    !isValidPomodoroProgress(completedFocusCount, blockType)
   ) {
     return failure('invalid-cycle');
   }

@@ -85,7 +85,10 @@ export type PomodoroDomainErrorCode =
   | 'invalid-timestamp'
   | 'invalid-deadline'
   | 'invalid-transition'
-  | 'block-expired';
+  | 'block-expired'
+  | 'invalid-completion-event'
+  | 'invalid-identity'
+  | 'invalid-preferences';
 
 export type PomodoroDomainError = {
   code: PomodoroDomainErrorCode;
