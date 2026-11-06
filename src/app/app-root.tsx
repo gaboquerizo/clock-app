@@ -14,6 +14,8 @@ import { createTimersState } from '@/features/timers/state/timers-state';
 import { createTimersRuntime } from '@/features/timers/state/timers-runtime';
 import { StopwatchStateProvider } from '@/features/stopwatch/state/stopwatch-context';
 import { createStopwatchState } from '@/features/stopwatch/state/stopwatch-state';
+import { PomodoroStateProvider } from '@/features/pomodoro/state/pomodoro-context';
+import { createPomodoroState } from '@/features/pomodoro/state/pomodoro-state';
 
 /*—————————— Styles ——————————*/
 import './app-root.css';
@@ -31,6 +33,7 @@ export default function AppRoot(props: RouteSectionProps) {
   });
   const timersRuntime = createTimersRuntime(timers, { scheduler });
   const stopwatch = createStopwatchState();
+  const pomodoro = createPomodoroState();
   cancelTimerProcess = timersRuntime.cancel;
   const unsubscribeAlarmAlertBridge =
     connectAlarmsToGlobalAlerts(alarmsRuntime);
@@ -50,6 +53,7 @@ export default function AppRoot(props: RouteSectionProps) {
     void alarmsRuntime.start();
     void timersRuntime.start();
     void stopwatch.actions.load();
+    void pomodoro.actions.load();
   });
 
   onCleanup(() => {
@@ -64,14 +68,16 @@ export default function AppRoot(props: RouteSectionProps) {
     <GlobalAlertHost>
       <AlarmsStateProvider value={alarms}>
         <TimersStateProvider value={timers}>
-          <StopwatchStateProvider value={stopwatch}>
-            <div class="app-shell">
-              <aside class="app-shell__sidebar">
-                <AppSidebar />
-              </aside>
-              <main class="app-shell__main">{props.children}</main>
-            </div>
-          </StopwatchStateProvider>
+          <PomodoroStateProvider value={pomodoro}>
+            <StopwatchStateProvider value={stopwatch}>
+              <div class="app-shell">
+                <aside class="app-shell__sidebar">
+                  <AppSidebar />
+                </aside>
+                <main class="app-shell__main">{props.children}</main>
+              </div>
+            </StopwatchStateProvider>
+          </PomodoroStateProvider>
         </TimersStateProvider>
       </AlarmsStateProvider>
     </GlobalAlertHost>
