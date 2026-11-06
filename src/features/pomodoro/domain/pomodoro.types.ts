@@ -55,6 +55,8 @@ export type ReadyPomodoroCycle = PomodoroCycleBase & {
 
 export type RunningPomodoroCycle = PomodoroCycleBase & {
   status: 'running';
+  /** Absolute timestamp at which the current running segment began. */
+  startedAt: PomodoroTimestampMs;
   /** Absolute deadline of the current block execution. */
   endsAt: PomodoroTimestampMs;
 };
@@ -70,6 +72,28 @@ export type PomodoroCycle =
   | ReadyPomodoroCycle
   | RunningPomodoroCycle
   | PausedPomodoroCycle;
+
+export type PomodoroTransition = 'start' | 'pause' | 'resume';
+
+export type PomodoroTransitionCommand =
+  | { type: 'start'; timestampMs: PomodoroTimestampMs }
+  | { type: 'pause'; timestampMs: PomodoroTimestampMs }
+  | { type: 'resume'; timestampMs: PomodoroTimestampMs };
+
+export type PomodoroDomainErrorCode =
+  | 'invalid-cycle'
+  | 'invalid-timestamp'
+  | 'invalid-deadline'
+  | 'invalid-transition'
+  | 'block-expired';
+
+export type PomodoroDomainError = {
+  code: PomodoroDomainErrorCode;
+};
+
+export type PomodoroResult<T> =
+  | { ok: true; value: T }
+  | { ok: false; error: PomodoroDomainError };
 
 /** Emitted once when a particular block execution reaches its deadline. */
 export type PomodoroBlockCompletedEvent = {
