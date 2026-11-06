@@ -1,6 +1,6 @@
 import './pomodoro-view.css';
 
-import { createMemo, Show } from 'solid-js';
+import { createMemo, createSignal, Show } from 'solid-js';
 
 import PomodoroBlockIndicator from '@/features/pomodoro/components/pomodoro-block-indicator/pomodoro-block-indicator';
 import PomodoroCircularProgress from '@/features/pomodoro/components/pomodoro-circular-progress/pomodoro-circular-progress';
@@ -8,13 +8,93 @@ import PomodoroCycleProgressIndicators from '@/features/pomodoro/components/pomo
 import PomodoroCountdownDisplay from '@/features/pomodoro/components/pomodoro-countdown-display/pomodoro-countdown-display';
 import { getPomodoroRemainingMs } from '@/features/pomodoro/components/pomodoro-countdown-display/pomodoro-countdown-display.utils';
 import { usePomodoroState } from '@/features/pomodoro/state/pomodoro-context';
-import AppIcon from '@/shared/ui/ui-icon/ui-icon';
+import AppIcon, { type IconName } from '@/shared/ui/ui-icon/ui-icon';
+
+type PomodoroControl = {
+  label: string;
+  accessibleName: string;
+  icon: IconName;
+};
 
 export default function PomodoroView() {
   const pomodoro = usePomodoroState();
+  const [isActionPending, setIsActionPending] = createSignal(false);
   const currentBlock = pomodoro.selectors.currentBlock;
   const cycleProgress = pomodoro.selectors.cycleProgress;
   const currentCycle = () => pomodoro.state.cycle;
+  const isBusy = () =>
+    isActionPending() ||
+    pomodoro.state.status === 'loading' ||
+    pomodoro.state.status === 'saving';
+  const primaryControl = createMemo<PomodoroControl>(() => {
+    switch (currentCycle()?.status ?? 'ready') {
+      case 'ready':
+        return {
+          label: 'Iniciar',
+          accessibleName: 'Iniciar bloque Pomodoro',
+          icon: 'proicons:play',
+        };
+      case 'running':
+        return {
+          label: 'Pausar',
+          accessibleName: 'Pausar bloque Pomodoro',
+          icon: 'proicons:pause',
+        };
+      case 'paused':
+        return {
+          label: 'Reanudar',
+          accessibleName: 'Reanudar bloque Pomodoro',
+          icon: 'proicons:play',
+        };
+    }
+  });
+  const runAction = (action: () => Promise<unknown>) => {
+    if (isBusy()) {
+      return;
+    }
+
+    setIsActionPending(true);
+    void action()
+      .catch(() => undefined)
+      .finally(() => setIsActionPending(false));
+  };
+  const activatePrimaryControl = () => {
+    const cycle = currentCycle();
+
+    if (cycle === undefined || isBusy()) {
+      return;
+    }
+
+    switch (cycle.status) {
+      case 'ready':
+        runAction(() => pomodoro.actions.start());
+        break;
+      case 'running':
+        runAction(() => pomodoro.actions.pause());
+        break;
+      case 'paused':
+        runAction(() => pomodoro.actions.resume());
+        break;
+    }
+  };
+  const isResetBlockDisabled = () => {
+    const cycle = currentCycle();
+
+    return isBusy() || cycle === undefined || cycle.status === 'ready';
+  };
+  const resetBlock = () => {
+    const cycle = currentCycle();
+
+    if (
+      cycle === undefined ||
+      cycle.status === 'ready' ||
+      isBusy()
+    ) {
+      return;
+    }
+
+    runAction(() => pomodoro.actions.resetBlock());
+  };
   const activeFocusNumber = () => {
     const cycle = currentCycle();
 
@@ -106,6 +186,39 @@ export default function PomodoroView() {
           >
             Controles
           </h2>
+          <div
+            aria-busy={isBusy()}
+            aria-label="Controles del bloque Pomodoro"
+            class="pomodoro-view__control-group"
+            role="group"
+          >
+            <button
+              aria-label={primaryControl().accessibleName}
+              class="pomodoro-view__control-button pomodoro-view__control-button--primary"
+              disabled={isBusy() || currentCycle() === undefined}
+              type="button"
+              onClick={activatePrimaryControl}
+            >
+              <AppIcon
+                class="pomodoro-view__control-icon"
+                name={primaryControl().icon}
+              />
+              <span>{primaryControl().label}</span>
+            </button>
+            <button
+              aria-label="Reiniciar bloque Pomodoro"
+              class="pomodoro-view__control-button"
+              disabled={isResetBlockDisabled()}
+              type="button"
+              onClick={resetBlock}
+            >
+              <AppIcon
+                class="pomodoro-view__control-icon"
+                name="proicons:arrow-counterclockwise"
+              />
+              <span>Reiniciar bloque</span>
+            </button>
+          </div>
         </section>
 
         <section
