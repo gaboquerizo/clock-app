@@ -1,14 +1,24 @@
 import './pomodoro-view.css';
 
-import { Show } from 'solid-js';
+import { createMemo, Show } from 'solid-js';
 
-import AppIcon from '@/shared/ui/ui-icon/ui-icon';
 import PomodoroBlockIndicator from '@/features/pomodoro/components/pomodoro-block-indicator/pomodoro-block-indicator';
+import PomodoroCountdownDisplay from '@/features/pomodoro/components/pomodoro-countdown-display/pomodoro-countdown-display';
+import { getPomodoroRemainingMs } from '@/features/pomodoro/components/pomodoro-countdown-display/pomodoro-countdown-display.utils';
 import { usePomodoroState } from '@/features/pomodoro/state/pomodoro-context';
+import AppIcon from '@/shared/ui/ui-icon/ui-icon';
 
 export default function PomodoroView() {
   const pomodoro = usePomodoroState();
   const currentBlock = pomodoro.selectors.currentBlock;
+  const currentCycle = () => pomodoro.state.cycle;
+  const remainingMs = createMemo(() => {
+    const cycle = currentCycle();
+
+    return cycle === undefined
+      ? undefined
+      : getPomodoroRemainingMs(cycle, Date.now());
+  });
 
   return (
     <section aria-labelledby="pomodoro-view-title" class="pomodoro-view">
@@ -57,6 +67,14 @@ export default function PomodoroView() {
           </h2>
           <Show when={currentBlock()}>
             {(block) => <PomodoroBlockIndicator blockType={block().type} />}
+          </Show>
+          <Show when={currentCycle()}>
+            {(cycle) => (
+              <PomodoroCountdownDisplay
+                assignedDurationMs={cycle().currentBlock.durationMs}
+                remainingMs={remainingMs() ?? 0}
+              />
+            )}
           </Show>
         </section>
 
