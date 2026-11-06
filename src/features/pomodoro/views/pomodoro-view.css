@@ -93,6 +93,19 @@
   grid-area: timer;
 }
 
+.pomodoro-view__dial {
+  display: grid;
+  align-self: center;
+  place-items: center;
+  width: min(100%, var(--w-20));
+  aspect-ratio: 1;
+  margin-block: auto;
+}
+
+.pomodoro-view__dial > * {
+  grid-area: 1 / 1;
+}
+
 .pomodoro-view__controls {
   grid-area: controls;
 }

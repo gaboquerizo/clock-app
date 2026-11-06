@@ -3,6 +3,7 @@ import './pomodoro-view.css';
 import { createMemo, Show } from 'solid-js';
 
 import PomodoroBlockIndicator from '@/features/pomodoro/components/pomodoro-block-indicator/pomodoro-block-indicator';
+import PomodoroCircularProgress from '@/features/pomodoro/components/pomodoro-circular-progress/pomodoro-circular-progress';
 import PomodoroCountdownDisplay from '@/features/pomodoro/components/pomodoro-countdown-display/pomodoro-countdown-display';
 import { getPomodoroRemainingMs } from '@/features/pomodoro/components/pomodoro-countdown-display/pomodoro-countdown-display.utils';
 import { usePomodoroState } from '@/features/pomodoro/state/pomodoro-context';
@@ -70,10 +71,16 @@ export default function PomodoroView() {
           </Show>
           <Show when={currentCycle()}>
             {(cycle) => (
-              <PomodoroCountdownDisplay
-                assignedDurationMs={cycle().currentBlock.durationMs}
-                remainingMs={remainingMs() ?? 0}
-              />
+              <div class="pomodoro-view__dial">
+                <PomodoroCircularProgress
+                  durationMs={cycle().currentBlock.durationMs}
+                  remainingMs={remainingMs() ?? 0}
+                />
+                <PomodoroCountdownDisplay
+                  assignedDurationMs={cycle().currentBlock.durationMs}
+                  remainingMs={remainingMs() ?? 0}
+                />
+              </div>
             )}
           </Show>
         </section>
