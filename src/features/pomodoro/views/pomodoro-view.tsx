@@ -4,6 +4,7 @@ import { createMemo, Show } from 'solid-js';
 
 import PomodoroBlockIndicator from '@/features/pomodoro/components/pomodoro-block-indicator/pomodoro-block-indicator';
 import PomodoroCircularProgress from '@/features/pomodoro/components/pomodoro-circular-progress/pomodoro-circular-progress';
+import PomodoroCycleProgressIndicators from '@/features/pomodoro/components/pomodoro-cycle-progress-indicators/pomodoro-cycle-progress-indicators';
 import PomodoroCountdownDisplay from '@/features/pomodoro/components/pomodoro-countdown-display/pomodoro-countdown-display';
 import { getPomodoroRemainingMs } from '@/features/pomodoro/components/pomodoro-countdown-display/pomodoro-countdown-display.utils';
 import { usePomodoroState } from '@/features/pomodoro/state/pomodoro-context';
@@ -12,7 +13,17 @@ import AppIcon from '@/shared/ui/ui-icon/ui-icon';
 export default function PomodoroView() {
   const pomodoro = usePomodoroState();
   const currentBlock = pomodoro.selectors.currentBlock;
+  const cycleProgress = pomodoro.selectors.cycleProgress;
   const currentCycle = () => pomodoro.state.cycle;
+  const activeFocusNumber = () => {
+    const cycle = currentCycle();
+
+    return cycle !== undefined &&
+      cycle.status !== 'ready' &&
+      cycle.currentBlock.type === 'focus'
+      ? cycle.completedFocusCount + 1
+      : undefined;
+  };
   const remainingMs = createMemo(() => {
     const cycle = currentCycle();
 
@@ -107,6 +118,11 @@ export default function PomodoroView() {
           >
             Progreso del ciclo
           </h2>
+          <PomodoroCycleProgressIndicators
+            activeFocusNumber={activeFocusNumber()}
+            completedFocusCount={cycleProgress().completedFocusCount}
+            totalFocusCount={cycleProgress().totalFocusCount}
+          />
         </section>
       </div>
     </section>
