@@ -1,8 +1,15 @@
 import './pomodoro-view.css';
 
+import { Show } from 'solid-js';
+
 import AppIcon from '@/shared/ui/ui-icon/ui-icon';
+import PomodoroBlockIndicator from '@/features/pomodoro/components/pomodoro-block-indicator/pomodoro-block-indicator';
+import { usePomodoroState } from '@/features/pomodoro/state/pomodoro-context';
 
 export default function PomodoroView() {
+  const pomodoro = usePomodoroState();
+  const currentBlock = pomodoro.selectors.currentBlock;
+
   return (
     <section aria-labelledby="pomodoro-view-title" class="pomodoro-view">
       <header class="pomodoro-view__header">
@@ -48,6 +55,9 @@ export default function PomodoroView() {
           >
             Tiempo restante
           </h2>
+          <Show when={currentBlock()}>
+            {(block) => <PomodoroBlockIndicator blockType={block().type} />}
+          </Show>
         </section>
 
         <section
