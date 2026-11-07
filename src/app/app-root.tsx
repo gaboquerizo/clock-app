@@ -41,6 +41,11 @@ export default function AppRoot(props: RouteSectionProps) {
     connectAlarmsToGlobalAlerts(alarmsRuntime);
   const unsubscribeTimerAlertBridge =
     connectTimersToGlobalAlerts(timersRuntime);
+  const unsubscribePomodoroCompletion = pomodoroRuntime.subscribe(
+    async (event) => {
+      await pomodoro.actions.completeBlock(event);
+    },
+  );
 
   createEffect(() => {
     alarmsRuntime.sync(alarms.state.alarms);
@@ -65,6 +70,7 @@ export default function AppRoot(props: RouteSectionProps) {
   onCleanup(() => {
     unsubscribeAlarmAlertBridge();
     unsubscribeTimerAlertBridge();
+    unsubscribePomodoroCompletion();
     alarmsRuntime.stop();
     timersRuntime.stop();
     pomodoroRuntime.stop();
