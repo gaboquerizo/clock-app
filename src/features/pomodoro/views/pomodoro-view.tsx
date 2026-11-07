@@ -8,7 +8,7 @@ import PomodoroCycleProgressIndicators from '@/features/pomodoro/components/pomo
 import PomodoroCountdownDisplay from '@/features/pomodoro/components/pomodoro-countdown-display/pomodoro-countdown-display';
 import PomodoroCycleResetDialog from '@/features/pomodoro/components/pomodoro-cycle-reset-dialog/pomodoro-cycle-reset-dialog';
 import PomodoroSettingsDialog from '@/features/pomodoro/components/pomodoro-settings-dialog/pomodoro-settings-dialog';
-import { getPomodoroRemainingMs } from '@/features/pomodoro/components/pomodoro-countdown-display/pomodoro-countdown-display.utils';
+import { getPomodoroRemainingMs } from '@/features/pomodoro/domain/pomodoro-time';
 import { usePomodoroState } from '@/features/pomodoro/state/pomodoro-context';
 import AppIcon, { type IconName } from '@/shared/ui/ui-icon/ui-icon';
 
