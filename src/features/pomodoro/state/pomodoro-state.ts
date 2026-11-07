@@ -69,8 +69,15 @@ export type PomodoroStateError = {
 export type PomodoroFeatureState = {
   cycle: PomodoroCycle | undefined;
   preferences: PomodoroPreferences;
+  lastProcessedCompletion: PomodoroCompletionReceipt | null;
   status: PomodoroStateStatus;
   error: PomodoroStateError | undefined;
+};
+
+export type PomodoroCompletionMetadata = {
+  reason: 'activation' | 'recovery';
+  scheduledAt: PomodoroTimestampMs;
+  observedAt: PomodoroTimestampMs;
 };
 
 export type PomodoroCycleProgress = {
@@ -108,6 +115,7 @@ export type PomodoroActions = {
   resetCycle(): Promise<PomodoroActionResult<PomodoroCycle>>;
   completeBlock(
     event: PomodoroBlockCompletedEvent,
+    metadata?: PomodoroCompletionMetadata,
   ): Promise<PomodoroActionResult<PomodoroCycle>>;
   savePreferences(
     preferences: PomodoroPreferences,
@@ -191,9 +199,47 @@ function isValidCompletionReceipt(
 
   const receipt = value as Record<string, unknown>;
 
-  return (
+  if (
     isValidPomodoroCycleId(receipt.cycleId) &&
     isValidPomodoroBlockExecutionId(receipt.blockExecutionId)
+  ) {
+    if (receipt.recovery === undefined) {
+      return true;
+    }
+
+    if (
+      typeof receipt.recovery !== 'object' ||
+      receipt.recovery === null ||
+      Array.isArray(receipt.recovery)
+    ) {
+      return false;
+    }
+
+    const recovery = receipt.recovery as Record<string, unknown>;
+
+    return (
+      isValidPomodoroBlockType(recovery.blockType) &&
+      isValidPomodoroTimestampMs(recovery.completedAt) &&
+      isValidPomodoroTimestampMs(recovery.scheduledAt) &&
+      isValidPomodoroTimestampMs(recovery.observedAt) &&
+      recovery.completedAt === recovery.scheduledAt &&
+      recovery.observedAt >= recovery.scheduledAt
+    );
+  }
+
+  return false;
+}
+
+function isValidCompletionMetadata(
+  event: PomodoroBlockCompletedEvent,
+  metadata: PomodoroCompletionMetadata,
+): boolean {
+  return (
+    (metadata.reason === 'activation' || metadata.reason === 'recovery') &&
+    isValidPomodoroTimestampMs(metadata.scheduledAt) &&
+    isValidPomodoroTimestampMs(metadata.observedAt) &&
+    metadata.scheduledAt === event.completedAt &&
+    metadata.observedAt >= metadata.scheduledAt
   );
 }
 
@@ -220,6 +266,7 @@ export function createPomodoroState(
   const [state, setState] = createStore<PomodoroFeatureState>({
     cycle: undefined,
     preferences: { ...DEFAULT_POMODORO_PREFERENCES },
+    lastProcessedCompletion: null,
     status: 'idle',
     error: undefined,
   });
@@ -341,6 +388,7 @@ export function createPomodoroState(
       setState({
         cycle: snapshot.cycle,
         preferences,
+        lastProcessedCompletion: snapshot.lastProcessedCompletion,
         status: 'ready',
         error: undefined,
       });
@@ -375,7 +423,12 @@ export function createPomodoroState(
       };
       await cycleRepository.update(snapshot);
       lastProcessedCompletion = completionReceipt;
-      setState({ cycle, status: 'ready', error: undefined });
+      setState({
+        cycle,
+        lastProcessedCompletion: completionReceipt,
+        status: 'ready',
+        error: undefined,
+      });
       return { ok: true, value: cycle };
     } catch (error) {
       return setError(createStorageError(operation, error));
@@ -444,7 +497,7 @@ export function createPomodoroState(
       );
     },
 
-    completeBlock(event) {
+    completeBlock(event, metadata) {
       return enqueue(async () => {
         const loaded = await ensureLoaded();
 
@@ -458,6 +511,16 @@ export function createPomodoroState(
           lastProcessedCompletion.blockExecutionId === event.blockExecutionId
         ) {
           return { ok: true, value: loaded.value };
+        }
+
+        if (
+          !isValidCompletionEvent(event) ||
+          (metadata !== undefined &&
+            !isValidCompletionMetadata(event, metadata))
+        ) {
+          return setError(
+            createDomainError('complete-block', 'invalid-completion-event'),
+          );
         }
 
         const cycle = loaded.value;
@@ -479,10 +542,26 @@ export function createPomodoroState(
           );
         }
 
-        return persistCycle('complete-block', result.value, {
+        const completionReceipt: PomodoroCompletionReceipt = {
           cycleId: event.cycleId,
           blockExecutionId: event.blockExecutionId,
-        });
+          ...(metadata?.reason === 'recovery'
+            ? {
+                recovery: {
+                  blockType: event.blockType,
+                  completedAt: event.completedAt,
+                  scheduledAt: metadata.scheduledAt,
+                  observedAt: metadata.observedAt,
+                },
+              }
+            : {}),
+        };
+
+        return persistCycle(
+          'complete-block',
+          result.value,
+          completionReceipt,
+        );
       });
     },
 

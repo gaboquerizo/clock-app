@@ -43,7 +43,11 @@ export default function AppRoot(props: RouteSectionProps) {
     connectTimersToGlobalAlerts(timersRuntime);
   const unsubscribePomodoroCompletion = pomodoroRuntime.subscribe(
     async (event) => {
-      await pomodoro.actions.completeBlock(event);
+      await pomodoro.actions.completeBlock(event, {
+        reason: event.reason,
+        scheduledAt: event.scheduledAt,
+        observedAt: event.observedAt,
+      });
     },
   );
 

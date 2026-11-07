@@ -26,6 +26,7 @@ export type PomodoroBlockExpirationListener = (
 
 export type PomodoroRuntimeOptions = {
   scheduler: Scheduler;
+  now?: () => number;
 };
 
 export type PomodoroRuntime = {
@@ -56,8 +57,12 @@ export function createPomodoroRuntime(
   options: PomodoroRuntimeOptions,
 ): PomodoroRuntime {
   const scheduler = options.scheduler;
+  const now = options.now ?? (() => Date.now());
   const registeredAt = new Map<string, number>();
   const listeners = new Set<PomodoroBlockExpirationListener>();
+  let lastEmittedExpiration:
+    | { id: string; scheduledAt: number }
+    | undefined;
   let isStarted = false;
   let isReady = false;
   let startPromise: Promise<void> | undefined;
@@ -78,6 +83,25 @@ export function createPomodoroRuntime(
       return;
     }
 
+    if (
+      lastEmittedExpiration?.id === event.id &&
+      lastEmittedExpiration.scheduledAt === event.scheduledAt
+    ) {
+      return;
+    }
+
+    lastEmittedExpiration = {
+      id: event.id,
+      scheduledAt: event.scheduledAt,
+    };
+
+    const reason =
+      event.reason === 'recovery' ||
+      (typeof document !== 'undefined' &&
+        document.visibilityState === 'hidden')
+        ? 'recovery'
+        : 'activation';
+
     emitExpiration(listeners, {
       type: 'block-completed',
       cycleId: cycle.id,
@@ -86,7 +110,7 @@ export function createPomodoroRuntime(
       completedAt: event.scheduledAt,
       scheduledAt: event.scheduledAt,
       observedAt: event.observedAt,
-      reason: event.reason,
+      reason,
     });
   };
 
@@ -120,6 +144,26 @@ export function createPomodoroRuntime(
       return;
     }
 
+    if (
+      lastEmittedExpiration?.id === desiredProcessId &&
+      lastEmittedExpiration.scheduledAt === runningCycle.endsAt
+    ) {
+      return;
+    }
+
+    const observedAt = now();
+
+    if (runningCycle.endsAt <= observedAt) {
+      registeredAt.set(desiredProcessId, runningCycle.endsAt);
+      handleTrigger({
+        id: desiredProcessId,
+        scheduledAt: runningCycle.endsAt,
+        observedAt,
+        reason: 'recovery',
+      });
+      return;
+    }
+
     scheduler.register({
       at: runningCycle.endsAt,
       id: desiredProcessId,
@@ -139,6 +183,7 @@ export function createPomodoroRuntime(
       }
 
       isStarted = true;
+      lastEmittedExpiration = undefined;
       startPromise = (async () => {
         await controller.actions.load();
 
@@ -170,6 +215,7 @@ export function createPomodoroRuntime(
       }
 
       registeredAt.clear();
+      lastEmittedExpiration = undefined;
     },
 
     subscribe(listener) {

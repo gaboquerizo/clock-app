@@ -1,6 +1,7 @@
 import {
   isValidPomodoroBlockExecutionId,
   isValidPomodoroCycleId,
+  isValidPomodoroTimestampMs,
   validatePomodoroCycle,
 } from '../domain/pomodoro.rules';
 import type {
@@ -19,6 +20,13 @@ export const POMODORO_CYCLE_RECORD_ID = 'current';
 export type PomodoroCompletionReceipt = {
   cycleId: PomodoroCycleId;
   blockExecutionId: PomodoroBlockExecutionId;
+  /** Present only when the completion was recovered after an interruption. */
+  recovery?: {
+    blockType: PomodoroBlockExecution['type'];
+    completedAt: PomodoroTimestampMs;
+    scheduledAt: PomodoroTimestampMs;
+    observedAt: PomodoroTimestampMs;
+  };
 };
 
 /** Storage-facing snapshot with the latest completion used for deduplication. */
@@ -58,10 +66,33 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function isValidCompletionReceipt(
   value: unknown,
 ): value is PomodoroCompletionReceipt {
+  if (
+    !isRecord(value) ||
+    !isValidPomodoroCycleId(value.cycleId) ||
+    !isValidPomodoroBlockExecutionId(value.blockExecutionId)
+  ) {
+    return false;
+  }
+
+  if (value.recovery === undefined) {
+    return true;
+  }
+
+  if (!isRecord(value.recovery)) {
+    return false;
+  }
+
+  const recovery = value.recovery;
+
   return (
-    isRecord(value) &&
-    isValidPomodoroCycleId(value.cycleId) &&
-    isValidPomodoroBlockExecutionId(value.blockExecutionId)
+    (recovery.blockType === 'focus' ||
+      recovery.blockType === 'short-break' ||
+      recovery.blockType === 'long-break') &&
+    isValidPomodoroTimestampMs(recovery.completedAt) &&
+    isValidPomodoroTimestampMs(recovery.scheduledAt) &&
+    isValidPomodoroTimestampMs(recovery.observedAt) &&
+    recovery.completedAt === recovery.scheduledAt &&
+    recovery.observedAt >= recovery.scheduledAt
   );
 }
 
