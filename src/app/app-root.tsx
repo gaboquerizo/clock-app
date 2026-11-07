@@ -15,6 +15,7 @@ import { createTimersRuntime } from '@/features/timers/state/timers-runtime';
 import { StopwatchStateProvider } from '@/features/stopwatch/state/stopwatch-context';
 import { createStopwatchState } from '@/features/stopwatch/state/stopwatch-state';
 import { PomodoroStateProvider } from '@/features/pomodoro/state/pomodoro-context';
+import { createPomodoroRuntime } from '@/features/pomodoro/state/pomodoro-runtime';
 import { createPomodoroState } from '@/features/pomodoro/state/pomodoro-state';
 
 /*—————————— Styles ——————————*/
@@ -34,6 +35,7 @@ export default function AppRoot(props: RouteSectionProps) {
   const timersRuntime = createTimersRuntime(timers, { scheduler });
   const stopwatch = createStopwatchState();
   const pomodoro = createPomodoroState();
+  const pomodoroRuntime = createPomodoroRuntime(pomodoro, { scheduler });
   cancelTimerProcess = timersRuntime.cancel;
   const unsubscribeAlarmAlertBridge =
     connectAlarmsToGlobalAlerts(alarmsRuntime);
@@ -48,12 +50,16 @@ export default function AppRoot(props: RouteSectionProps) {
     timersRuntime.sync(timers.state.timers);
   });
 
+  createEffect(() => {
+    pomodoroRuntime.sync(pomodoro.state.cycle, pomodoro.state.status);
+  });
+
   onMount(() => {
     scheduler.start();
     void alarmsRuntime.start();
     void timersRuntime.start();
     void stopwatch.actions.load();
-    void pomodoro.actions.load();
+    void pomodoroRuntime.start();
   });
 
   onCleanup(() => {
@@ -61,6 +67,7 @@ export default function AppRoot(props: RouteSectionProps) {
     unsubscribeTimerAlertBridge();
     alarmsRuntime.stop();
     timersRuntime.stop();
+    pomodoroRuntime.stop();
     scheduler.stop();
   });
 
