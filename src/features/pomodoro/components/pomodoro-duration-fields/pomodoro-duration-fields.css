@@ -1,0 +1,95 @@
+.pomodoro-duration-fields {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.pomodoro-duration-fields__legend {
+  margin-block-end: var(--app-space-M);
+  color: var(--app-txt-1);
+  font-size: var(--body-M);
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.pomodoro-duration-fields__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--app-space-S);
+}
+
+.pomodoro-duration-fields__field {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: var(--app-gap-S);
+}
+
+.pomodoro-duration-fields__label {
+  color: var(--app-txt-2);
+  font-size: var(--body-S);
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.pomodoro-duration-fields__input-group {
+  display: flex;
+  align-items: baseline;
+  gap: var(--app-gap-S);
+  min-width: 0;
+}
+
+.pomodoro-duration-fields__input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: var(--app-logo);
+  padding: var(--app-gap-S) var(--app-space-S);
+  border: var(--app-solid-S) var(--app-bg-3);
+  border-radius: var(--app-radius-S);
+  background-color: var(--app-bg-1);
+  color: var(--app-txt-1);
+  font: inherit;
+  font-size: var(--body-L);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+}
+
+.pomodoro-duration-fields__input:hover {
+  border-color: var(--app-focus);
+}
+
+.pomodoro-duration-fields__input:focus-visible {
+  border-color: var(--app-focus);
+  outline: var(--app-solid-M) var(--app-focus);
+  outline-offset: var(--app-offset);
+}
+
+.pomodoro-duration-fields__input[aria-invalid='true'] {
+  border-color: var(--app-txt-3);
+}
+
+.pomodoro-duration-fields__input[aria-invalid='true']:focus-visible {
+  border-color: var(--app-focus);
+}
+
+.pomodoro-duration-fields__unit {
+  flex: 0 0 auto;
+  color: var(--app-txt-3);
+  font-size: var(--body-S);
+  line-height: 1.25;
+}
+
+.pomodoro-duration-fields__error {
+  margin: 0;
+  color: var(--app-txt-2);
+  font-size: var(--body-S);
+  line-height: 1.4;
+}
+
+@media (max-width: 420px) {
+  .pomodoro-duration-fields__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
