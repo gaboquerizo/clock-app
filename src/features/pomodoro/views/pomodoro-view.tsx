@@ -1,6 +1,12 @@
 import './pomodoro-view.css';
 
-import { createMemo, createSignal, Show } from 'solid-js';
+import {
+  createEffect,
+  createMemo,
+  createSignal,
+  onCleanup,
+  Show,
+} from 'solid-js';
 
 import PomodoroBlockIndicator from '@/features/pomodoro/components/pomodoro-block-indicator/pomodoro-block-indicator';
 import PomodoroCircularProgress from '@/features/pomodoro/components/pomodoro-circular-progress/pomodoro-circular-progress';
@@ -18,11 +24,14 @@ type PomodoroControl = {
   icon: IconName;
 };
 
+const VISUAL_COUNTDOWN_UPDATE_INTERVAL_MS = 1_000;
+
 export default function PomodoroView() {
   const pomodoro = usePomodoroState();
   const [isActionPending, setIsActionPending] = createSignal(false);
   const [isSettingsOpen, setIsSettingsOpen] = createSignal(false);
   const [isCycleResetOpen, setIsCycleResetOpen] = createSignal(false);
+  const [visualNowMs, setVisualNowMs] = createSignal(Date.now());
   const currentBlock = pomodoro.selectors.currentBlock;
   const cycleProgress = pomodoro.selectors.cycleProgress;
   const currentCycle = () => pomodoro.state.cycle;
@@ -113,7 +122,21 @@ export default function PomodoroView() {
 
     return cycle === undefined
       ? undefined
-      : getPomodoroRemainingMs(cycle, Date.now());
+      : getPomodoroRemainingMs(cycle, visualNowMs());
+  });
+
+  createEffect(() => {
+    if (currentCycle()?.status !== 'running') {
+      return;
+    }
+
+    setVisualNowMs(Date.now());
+    const intervalId = window.setInterval(
+      () => setVisualNowMs(Date.now()),
+      VISUAL_COUNTDOWN_UPDATE_INTERVAL_MS,
+    );
+
+    onCleanup(() => window.clearInterval(intervalId));
   });
 
   return (
