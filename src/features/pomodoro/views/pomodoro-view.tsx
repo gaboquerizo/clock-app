@@ -6,6 +6,7 @@ import PomodoroBlockIndicator from '@/features/pomodoro/components/pomodoro-bloc
 import PomodoroCircularProgress from '@/features/pomodoro/components/pomodoro-circular-progress/pomodoro-circular-progress';
 import PomodoroCycleProgressIndicators from '@/features/pomodoro/components/pomodoro-cycle-progress-indicators/pomodoro-cycle-progress-indicators';
 import PomodoroCountdownDisplay from '@/features/pomodoro/components/pomodoro-countdown-display/pomodoro-countdown-display';
+import PomodoroCycleResetDialog from '@/features/pomodoro/components/pomodoro-cycle-reset-dialog/pomodoro-cycle-reset-dialog';
 import PomodoroSettingsDialog from '@/features/pomodoro/components/pomodoro-settings-dialog/pomodoro-settings-dialog';
 import { getPomodoroRemainingMs } from '@/features/pomodoro/components/pomodoro-countdown-display/pomodoro-countdown-display.utils';
 import { usePomodoroState } from '@/features/pomodoro/state/pomodoro-context';
@@ -21,6 +22,7 @@ export default function PomodoroView() {
   const pomodoro = usePomodoroState();
   const [isActionPending, setIsActionPending] = createSignal(false);
   const [isSettingsOpen, setIsSettingsOpen] = createSignal(false);
+  const [isCycleResetOpen, setIsCycleResetOpen] = createSignal(false);
   const currentBlock = pomodoro.selectors.currentBlock;
   const cycleProgress = pomodoro.selectors.cycleProgress;
   const currentCycle = () => pomodoro.state.cycle;
@@ -137,8 +139,9 @@ export default function PomodoroView() {
           <button
             aria-label="Reiniciar ciclo"
             class="pomodoro-view__action"
-            disabled
+            disabled={isBusy() || currentCycle() === undefined}
             type="button"
+            onClick={() => setIsCycleResetOpen(true)}
           >
             <AppIcon
               class="pomodoro-view__action-icon"
@@ -152,6 +155,10 @@ export default function PomodoroView() {
       <PomodoroSettingsDialog
         open={isSettingsOpen()}
         onClose={() => setIsSettingsOpen(false)}
+      />
+      <PomodoroCycleResetDialog
+        open={isCycleResetOpen()}
+        onClose={() => setIsCycleResetOpen(false)}
       />
 
       <div class="pomodoro-view__content">
