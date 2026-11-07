@@ -1,0 +1,136 @@
+.ui-dialog.pomodoro-settings-dialog {
+  width: min(calc(100% - var(--app-space-L)), var(--w-40));
+  max-width: var(--w-40);
+}
+
+.pomodoro-settings-dialog__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-space-M);
+  min-width: 0;
+}
+
+.pomodoro-settings-dialog__header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--app-space-S);
+}
+
+.pomodoro-settings-dialog__icon {
+  display: inline-grid;
+  place-items: center;
+  width: var(--app-logo);
+  height: var(--app-logo);
+  border-radius: 50%;
+  background-color: var(--app-bg-2);
+  color: var(--app-accent);
+}
+
+.pomodoro-settings-dialog__icon-svg {
+  width: var(--icon-M);
+  height: var(--icon-M);
+}
+
+.pomodoro-settings-dialog__heading {
+  min-width: 0;
+}
+
+.pomodoro-settings-dialog__title {
+  margin: 0;
+  color: var(--app-txt-1);
+  font-size: var(--headline-M);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.pomodoro-settings-dialog__description {
+  margin: var(--app-gap-S) 0 0;
+  color: var(--app-txt-2);
+  font-size: var(--body-S);
+  line-height: 1.35;
+}
+
+.pomodoro-settings-dialog__close {
+  display: inline-grid;
+  place-items: center;
+  width: var(--app-logo);
+  height: var(--app-logo);
+  padding: 0;
+  border: var(--app-solid-S) transparent;
+  border-radius: var(--app-radius-S);
+  background-color: transparent;
+  color: var(--app-txt-2);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--headline-M);
+  line-height: 1;
+}
+
+.pomodoro-settings-dialog__close:hover:not(:disabled) {
+  background-color: var(--app-bg-2);
+  color: var(--app-accent);
+}
+
+.pomodoro-settings-dialog__close:focus-visible,
+.pomodoro-settings-dialog__button:focus-visible {
+  outline: var(--app-solid-M) var(--app-focus);
+  outline-offset: var(--app-offset);
+}
+
+.pomodoro-settings-dialog__close:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.pomodoro-settings-dialog__error {
+  margin: 0;
+  color: var(--app-txt-2);
+  font-size: var(--body-S);
+  line-height: 1.4;
+}
+
+.pomodoro-settings-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--app-gap-L);
+  padding-top: var(--app-space-S);
+}
+
+.pomodoro-settings-dialog__button {
+  min-height: var(--app-logo);
+  padding: var(--app-gap-M) var(--app-space-M);
+  border: var(--app-solid-S) transparent;
+  border-radius: var(--app-radius-M);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--body-M);
+  line-height: 1.25;
+}
+
+.pomodoro-settings-dialog__button--primary {
+  background-color: var(--app-accent);
+  color: var(--app-bg-1);
+}
+
+.pomodoro-settings-dialog__button--secondary {
+  border-color: var(--app-txt-3);
+  background-color: transparent;
+  color: var(--app-txt-2);
+}
+
+.pomodoro-settings-dialog__button:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.pomodoro-settings-dialog__button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+@media (max-width: 420px) {
+  .ui-dialog.pomodoro-settings-dialog {
+    width: min(calc(100% - var(--app-space-S)), var(--w-40));
+  }
+}

@@ -41,11 +41,26 @@
   border: var(--app-solid-S) var(--app-bg-3);
   border-radius: var(--app-radius-S);
   background-color: var(--app-bg-1);
-  color: var(--app-txt-3);
-  cursor: not-allowed;
+  color: var(--app-txt-2);
+  cursor: pointer;
   font: inherit;
   font-size: var(--body-M);
   line-height: 1.25;
+}
+
+.pomodoro-view__action:hover:not(:disabled) {
+  border-color: var(--app-focus);
+  color: var(--app-accent);
+}
+
+.pomodoro-view__action:focus-visible {
+  outline: var(--app-solid-M) var(--app-focus);
+  outline-offset: var(--app-offset);
+}
+
+.pomodoro-view__action:disabled {
+  color: var(--app-txt-3);
+  cursor: not-allowed;
   opacity: 0.55;
 }
 
