@@ -17,6 +17,7 @@ import type {
 
 export type GlobalAlertHostContextValue = {
   snapshot: Accessor<GlobalAlertSnapshot>;
+  invalidate(eventId: string): Promise<boolean>;
   dismiss(alertId: string): Promise<boolean>;
   selectAction(alertId: string, actionId: string): Promise<boolean>;
 };
@@ -55,6 +56,7 @@ export default function GlobalAlertHost(props: GlobalAlertHostProps) {
 
   const context: GlobalAlertHostContextValue = {
     snapshot,
+    invalidate: (eventId) => service.invalidate(eventId),
     dismiss: (alertId) => service.dismiss(alertId),
     selectAction: (alertId, actionId) =>
       service.selectAction(alertId, actionId),

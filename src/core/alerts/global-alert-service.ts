@@ -97,6 +97,41 @@ export function createGlobalAlertService(): GlobalAlertService {
       return alert.id;
     },
 
+    async invalidate(eventId) {
+      if (eventId.trim() === '') {
+        return false;
+      }
+
+      const alertId = alertIdsByEventId.get(eventId);
+
+      if (alertId === undefined) {
+        return false;
+      }
+
+      if (active?.id === alertId) {
+        if (active.actionPending) {
+          return false;
+        }
+
+        const invalidated = active;
+        active = queue.shift();
+        notify();
+        await invalidated.request.onDismiss?.();
+        return true;
+      }
+
+      const queuedIndex = queue.findIndex(({ id }) => id === alertId);
+
+      if (queuedIndex === -1) {
+        return false;
+      }
+
+      const [invalidated] = queue.splice(queuedIndex, 1);
+      notify();
+      await invalidated.request.onDismiss?.();
+      return true;
+    },
+
     async dismiss(alertId) {
       if (active === undefined || active.id !== alertId || active.actionPending) {
         return false;

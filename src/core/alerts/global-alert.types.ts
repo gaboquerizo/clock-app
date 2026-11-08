@@ -39,6 +39,7 @@ export type GlobalAlertService = {
   getSnapshot(): GlobalAlertSnapshot;
   subscribe(listener: GlobalAlertListener): () => void;
   present(request: GlobalAlertRequest): string;
+  invalidate(eventId: string): Promise<boolean>;
   dismiss(alertId: string): Promise<boolean>;
   selectAction(alertId: string, actionId: string): Promise<boolean>;
 };
