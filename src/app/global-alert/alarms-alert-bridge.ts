@@ -49,6 +49,7 @@ export function connectAlarmsToGlobalAlerts(
     };
 
     alerts.present({
+      eventId: `alarm:${activationId}`,
       icon: 'proicons:alarm-clock',
       title: `Alarma · ${alarm.time}`,
       message: alarm.label.trim() || 'Alarma',

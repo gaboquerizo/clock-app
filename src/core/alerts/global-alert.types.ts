@@ -11,6 +11,8 @@ export type GlobalAlertAction = {
 };
 
 export type GlobalAlertRequest = {
+  /** Optional stable identity used to reject duplicate event requests. */
+  readonly eventId?: string;
   /** Iconify identifier from the application's approved icon collections. */
   readonly icon: string;
   readonly title: string;

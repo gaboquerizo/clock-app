@@ -47,6 +47,7 @@ export function connectTimersToGlobalAlerts(
     const label = timer.label.trim() || 'Temporizador';
 
     alerts.present({
+      eventId: `timer:${completionId}`,
       icon: 'proicons:timer',
       title: 'Temporizador finalizado',
       message: label,

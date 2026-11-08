@@ -9,6 +9,7 @@ import type {
 export function createGlobalAlertService(): GlobalAlertService {
   const listeners = new Set<GlobalAlertListener>();
   const queue: ActiveGlobalAlert[] = [];
+  const alertIdsByEventId = new Map<string, string>();
   let active: ActiveGlobalAlert | undefined;
   let nextAlertId = 0;
 
@@ -59,6 +60,19 @@ export function createGlobalAlertService(): GlobalAlertService {
         );
       }
 
+      if (request.eventId !== undefined && request.eventId.trim() === '') {
+        throw new Error('A global alert event identity must not be empty.');
+      }
+
+      const existingAlertId =
+        request.eventId === undefined
+          ? undefined
+          : alertIdsByEventId.get(request.eventId);
+
+      if (existingAlertId !== undefined) {
+        return existingAlertId;
+      }
+
       const alert: ActiveGlobalAlert = {
         id: `global-alert-${++nextAlertId}`,
         request: {
@@ -67,6 +81,10 @@ export function createGlobalAlertService(): GlobalAlertService {
         },
         actionPending: false,
       };
+
+      if (request.eventId !== undefined) {
+        alertIdsByEventId.set(request.eventId, alert.id);
+      }
 
       if (active === undefined) {
         active = alert;
