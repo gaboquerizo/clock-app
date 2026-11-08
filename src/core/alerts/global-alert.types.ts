@@ -7,6 +7,8 @@ export type GlobalAlertAction = {
   readonly id: string;
   readonly label: string;
   readonly emphasis: GlobalAlertActionEmphasis;
+  /** Side-effect-free check re-evaluated when rendering and before dispatch. */
+  readonly isEnabled?: () => boolean;
   readonly onSelect: () => void | Promise<void>;
 };
 
@@ -18,6 +20,8 @@ export type GlobalAlertRequest = {
   readonly title: string;
   readonly message: string;
   readonly actions: readonly GlobalAlertAction[];
+  /** Optional extra action appended after the existing actions. */
+  readonly secondaryAction?: GlobalAlertAction;
   readonly primaryActionId: string;
   readonly onDismiss?: () => void | Promise<void>;
 };

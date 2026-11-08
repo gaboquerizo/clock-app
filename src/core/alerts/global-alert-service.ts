@@ -1,5 +1,6 @@
 import type {
   ActiveGlobalAlert,
+  GlobalAlertAction,
   GlobalAlertListener,
   GlobalAlertRequest,
   GlobalAlertService,
@@ -44,11 +45,17 @@ export function createGlobalAlertService(): GlobalAlertService {
     },
 
     present(request: GlobalAlertRequest) {
-      if (request.actions.length === 0) {
+      const { secondaryAction, ...requestWithoutSecondaryAction } = request;
+      const actions =
+        secondaryAction === undefined
+          ? request.actions
+          : [...request.actions, secondaryAction];
+
+      if (actions.length === 0) {
         throw new Error('A global alert must provide at least one action.');
       }
 
-      const actionIds = request.actions.map(({ id }) => id);
+      const actionIds = actions.map(({ id }) => id);
 
       if (new Set(actionIds).size !== actionIds.length) {
         throw new Error('Global alert action identifiers must be unique.');
@@ -76,8 +83,8 @@ export function createGlobalAlertService(): GlobalAlertService {
       const alert: ActiveGlobalAlert = {
         id: `global-alert-${++nextAlertId}`,
         request: {
-          ...request,
-          actions: request.actions.map((action) => ({ ...action })),
+          ...requestWithoutSecondaryAction,
+          actions: actions.map((action) => ({ ...action })),
         },
         actionPending: false,
       };
@@ -166,15 +173,29 @@ export function createGlobalAlertService(): GlobalAlertService {
 
       const action = active.request.actions.find(({ id }) => id === actionId);
 
-      if (action === undefined) {
+      if (action === undefined || !isActionEnabled(action)) {
         return false;
       }
 
       active = { ...active, actionPending: true };
       notify();
 
+      if (active?.id !== alertId) {
+        return false;
+      }
+
+      const currentAction = active.request.actions.find(
+        ({ id }) => id === actionId,
+      );
+
+      if (currentAction === undefined || !isActionEnabled(currentAction)) {
+        active = { ...active, actionPending: false };
+        notify();
+        return false;
+      }
+
       try {
-        await action.onSelect();
+        await currentAction.onSelect();
       } catch (error) {
         if (active?.id === alertId) {
           active = { ...active, actionPending: false };
@@ -191,6 +212,14 @@ export function createGlobalAlertService(): GlobalAlertService {
       return true;
     },
   };
+}
+
+function isActionEnabled(action: GlobalAlertAction): boolean {
+  try {
+    return action.isEnabled?.() ?? true;
+  } catch {
+    return false;
+  }
 }
 
 export const globalAlertService = createGlobalAlertService();

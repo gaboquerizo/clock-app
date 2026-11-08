@@ -1,6 +1,9 @@
 import { createEffect, createSignal, For, Show } from 'solid-js';
 
-import type { ActiveGlobalAlert } from '@/core/alerts/global-alert.types';
+import type {
+  ActiveGlobalAlert,
+  GlobalAlertAction,
+} from '@/core/alerts/global-alert.types';
 import UiDialog from '@/shared/ui/ui-dialog/ui-dialog';
 import UiIcon, { type IconName } from '@/shared/ui/ui-icon/ui-icon';
 
@@ -14,6 +17,14 @@ type GlobalAlertDialogProps = {
 
 const actionFailureMessage =
   'No se pudo completar la acción. Inténtalo de nuevo.';
+
+function isActionEnabled(action: GlobalAlertAction): boolean {
+  try {
+    return action.isEnabled?.() ?? true;
+  } catch {
+    return false;
+  }
+}
 
 export default function GlobalAlertDialog(props: GlobalAlertDialogProps) {
   const [actionError, setActionError] = createSignal<string>();
@@ -104,7 +115,9 @@ export default function GlobalAlertDialog(props: GlobalAlertDialogProps) {
                       autofocus={isPrimary}
                       class={`global-alert-dialog__action global-alert-dialog__action--${action.emphasis}`}
                       data-primary={isPrimary ? 'true' : undefined}
-                      disabled={alert.actionPending}
+                      disabled={
+                        alert.actionPending || !isActionEnabled(action)
+                      }
                       ref={(element) => {
                         if (isPrimary) {
                           primaryActionButton = element;
