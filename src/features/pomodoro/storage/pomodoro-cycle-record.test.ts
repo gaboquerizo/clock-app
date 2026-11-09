@@ -115,6 +115,78 @@ describe('Pomodoro cycle record mapping', () => {
     expect(ready.ok && 'endsAt' in ready.value).toBe(false);
   });
 
+  it('round trips metadata for a recovered completion', () => {
+    const scheduledAt = timestampMs + 25 * 60_000;
+    const snapshot: PomodoroCycleSnapshot = {
+      ...readySnapshot(),
+      lastProcessedCompletion: {
+        cycleId: 'cycle-one',
+        blockExecutionId: 'focus-one',
+        recovery: {
+          blockType: 'focus',
+          completedAt: scheduledAt,
+          scheduledAt,
+          observedAt: scheduledAt + 5_000,
+        },
+      },
+    };
+    const record = toPomodoroCycleRecord(snapshot);
+
+    expect(record).toMatchObject({ ok: true });
+    expect(record.ok && fromPomodoroCycleRecord(record.value)).toEqual({
+      ok: true,
+      value: snapshot,
+    });
+  });
+
+  it('rejects recovery receipts with inconsistent completion timestamps', () => {
+    const scheduledAt = timestampMs + 25 * 60_000;
+    const snapshot: PomodoroCycleSnapshot = {
+      ...readySnapshot(),
+      lastProcessedCompletion: {
+        cycleId: 'cycle-one',
+        blockExecutionId: 'focus-one',
+        recovery: {
+          blockType: 'focus',
+          completedAt: scheduledAt,
+          scheduledAt,
+          observedAt: scheduledAt + 1,
+        },
+      },
+    };
+    const validRecord = toPomodoroCycleRecord(snapshot);
+
+    if (!validRecord.ok) {
+      throw new Error('Expected the recovery receipt to be valid.');
+    }
+
+    expect(
+      toPomodoroCycleRecord({
+        ...snapshot,
+        lastProcessedCompletion: {
+          ...snapshot.lastProcessedCompletion!,
+          recovery: {
+            ...snapshot.lastProcessedCompletion!.recovery!,
+            completedAt: scheduledAt - 1,
+          },
+        },
+      }),
+    ).toEqual({ ok: false, error: { code: 'invalid-record' } });
+
+    expect(
+      fromPomodoroCycleRecord({
+        ...validRecord.value,
+        lastProcessedCompletion: {
+          ...snapshot.lastProcessedCompletion!,
+          recovery: {
+            ...snapshot.lastProcessedCompletion!.recovery!,
+            observedAt: scheduledAt - 1,
+          },
+        },
+      }),
+    ).toEqual({ ok: false, error: { code: 'invalid-record' } });
+  });
+
   it('rejects malformed cycle data and completion receipts', () => {
     const snapshot = readySnapshot();
 
