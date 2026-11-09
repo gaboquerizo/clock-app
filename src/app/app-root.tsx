@@ -3,6 +3,7 @@ import { createEffect, onCleanup, onMount } from 'solid-js';
 import type { RouteSectionProps } from '@solidjs/router';
 
 import { connectAlarmsToGlobalAlerts } from '@/app/global-alert/alarms-alert-bridge';
+import { connectPomodoroToGlobalAlerts } from '@/app/global-alert/pomodoro-alert-bridge';
 import { connectTimersToGlobalAlerts } from '@/app/global-alert/timers-alert-bridge';
 import { createScheduler } from '@/core/time/scheduler';
 import GlobalAlertHost from '@/app/global-alert/global-alert-host';
@@ -41,14 +42,9 @@ export default function AppRoot(props: RouteSectionProps) {
     connectAlarmsToGlobalAlerts(alarmsRuntime);
   const unsubscribeTimerAlertBridge =
     connectTimersToGlobalAlerts(timersRuntime);
-  const unsubscribePomodoroCompletion = pomodoroRuntime.subscribe(
-    async (event) => {
-      await pomodoro.actions.completeBlock(event, {
-        reason: event.reason,
-        scheduledAt: event.scheduledAt,
-        observedAt: event.observedAt,
-      });
-    },
+  const unsubscribePomodoroCompletion = connectPomodoroToGlobalAlerts(
+    pomodoroRuntime,
+    pomodoro,
   );
 
   createEffect(() => {
