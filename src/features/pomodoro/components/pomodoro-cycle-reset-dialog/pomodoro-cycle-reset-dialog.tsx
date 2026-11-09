@@ -2,6 +2,7 @@ import './pomodoro-cycle-reset-dialog.css';
 
 import { createSignal, Show } from 'solid-js';
 
+import { globalAlertService } from '@/core/alerts/global-alert-service';
 import { usePomodoroState } from '@/features/pomodoro/state/pomodoro-context';
 import AppIcon from '@/shared/ui/ui-icon/ui-icon';
 import UiDialog from '@/shared/ui/ui-dialog/ui-dialog';
@@ -40,6 +41,7 @@ export default function PomodoroCycleResetDialog(
       return;
     }
 
+    const discardedCycleId = pomodoro.state.cycle?.id;
     setError(undefined);
     setIsConfirming(true);
 
@@ -47,6 +49,17 @@ export default function PomodoroCycleResetDialog(
       const result = await pomodoro.actions.resetCycle();
 
       if (result.ok) {
+        if (discardedCycleId !== undefined) {
+          void globalAlertService
+            .invalidateByOrigin(discardedCycleId)
+            .catch((invalidationError: unknown) => {
+              console.warn(
+                'Pomodoro alerts for the discarded cycle could not be invalidated.',
+                invalidationError,
+              );
+            });
+        }
+
         setIsConfirming(false);
         closeDialog();
         return;

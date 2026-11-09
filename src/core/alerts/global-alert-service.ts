@@ -174,6 +174,55 @@ export function createGlobalAlertService(): GlobalAlertService {
       return true;
     },
 
+    async invalidateByOrigin(originId) {
+      if (originId.trim() === '') {
+        return false;
+      }
+
+      const invalidatedQueued: ActiveGlobalAlert[] = [];
+
+      for (let index = queue.length - 1; index >= 0; index -= 1) {
+        if (queue[index].request.originId === originId) {
+          const [invalidated] = queue.splice(index, 1);
+          invalidatedQueued.unshift(invalidated);
+        }
+      }
+
+      const invalidatedActive =
+        active?.request.originId === originId && !active.actionPending
+          ? active
+          : undefined;
+
+      if (invalidatedActive !== undefined) {
+        active = { ...invalidatedActive, actionPending: true };
+      }
+
+      if (
+        invalidatedActive !== undefined ||
+        invalidatedQueued.length > 0
+      ) {
+        notify();
+      }
+
+      const queuedDismissals = Promise.all(
+        invalidatedQueued.map((alert) => runLifecycle(alert, 'dismissal')),
+      );
+
+      if (invalidatedActive !== undefined) {
+        await runLifecycle(invalidatedActive, 'dismissal');
+
+        if (active?.id === invalidatedActive.id) {
+          advanceQueue();
+        }
+      }
+
+      await queuedDismissals;
+
+      return (
+        invalidatedActive !== undefined || invalidatedQueued.length > 0
+      );
+    },
+
     async dismiss(alertId) {
       if (active === undefined || active.id !== alertId || active.actionPending) {
         return false;

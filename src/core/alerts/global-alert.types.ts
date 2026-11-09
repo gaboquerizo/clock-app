@@ -15,6 +15,8 @@ export type GlobalAlertAction = {
 export type GlobalAlertRequest = {
   /** Optional stable identity used to reject duplicate event requests. */
   readonly eventId?: string;
+  /** Optional owner identity used to invalidate related alerts as a group. */
+  readonly originId?: string;
   /** Iconify identifier from the application's approved icon collections. */
   readonly icon: string;
   readonly title: string;
@@ -46,6 +48,7 @@ export type GlobalAlertService = {
   subscribe(listener: GlobalAlertListener): () => void;
   present(request: GlobalAlertRequest): string;
   invalidate(eventId: string): Promise<boolean>;
+  invalidateByOrigin(originId: string): Promise<boolean>;
   dismiss(alertId: string): Promise<boolean>;
   selectAction(alertId: string, actionId: string): Promise<boolean>;
 };

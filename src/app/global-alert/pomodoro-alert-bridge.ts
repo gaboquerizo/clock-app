@@ -123,6 +123,10 @@ export function connectPomodoroToGlobalAlerts(
         return;
       }
 
+      if (pomodoro.state.cycle?.id !== result.value.id) {
+        return;
+      }
+
       const nextCycle = result.value;
       const nextBlock = nextCycle.currentBlock;
       const nextBlockLabel = COMPLETED_BLOCK_LABELS[nextBlock.type];
@@ -219,6 +223,7 @@ export function connectPomodoroToGlobalAlerts(
 
       alerts.present({
         eventId,
+        originId: event.cycleId,
         icon: 'proicons:timer',
         title: COMPLETED_BLOCK_TITLES[event.blockType],
         message: `Siguiente: ${nextBlockLabel.toLowerCase()} de ${formatDuration(nextBlock.durationMs)}.`,
