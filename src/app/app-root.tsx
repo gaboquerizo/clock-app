@@ -1,6 +1,6 @@
 /*—————————— Library ——————————*/
 import { createEffect, onCleanup, onMount } from 'solid-js';
-import type { RouteSectionProps } from '@solidjs/router';
+import { useNavigate, type RouteSectionProps } from '@solidjs/router';
 
 import { connectAlarmsToGlobalAlerts } from '@/app/global-alert/alarms-alert-bridge';
 import { connectPomodoroToGlobalAlerts } from '@/app/global-alert/pomodoro-alert-bridge';
@@ -26,6 +26,7 @@ import './app-root.css';
 import AppSidebar from '../shared/layouts/sidebar/app-sidebar';
 
 export default function AppRoot(props: RouteSectionProps) {
+  const navigate = useNavigate();
   const scheduler = createScheduler();
   const alarms = createAlarmsState();
   const alarmsRuntime = createAlarmsRuntime(alarms, { scheduler });
@@ -45,6 +46,7 @@ export default function AppRoot(props: RouteSectionProps) {
   const unsubscribePomodoroCompletion = connectPomodoroToGlobalAlerts(
     pomodoroRuntime,
     pomodoro,
+    { navigateToPomodoro: () => navigate('/pomodoro') },
   );
 
   createEffect(() => {

@@ -1,8 +1,11 @@
+import bellsSoundUrl from '@/assets/sounds/bells.mp3';
 import { globalAlertService } from '@/core/alerts/global-alert-service';
 import type {
   GlobalAlertAction,
   GlobalAlertService,
 } from '@/core/alerts/global-alert.types';
+import { audioService } from '@/core/services/audio.service';
+import type { AudioService } from '@/core/services/audio.service';
 import type { PomodoroBlockType } from '@/features/pomodoro/domain/pomodoro.types';
 import type { PomodoroRuntime } from '@/features/pomodoro/state/pomodoro-runtime';
 import type {
@@ -20,9 +23,12 @@ const COMPLETED_BLOCK_TITLES: Record<PomodoroBlockType, string> = {
   'short-break': 'Descanso corto completado',
   'long-break': 'Descanso largo completado',
 };
+const MAX_POMODORO_SOUND_DURATION_MS = 60_000;
 
 export type PomodoroAlertBridgeOptions = {
   alerts?: GlobalAlertService;
+  audio?: AudioService;
+  navigateToPomodoro: () => void;
 };
 
 function formatDuration(durationMs: number): string {
@@ -56,9 +62,10 @@ function canStartPreparedBlock(
 export function connectPomodoroToGlobalAlerts(
   runtime: Pick<PomodoroRuntime, 'subscribe'>,
   pomodoro: PomodoroStateController,
-  options: PomodoroAlertBridgeOptions = {},
+  options: PomodoroAlertBridgeOptions,
 ): () => void {
   const alerts = options.alerts ?? globalAlertService;
+  const audio = options.audio ?? audioService;
   const processedEventIds = new Set<string>();
   const processingEventIds = new Set<string>();
 
@@ -119,6 +126,67 @@ export function connectPomodoroToGlobalAlerts(
       const nextCycle = result.value;
       const nextBlock = nextCycle.currentBlock;
       const nextBlockLabel = COMPLETED_BLOCK_LABELS[nextBlock.type];
+      const audioSourceId = `pomodoro:${event.cycleId}:${event.blockExecutionId}`;
+      let audioStopped = false;
+      let audioRequested = false;
+
+      const stopSound = () => {
+        if (audioStopped) {
+          return;
+        }
+
+        audioStopped = true;
+
+        try {
+          audio.requestStop(audioSourceId);
+        } catch (error) {
+          console.warn(
+            'The default Pomodoro sound could not be stopped.',
+            error,
+          );
+        }
+      };
+
+      const playSound = () => {
+        if (audioStopped || audioRequested) {
+          return;
+        }
+
+        audioRequested = true;
+        let playback: Promise<Awaited<ReturnType<AudioService['play']>>>;
+
+        try {
+          playback = audio.play({
+            sourceId: audioSourceId,
+            sourceUrl: bellsSoundUrl,
+            maxDurationMs: MAX_POMODORO_SOUND_DURATION_MS,
+            loop: false,
+          });
+        } catch (error) {
+          console.warn(
+            'The default Pomodoro sound could not be played.',
+            error,
+          );
+          return;
+        }
+
+        void playback
+          .then((result) => {
+            if (result.status === 'blocked' || result.status === 'failed') {
+              console.warn(
+                'The default Pomodoro sound could not be played.',
+                result.error,
+              );
+            }
+          })
+          .catch((error: unknown) => {
+            console.warn(
+              'The default Pomodoro sound could not be played.',
+              error,
+            );
+          });
+      };
+
       const canStartNext = () =>
         canStartPreparedBlock(
           pomodoro,
@@ -144,6 +212,8 @@ export function connectPomodoroToGlobalAlerts(
           if (!startResult.ok) {
             throw new Error(startResult.error.message);
           }
+
+          options.navigateToPomodoro();
         },
       };
 
@@ -157,11 +227,13 @@ export function connectPomodoroToGlobalAlerts(
             id: 'accept',
             label: 'Aceptar',
             emphasis: 'primary',
-            onSelect: () => undefined,
+            onSelect: stopSound,
           },
         ],
         secondaryAction: startNext,
         primaryActionId: 'accept',
+        onActivate: playSound,
+        onDismiss: stopSound,
       });
     } catch (error) {
       console.warn(
