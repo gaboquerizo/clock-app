@@ -152,7 +152,7 @@ describe('Timers global alert bridge', () => {
     disconnect();
   });
 
-  it('queues one alert per distinct completion, never duplicates one completion, and unsubscribes', () => {
+  it('queues each completion once and only notifies for live events', () => {
     const alerts = createGlobalAlertService();
     const emitter = createRuntimeEmitter();
     const audio = createAudioService();
@@ -166,7 +166,7 @@ describe('Timers global alert bridge', () => {
       'timer-1',
       'One',
       40_000,
-      'recovery',
+      'activation',
     );
 
     emitter.emit(firstCompletion);
@@ -182,14 +182,29 @@ describe('Timers global alert bridge', () => {
       },
     ]);
 
-    emitter.emit(createCompletion('timer-2', 'Two', 40_000, 'activation'));
+    emitter.emit(createCompletion('timer-2', 'Recovered', 41_000, 'recovery'));
     expect(alerts.getSnapshot().queuedCount).toBe(1);
-    expect(notifications.requests).toHaveLength(2);
+    expect(notifications.requests).toHaveLength(1);
+
+    emitter.emit(createCompletion('timer-3', 'Two', 42_000, 'activation'));
+    expect(alerts.getSnapshot().queuedCount).toBe(2);
+    expect(notifications.requests).toEqual([
+      {
+        title: 'Temporizador finalizado',
+        body: 'One',
+        tag: 'clock-app-timer-timer-1',
+      },
+      {
+        title: 'Temporizador finalizado',
+        body: 'Two',
+        tag: 'clock-app-timer-timer-3',
+      },
+    ]);
 
     disconnect();
-    emitter.emit(createCompletion('timer-3', 'Three', 40_000, 'activation'));
+    emitter.emit(createCompletion('timer-4', 'Three', 43_000, 'activation'));
 
-    expect(alerts.getSnapshot().queuedCount).toBe(1);
+    expect(alerts.getSnapshot().queuedCount).toBe(2);
     expect(notifications.requests).toHaveLength(2);
   });
 
@@ -277,7 +292,7 @@ describe('Timers global alert bridge', () => {
 
     expect(audio.requests).toHaveLength(1);
     expect(audio.requests[0]).toMatchObject({
-      sourceId: 'timer:timer-a',
+      sourceId: 'timer:timer-a:50000',
       sourceUrl: expect.stringContaining('bells'),
       loop: true,
       maxDurationMs: 60_000,
@@ -288,7 +303,7 @@ describe('Timers global alert bridge', () => {
       throw new Error('Expected an active timer alert.');
     }
     await alerts.selectAction(firstAlert.id, 'accept');
-    expect(audio.stoppedSources).toEqual(['timer:timer-a']);
+    expect(audio.stoppedSources).toEqual(['timer:timer-a:50000']);
 
     emitter.emit(createCompletion('timer-b', 'Break', 60_000, 'recovery'));
     const secondAlert = alerts.getSnapshot().active;
@@ -297,7 +312,10 @@ describe('Timers global alert bridge', () => {
     }
     await alerts.dismiss(secondAlert.id);
 
-    expect(audio.stoppedSources).toEqual(['timer:timer-a', 'timer:timer-b']);
+    expect(audio.stoppedSources).toEqual([
+      'timer:timer-a:50000',
+      'timer:timer-b:60000',
+    ]);
     disconnect();
   });
 

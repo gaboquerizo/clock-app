@@ -24,7 +24,8 @@ export function connectTimersToGlobalAlerts(
   const notifications = options.notifications ?? notificationService;
   const presentedCompletions = new Set<string>();
 
-  return runtime.subscribe(({ timer }) => {
+  return runtime.subscribe((event) => {
+    const { timer } = event;
     const completionId = `${timer.id}:${timer.completedAt}`;
 
     if (presentedCompletions.has(completionId)) {
@@ -84,6 +85,28 @@ export function connectTimersToGlobalAlerts(
 
     const label = timer.label.trim() || 'Temporizador';
 
+    if (event.reason === 'activation') {
+      try {
+        const notificationResult = notifications.show({
+          body: label,
+          tag: `clock-app-timer-${timer.id}`,
+          title: 'Temporizador finalizado',
+        });
+
+        if (notificationResult.status === 'error') {
+          console.warn(
+            'The browser timer notification could not be displayed.',
+            notificationResult.error,
+          );
+        }
+      } catch (error) {
+        console.warn(
+          'The browser timer notification could not be displayed.',
+          error,
+        );
+      }
+    }
+
     alerts.present({
       eventId: `timer:${completionId}`,
       icon: 'proicons:timer',
@@ -101,26 +124,5 @@ export function connectTimersToGlobalAlerts(
       onActivate: playSound,
       onDismiss: stopSound,
     });
-
-    try {
-      const notificationResult = notifications.show({
-        body: label,
-        tag: `clock-app-timer-${timer.id}`,
-        title: 'Temporizador finalizado',
-      });
-
-      if (notificationResult.status === 'error') {
-        console.warn(
-          'The browser timer notification could not be displayed.',
-          notificationResult.error,
-        );
-      }
-    } catch (error) {
-      console.warn(
-        'The browser timer notification could not be displayed.',
-        error,
-      );
-    }
-
   });
 }

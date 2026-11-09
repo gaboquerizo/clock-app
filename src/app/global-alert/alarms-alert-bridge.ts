@@ -87,6 +87,23 @@ export function connectAlarmsToGlobalAlerts(
         });
     };
 
+    try {
+      const notificationResult = notifications.show({
+        body: alarm.label.trim() || 'Alarma',
+        tag: `clock-app-alarm-${alarm.id}`,
+        title: `Alarma · ${alarm.time}`,
+      });
+
+      if (notificationResult.status === 'error') {
+        console.warn(
+          'The browser alarm notification could not be displayed.',
+          notificationResult.error,
+        );
+      }
+    } catch (error) {
+      console.warn('The browser alarm notification could not be displayed.', error);
+    }
+
     alerts.present({
       eventId: `alarm:${activationId}`,
       icon: 'proicons:alarm-clock',
@@ -104,23 +121,6 @@ export function connectAlarmsToGlobalAlerts(
       onActivate: playAlarmSound,
       onDismiss: acceptAlarm,
     });
-
-    try {
-      const notificationResult = notifications.show({
-        body: alarm.label.trim() || 'Alarma',
-        tag: `clock-app-alarm-${alarm.id}`,
-        title: `Alarma · ${alarm.time}`,
-      });
-
-      if (notificationResult.status === 'error') {
-        console.warn(
-          'The browser alarm notification could not be displayed.',
-          notificationResult.error,
-        );
-      }
-    } catch (error) {
-      console.warn('The browser alarm notification could not be displayed.', error);
-    }
 
   });
 }
