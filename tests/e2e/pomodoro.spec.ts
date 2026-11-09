@@ -30,11 +30,19 @@ test('navigates to Pomodoro while keeping the app shell and existing routes avai
   });
   await expect(cycleRegion).toBeVisible();
   await expect(
+    main.getByRole('timer', { name: 'Tiempo restante' }),
+  ).toHaveText('25:00');
+  await expect(main.getByRole('status')).toContainText('Concentración');
+  await expect(
+    main.getByRole('list', { name: 'Estado de las concentraciones' }).getByRole('listitem'),
+  ).toHaveCount(4);
+  await expect(main.getByLabel('0 de 4 concentraciones completadas')).toBeVisible();
+  await expect(
     main.getByRole('button', { name: 'Configuración' }),
-  ).toBeDisabled();
+  ).toBeEnabled();
   await expect(
     main.getByRole('button', { name: 'Reiniciar ciclo' }),
-  ).toBeDisabled();
+  ).toBeEnabled();
   await expect(
     navigation.getByRole('link', { name: 'Pomodoro' }),
   ).toHaveAttribute('aria-current', 'page');
