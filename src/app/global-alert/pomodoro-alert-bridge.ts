@@ -109,10 +109,6 @@ export function connectPomodoroToGlobalAlerts(
 
       processedEventIds.add(eventId);
 
-      if (event.reason === 'recovery') {
-        return;
-      }
-
       const receipt = pomodoro.state.lastProcessedCompletion;
 
       if (
@@ -130,6 +126,7 @@ export function connectPomodoroToGlobalAlerts(
       const nextCycle = result.value;
       const nextBlock = nextCycle.currentBlock;
       const nextBlockLabel = COMPLETED_BLOCK_LABELS[nextBlock.type];
+      const isNormalActivation = event.reason === 'activation';
       const audioSourceId = `pomodoro:${event.cycleId}:${event.blockExecutionId}`;
       let audioStopped = false;
       let audioRequested = false;
@@ -232,13 +229,14 @@ export function connectPomodoroToGlobalAlerts(
             id: 'accept',
             label: 'Aceptar',
             emphasis: 'primary',
-            onSelect: stopSound,
+            onSelect: isNormalActivation ? stopSound : () => undefined,
           },
         ],
         secondaryAction: startNext,
         primaryActionId: 'accept',
-        onActivate: playSound,
-        onDismiss: stopSound,
+        ...(isNormalActivation
+          ? { onActivate: playSound, onDismiss: stopSound }
+          : {}),
       });
     } catch (error) {
       console.warn(
