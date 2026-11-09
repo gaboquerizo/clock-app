@@ -27,9 +27,39 @@ export function createGlobalAlertService(): GlobalAlertService {
     }
   };
 
-  const advanceQueue = () => {
-    active = queue.shift();
+  const runLifecycle = (
+    alert: ActiveGlobalAlert,
+    phase: 'activation' | 'dismissal',
+  ): Promise<void> => {
+    const callback =
+      phase === 'activation'
+        ? alert.request.onActivate
+        : alert.request.onDismiss;
+
+    try {
+      return Promise.resolve(callback?.()).then(
+        () => undefined,
+        (error: unknown) => {
+          console.warn(`Global alert ${phase} callback failed.`, error);
+        },
+      );
+    } catch (error) {
+      console.warn(`Global alert ${phase} callback failed.`, error);
+      return Promise.resolve();
+    }
+  };
+
+  const setActive = (alert: ActiveGlobalAlert | undefined) => {
+    active = alert;
     notify();
+
+    if (alert !== undefined && active?.id === alert.id && !active.actionPending) {
+      void runLifecycle(alert, 'activation');
+    }
+  };
+
+  const advanceQueue = () => {
+    setActive(queue.shift());
   };
 
   return {
@@ -94,8 +124,7 @@ export function createGlobalAlertService(): GlobalAlertService {
       }
 
       if (active === undefined) {
-        active = alert;
-        notify();
+        setActive(alert);
       } else {
         queue.push(alert);
         notify();
@@ -121,9 +150,15 @@ export function createGlobalAlertService(): GlobalAlertService {
         }
 
         const invalidated = active;
-        active = queue.shift();
+        active = { ...active, actionPending: true };
         notify();
-        await invalidated.request.onDismiss?.();
+
+        await runLifecycle(invalidated, 'dismissal');
+
+        if (active?.id === alertId) {
+          advanceQueue();
+        }
+
         return true;
       }
 
@@ -135,7 +170,7 @@ export function createGlobalAlertService(): GlobalAlertService {
 
       const [invalidated] = queue.splice(queuedIndex, 1);
       notify();
-      await invalidated.request.onDismiss?.();
+      await runLifecycle(invalidated, 'dismissal');
       return true;
     },
 
@@ -148,16 +183,7 @@ export function createGlobalAlertService(): GlobalAlertService {
       active = { ...active, actionPending: true };
       notify();
 
-      try {
-        await dismissed.request.onDismiss?.();
-      } catch (error) {
-        if (active?.id === alertId) {
-          active = { ...active, actionPending: false };
-          notify();
-        }
-
-        throw error;
-      }
+      await runLifecycle(dismissed, 'dismissal');
 
       if (active?.id === alertId) {
         advanceQueue();
@@ -171,7 +197,10 @@ export function createGlobalAlertService(): GlobalAlertService {
         return false;
       }
 
-      const action = active.request.actions.find(({ id }) => id === actionId);
+      const selectedAlert = active;
+      const action = selectedAlert.request.actions.find(
+        ({ id }) => id === actionId,
+      );
 
       if (action === undefined || !isActionEnabled(action)) {
         return false;
@@ -206,7 +235,11 @@ export function createGlobalAlertService(): GlobalAlertService {
       }
 
       if (active?.id === alertId) {
-        advanceQueue();
+        await runLifecycle(selectedAlert, 'dismissal');
+
+        if (active?.id === alertId) {
+          advanceQueue();
+        }
       }
 
       return true;

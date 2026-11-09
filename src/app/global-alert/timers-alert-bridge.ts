@@ -32,7 +32,7 @@ export function connectTimersToGlobalAlerts(
     }
 
     presentedCompletions.add(completionId);
-    const sourceId = `timer:${timer.id}`;
+    const sourceId = `timer:${completionId}`;
     let soundStopped = false;
 
     const stopSound = () => {
@@ -41,7 +41,45 @@ export function connectTimersToGlobalAlerts(
       }
 
       soundStopped = true;
-      audio.requestStop(sourceId);
+
+      try {
+        audio.requestStop(sourceId);
+      } catch (error) {
+        console.warn('The default timer sound could not be stopped.', error);
+      }
+    };
+
+    const playSound = () => {
+      if (soundStopped) {
+        return;
+      }
+
+      let playback: Promise<Awaited<ReturnType<AudioService['play']>>>;
+
+      try {
+        playback = audio.play({
+          sourceId,
+          sourceUrl: bellsSoundUrl,
+          maxDurationMs: MAX_TIMER_SOUND_DURATION_MS,
+          loop: true,
+        });
+      } catch (error) {
+        console.warn('The default timer sound could not be played.', error);
+        return;
+      }
+
+      void playback
+        .then((result) => {
+          if (result.status === 'blocked' || result.status === 'failed') {
+            console.warn(
+              'The default timer sound could not be played.',
+              result.error,
+            );
+          }
+        })
+        .catch((error: unknown) => {
+          console.warn('The default timer sound could not be played.', error);
+        });
     };
 
     const label = timer.label.trim() || 'Temporizador';
@@ -60,6 +98,7 @@ export function connectTimersToGlobalAlerts(
         },
       ],
       primaryActionId: 'accept',
+      onActivate: playSound,
       onDismiss: stopSound,
     });
 
@@ -83,31 +122,5 @@ export function connectTimersToGlobalAlerts(
       );
     }
 
-    let playback: Promise<Awaited<ReturnType<AudioService['play']>>>;
-
-    try {
-      playback = audio.play({
-        sourceId,
-        sourceUrl: bellsSoundUrl,
-        maxDurationMs: MAX_TIMER_SOUND_DURATION_MS,
-        loop: true,
-      });
-    } catch (error) {
-      console.warn('The default timer sound could not be played.', error);
-      return;
-    }
-
-    void playback
-      .then((result) => {
-        if (result.status === 'blocked' || result.status === 'failed') {
-          console.warn(
-            'The default timer sound could not be played.',
-            result.error,
-          );
-        }
-      })
-      .catch((error: unknown) => {
-        console.warn('The default timer sound could not be played.', error);
-      });
   });
 }

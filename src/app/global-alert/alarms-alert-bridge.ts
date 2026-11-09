@@ -37,6 +37,7 @@ export function connectAlarmsToGlobalAlerts(
 
     presentedActivations.add(activationId);
 
+    const sourceId = `alarm:${activationId}`;
     let accepted = false;
 
     const acceptAlarm = () => {
@@ -44,8 +45,46 @@ export function connectAlarmsToGlobalAlerts(
         return;
       }
 
-      audio.requestStop(alarm.id);
       accepted = true;
+
+      try {
+        audio.requestStop(sourceId);
+      } catch (error) {
+        console.warn('The default alarm sound could not be stopped.', error);
+      }
+    };
+
+    const playAlarmSound = () => {
+      if (accepted) {
+        return;
+      }
+
+      let playback: Promise<Awaited<ReturnType<AudioService['play']>>>;
+
+      try {
+        playback = audio.play({
+          sourceId,
+          sourceUrl: bellsSoundUrl,
+          maxDurationMs: MAX_ALARM_SOUND_DURATION_MS,
+          loop: true,
+        });
+      } catch (error) {
+        console.warn('The default alarm sound could not be played.', error);
+        return;
+      }
+
+      void playback
+        .then((result) => {
+          if (result.status === 'blocked' || result.status === 'failed') {
+            console.warn(
+              'The default alarm sound could not be played.',
+              result.error,
+            );
+          }
+        })
+        .catch((error: unknown) => {
+          console.warn('The default alarm sound could not be played.', error);
+        });
     };
 
     alerts.present({
@@ -62,6 +101,7 @@ export function connectAlarmsToGlobalAlerts(
         },
       ],
       primaryActionId: 'accept',
+      onActivate: playAlarmSound,
       onDismiss: acceptAlarm,
     });
 
@@ -82,23 +122,5 @@ export function connectAlarmsToGlobalAlerts(
       console.warn('The browser alarm notification could not be displayed.', error);
     }
 
-    void audio
-      .play({
-        sourceId: alarm.id,
-        sourceUrl: bellsSoundUrl,
-        maxDurationMs: MAX_ALARM_SOUND_DURATION_MS,
-        loop: true,
-      })
-      .then((result) => {
-        if (result.status === 'failed') {
-          console.warn(
-            'The default alarm sound could not be played.',
-            result.error,
-          );
-        }
-      })
-      .catch((error: unknown) => {
-        console.warn('The default alarm sound could not be played.', error);
-      });
   });
 }

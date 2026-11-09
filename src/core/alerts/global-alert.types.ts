@@ -23,6 +23,8 @@ export type GlobalAlertRequest = {
   /** Optional extra action appended after the existing actions. */
   readonly secondaryAction?: GlobalAlertAction;
   readonly primaryActionId: string;
+  /** Runs only when this alert becomes the visible active alert. */
+  readonly onActivate?: () => void | Promise<void>;
   readonly onDismiss?: () => void | Promise<void>;
 };
 
